@@ -101,7 +101,6 @@ body {
 }
 
 
-.signupcard input,
 .signupcard label,
 .signupcard button {
   color: white;
