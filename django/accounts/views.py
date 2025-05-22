@@ -1,21 +1,19 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
-from django.contrib.auth import login as auth_login
-from django.contrib.auth import logout as auth_logout
+from django.contrib.auth import authenticate, login as auth_login
+from django.http import JsonResponse
+import json
 
 # Create your views here.
 def login(request):
-    if request.user.is_authenticated:
-        return redirect('books:index')
-    
     if request.method == "POST":
-        form = AuthenticationForm(request, request.POST)
-        if form.is_vaild():
-            auth_login(request, form.get_user())
-            return redirect('books:index')
-    else:
-        form = AuthenticationForm()
-    context = {
-        'form': form,
-    }
-    return render(request, 'accounts/login.html', context)
+        data = json.loads(request.body)
+        username = data.get("username")
+        password = data.get("password")
+
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            auth_login(request, user)
+            return JsonResponse({"message": "로그인 성공", "username": user.username})
+        else:
+            return JsonResponse({"error": "아이디 또는 비밀번호가 일치하지 않습니다."}, status=400)
+    
+    return JsonResponse({"error": "POST 요청만 허용됩니다."}, status=405)
