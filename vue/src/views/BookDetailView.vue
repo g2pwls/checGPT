@@ -24,10 +24,10 @@
       <section class="author-info-section">
         <h2>작가 정보</h2>
         <div class="author-profile">
-          <img v-if="book.fields.author_photo" :src="book.fields.author_photo" alt="author" class="author-photo" />
+          <img v-if="book.author_photo" :src="book.author_photo" alt="author" class="author-photo" />
           <div>
-            <p class="author-name"><strong>{{ book.fields.author }}</strong></p>
-            <p class="author-desc">{{ book.fields.author_info }}</p>
+            <p class="author-name"><strong>{{ book.author }}</strong></p>
+            <p class="author-desc">{{ book.author_info }}</p>
           </div>
         </div>
       </section>

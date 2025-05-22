@@ -30,9 +30,9 @@
         <div class="book-grid">
           <div
             v-for="book in books"
-            :key="book.pk"
+            :key="book.id"
             class="book-card"
-            @click="goToDetail(book.pk)"
+            @click="goToDetail(book.id)"
             style="cursor: pointer;"
           >
             <img :src="book.cover" alt="book cover" class="book-cover" />
