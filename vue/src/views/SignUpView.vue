@@ -1,5 +1,6 @@
 <template>
-  <form @submit.prevent="submitForm" enctype="multipart/form-data">
+  <div class="signupwrapper">
+  <form @submit.prevent="submitForm" enctype="multipart/form-data" class="signupcard">
     <input v-model="form.username" placeholder="아이디" />
     <input v-model="form.email" placeholder="이메일" type="email" />
     <input v-model="form.password1" placeholder="비밀번호" type="password" />
@@ -13,9 +14,9 @@
         {{ label }}
       </label>
     </div>
-
     <button type="submit">회원가입</button>
   </form>
+</div>
 </template>
 
 <script setup>
@@ -70,6 +71,53 @@ async function submitForm() {
 }
 </script>
 
+<style>
+body {
+    height: 100%;
+    margin: 0;
+    /* overflow: hidden; */
+}
+</style>
+
+
 <style scoped>
+.signupwrapper {
+  height: 100vh;
+  background-color: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.signupcard {
+  background-color: #1e1e1e;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+
+.signupcard input,
+.signupcard label,
+.signupcard button {
+  color: white;
+}
+
+
+.signupcard button {
+  background-color: #333;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.signupcard button:hover {
+  background-color: #444;
+}
 
 </style>
