@@ -26,3 +26,9 @@ class CategoryListView(APIView):
         categories = Category.objects.all()
         serializer = CategorySerializer(categories, many=True)
         return Response(serializer.data)
+    
+class BookDetailView(APIView):
+    def get(self, request, book_id):
+        book = get_object_or_404(Book, pk=book_id)
+        serializer = BookSerializer(book)
+        return Response(serializer.data)
