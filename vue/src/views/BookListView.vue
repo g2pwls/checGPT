@@ -96,7 +96,7 @@
         height: 100vh;
         background-color: #111;
         color: white;
-        font-family: sans-serif;
+        font-family: 'Noto Sans KR', sans-serif;
         gap: 0;
     }
     
@@ -145,14 +145,13 @@
     /* 본문 */
     .main-content {
         flex: 1;
-        padding: 24px 24px 24px 10px;
+        padding: 100px 24px 24px 10px;
         overflow-y: auto;
         background-color: #000;
-        margin-top: 100px;
         display: flex;
         /* justify-content: center */
         /* overflow: hidden; */
-
+        
     }
     
     /* 검색창 */
@@ -225,4 +224,3 @@
     }
 
 </style>
-  
