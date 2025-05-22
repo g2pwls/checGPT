@@ -21,7 +21,10 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import axios from 'axios'
+
+const router = useRouter()
 
 const form = ref({
   username: '',
@@ -64,6 +67,7 @@ async function submitForm() {
       },
     })
     alert('회원가입 성공')
+    router.push('/login')
   } catch (err) {
     console.error(err)
     alert('회원가입 실패')
