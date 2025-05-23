@@ -25,7 +25,7 @@ const router = useRouter()
 
 const login = function () {
     axios({
-        url: "http://127.0.0.1:8000/accounts/login/",
+        url: "http://127.0.0.1:8000/accounts/api/login/",
         method: "POST",
         data: {
             username: username.value,
@@ -33,7 +33,7 @@ const login = function () {
         }
     }).then((response) => {
         console.log(response)
-        router.push({name:'home'})
+        router.push('/mypage')
     }).catch((error) => {
         console.log(error)
     })

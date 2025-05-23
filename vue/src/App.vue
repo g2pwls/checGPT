@@ -1,8 +1,9 @@
 <template>
   <header>
     <nav>
-      <RouterLink :to="{name: 'SignUpView'}">Sign Up</RouterLink> | 
-      <RouterLink :to="{name: 'MyPageView'}">My Page</RouterLink>
+      <RouterLink :to="{name: 'SignUpView'}">회원가입</RouterLink> | 
+      <RouterLink :to="{name: 'MyPageView'}">My Page</RouterLink> | 
+      <RouterLink :to="{name: 'LoginView'}">로그인</RouterLink>
     </nav>
       
   </header>

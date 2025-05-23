@@ -1,12 +1,14 @@
 <template>
   <div class="signupwrapper">
   <form @submit.prevent="submitForm" enctype="multipart/form-data" class="signupcard">
-    <input v-model="form.username" placeholder="아이디" />
-    <input v-model="form.email" placeholder="이메일" type="email" />
-    <input v-model="form.password1" placeholder="비밀번호" type="password" />
-    <input v-model="form.password2" placeholder="비밀번호 확인" type="password" />
-    <input v-model="form.full_name" placeholder="이름" />
-    <input @change="onFileChange" type="file" />
+    아이디<input v-model="form.username" placeholder="ID" />
+    <p v-if="errors.username" style="color: red;">{{ errors.username[0] }}</p>
+    이메일<input v-model="form.email" placeholder="pro@ssafy.com" type="email" />
+    비밀번호<input v-model="form.password1" placeholder="password" type="password" />
+    <p v-if="errors.password1" style="color: red;">{{ errors.password1[0] }}</p>
+    비밀번호 확인<input v-model="form.password2" placeholder="비밀번호와 일치해야 합니다" type="password" />
+    이름<input v-model="form.name" placeholder="이름" />
+    프로필 이미지<input @change="onFileChange" type="file" />
 
     <div>
       <label v-for="(label, value) in genreChoices" :key="value">
@@ -31,7 +33,7 @@ const form = ref({
   email: '',
   password1: '',
   password2: '',
-  full_name: '',
+  name: '',
   profile_image: null,
   interests: [],
 })
@@ -45,6 +47,8 @@ const genreChoices = {
   '취미': '취미/실용',
   '어린이': '어린이/청소년',
 }
+
+const errors = ref({})
 
 function onFileChange(event) {
   form.value.profile_image = event.target.files[0]
@@ -61,15 +65,16 @@ async function submitForm() {
   }
 
   try {
-    const res = await axios.post('http://localhost:8000/api/register/', formData, {
+    const res = await axios.post('http://localhost:8000/api/signup/', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     })
+    console.log('회원가입 성공:', res.data)
     alert('회원가입 성공')
     router.push('/login')
   } catch (err) {
-    console.error(err)
+    console.error('회원가입 실패:', err.response?.data)
     alert('회원가입 실패')
   }
 }
@@ -95,6 +100,8 @@ body {
 
 .signupcard {
   background-color: #1e1e1e;
+  color: white;
+  font-weight: bold;
   padding: 2rem;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
@@ -104,23 +111,52 @@ body {
   gap: 1rem;
 }
 
-
-.signupcard label,
-.signupcard button {
+/* 입력창 스타일 - 로그인 input과 동일 */
+.signupcard input[type="text"],
+.signupcard input[type="email"],
+.signupcard input[type="password"],
+.signupcard input[type="file"],
+.signupcard input:not([type="checkbox"]) {
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  background-color: #2a2a2a;
   color: white;
+  font-size: 14px;
+  outline: none;
 }
 
+/* 체크박스 라벨 스타일 */
+.signupcard label {
+  color: white;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  user-select: none;
+}
 
-.signupcard button {
-  background-color: #333;
-  border: none;
-  padding: 0.5rem;
-  border-radius: 4px;
+/* 체크박스 자체는 기본 스타일 유지 (필요시 커스터마이징 가능) */
+.signupcard input[type="checkbox"] {
   cursor: pointer;
 }
 
+/* 버튼 스타일 - 로그인 submit 스타일과 비슷하게 */
+.signupcard button {
+  padding: 10px;
+  background-color: #f44;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
 .signupcard button:hover {
-  background-color: #444;
+  background-color: #d33;
 }
 
 </style>
