@@ -65,7 +65,7 @@ async function submitForm() {
   }
 
   try {
-    const res = await axios.post('http://localhost:8000/api/signup/', formData, {
+    const res = await axios.post('http://localhost:8000/accounts/api/signup/', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
