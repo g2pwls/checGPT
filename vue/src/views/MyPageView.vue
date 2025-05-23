@@ -1,7 +1,10 @@
 <template>
   <div>
     <section>
-      <img :src="user.profile_image" alt="프로필 사진" />
+      <img
+        :src="user.profile_image ? `http://127.0.0.1:8000${user.profile_image}` : '/default-profile.png'"
+        alt="프로필 사진"
+      />
       <h2>{{ user.name }}</h2>
     </section>
   </div>
