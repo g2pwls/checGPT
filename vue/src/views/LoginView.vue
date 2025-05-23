@@ -1,56 +1,82 @@
 <template>
-    <div class="login-wrapper">
-        <form @submit.prevent="login" class="login-card">
-            <div>
-                <label for="username">아이디</label>
-                <input type="text" id="usrename" v-model="username">
-            </div>
-            <div>
-                <label for="password">비밀번호</label>
-                <input type="password" id="password" v-model="password">
-            </div>
-            <input type="submit" value="로그인">
-        </form>
-    </div>
+  <div class="login-wrapper">
+    <form @submit.prevent="login" class="login-card">
+      <div>
+        <label for="username">아이디</label>
+        <input type="text" id="username" v-model="username">
+      </div>
+      <div>
+        <label for="password">비밀번호</label>
+        <input type="password" id="password" v-model="password">
+      </div>
+      <input type="submit" value="로그인">
+      <button class="signup-button" @click="goSignup">회원가입</button>
+    </form>
+  </div>
 </template>
 
 <script setup>
-import {ref} from 'vue'
 import axios from 'axios'
-import {useRouter} from 'vue-router'
+import { useRouter } from 'vue-router'
+import { ref } from 'vue'
+import { useUserStore } from '@/stores/user'
 
-const username = ref("")
-const password = ref("")
 const router = useRouter()
+const userStore = useUserStore()
 
-const login = function () {
-    axios({
-        url: "http://127.0.0.1:8000/accounts/login/",
-        method: "POST",
-        data: {
-            username: username.value,
-            password: password.value,
-        }
-    }).then((response) => {
-        console.log(response)
-        router.push({name:'home'})
-    }).catch((error) => {
-        console.log(error)
+const username = ref('')
+const password = ref('')
+
+const login = async () => {
+  try {
+    const response = await axios.post('http://127.0.0.1:8000/accounts/api/login/', {
+      username: username.value,
+      password: password.value
     })
+
+    const token = response.data.token
+    const name = response.data.name
+
+    localStorage.setItem('token', token)
+    localStorage.setItem('name', name)
+    axios.defaults.headers.common['Authorization'] = `Token ${token}`
+
+    userStore.login(name)
+    alert(`${name}님, 환영합니다!`)
+    router.push('/mypage')
+  } catch (error) {
+    console.error(error)
+    alert('로그인에 실패했습니다.')
+  }
+}
+
+const goSignup = () => {
+  router.push('/signup')
 }
 </script>
 
+
 <style scoped>
-/* 화면 전체 중앙 정렬용 wrapper */
+.signup-button {
+  width: 320px;
+  padding: 10px;
+  background-color: #444;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
 .login-wrapper {
-  height: 92vh;
-  background-color: #f9f6f2;
+  height: 100vh;
+  background-color: #000;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-/* 로그인 카드 UI */
 .login-card {
   background-color: #1e1e1e;
   padding: 2rem;
@@ -62,20 +88,17 @@ const login = function () {
   gap: 1rem;
 }
 
-/* 입력 그룹 */
 .login-card div {
   display: flex;
   flex-direction: column;
 }
 
-/* 라벨 */
 label {
   color: white;
   font-weight: bold;
   margin-bottom: 0.5rem;
 }
 
-/* 입력창 */
 input[type="text"],
 input[type="password"] {
   padding: 10px;
@@ -87,7 +110,6 @@ input[type="password"] {
   outline: none;
 }
 
-/* 로그인 버튼 */
 input[type="submit"] {
   padding: 10px;
   background-color: #f44;

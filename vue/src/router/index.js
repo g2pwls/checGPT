@@ -3,6 +3,8 @@ import HomeView from '../views/HomeView.vue'
 import LoginView from '../views/LoginView.vue'
 import BookListView from '../views/BookListView.vue'
 import BookDetailView from '../views/BookDetailView.vue'
+import MyPageView from '@/views/MyPageView.vue'
+import SignUpView from '@/views/SignUpView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -18,6 +20,11 @@ const router = createRouter({
       component: LoginView,
     },
     {
+      path: '/signup',
+      name: 'SignUpView',
+      component: SignUpView,
+    },
+    {
       path: '/booklist',
       name: 'BookList',
       component: BookListView,
@@ -26,6 +33,11 @@ const router = createRouter({
       path: '/books/:bookId',
       name: 'BookDetail',
       component: BookDetailView,
+    },
+    {
+      path: '/mypage',
+      name: 'MyPageView',
+      component: MyPageView,
     },
   ],
   scrollBehavior(to, from, savedPosition) {
