@@ -2,9 +2,9 @@
   <section class="thread-detail">
     <div class="cover-img"></div>
 
-    <div class="content">
-      <div class="book-box">
-        <img :src="thread.book.cover_image" />
+    <div class="content" v-if="thread">
+      <div class="book-box" v-if="thread.book">
+        <img :src="thread.book.cover" />
         <div>
           <p class="book-title">{{ thread.book.title }}</p>
           <p>{{ thread.book.published_date }}</p>
@@ -21,14 +21,14 @@
         </div>
       </div>
 
-      <div class="author-box">
-        <img :src="authorProfile.image" class="avatar" />
-        <span>{{ thread.author.username }}</span>
+      <div class="author-box" v-if="thread && thread.writer">
+        <img :src="writerProfile.image" class="avatar" />
+        <span>{{ thread.writer.username }}</span>
         <button @click="followUser">+ 팔로우</button>
         <button @click="goToProfile">프로필가기</button>
       </div>
 
-      <div class="comments">
+      <div class="comments" v-if="thread && thread.comments">
         <h3>댓글 ({{ thread.comments.length }})</h3>
         <input v-model="newComment" placeholder="댓글을 입력하세요..." />
         <button @click="postComment">댓글 작성</button>
@@ -50,16 +50,23 @@ export default {
     return {
       thread: null,
       newComment: '',
-      authorProfile: {},
+      writerProfile: {},
     };
   },
   async mounted() {
-    const id = this.$route.params.id;
-    const res = await axios.get(`/api/threads/${id}/`);
-    this.thread = res.data;
+    try {
+      const id = this.$route.params.threadId;
+      const res = await axios.get(`/api/threads/${id}/`);
+      this.thread = res.data;
+      console.log('thread data:', this.thread);
 
-    const profileRes = await axios.get(`/api/users/${this.thread.author.id}/profile/`);
-    this.authorProfile = profileRes.data;
+      if (this.thread.writer && this.thread.writer.id) {
+        const profileRes = await axios.get(`/api/users/${this.thread.writer.id}/profile/`);
+        this.writerProfile = profileRes.data;
+      }
+    } catch (err) {
+      console.error('스레드 또는 프로필 데이터를 불러오는 중 오류 발생:', err);
+    }
   },
   methods: {
     async toggleLike() {
@@ -78,18 +85,25 @@ export default {
       this.$router.push(`/threads/${this.thread.id}/edit`);
     },
     async deleteThread() {
-      await axios.delete(`/api/threads/${this.thread.id}/`);
-      this.$router.push('/');
-    },
-    followUser() {
-      axios.post(`/api/follow/${this.thread.author.id}/`);
+  try {
+    console.log('DELETE URL:', `/api/threads/${this.thread.id}/`);
+    await axios.delete(`/api/threads/${this.thread.id}/`);
+    this.$router.push('/');
+  } catch (error) {
+    console.error('삭제 실패:', error);
+  }
+},
+
+    async followUser() {
+      await axios.post(`/api/follow/${this.thread.writer.id}/`);
     },
     goToProfile() {
-      this.$router.push(`/users/${this.thread.author.id}/profile`);
+      this.$router.push(`/users/${this.thread.writer.id}/profile`);
     }
   }
 }
 </script>
+
 
 <style scoped>
 .thread-detail {

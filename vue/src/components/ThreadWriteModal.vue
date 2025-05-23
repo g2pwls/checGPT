@@ -34,24 +34,38 @@ export default {
   },
   methods: {
     async submitThread() {
-      const thread = {
-        title: this.title,
-        content: this.content,
-        read_date: this.readDate,   // readDate → read_date로 변경 (Django 필드 이름에 맞게)
-        author: this.book.author,             // 고정 값, 또는 로그인 유저에서 가져오도록 추후 개선
-        book: this.book.id          // bookId → book (Django 필드 이름에 맞게)
-      }
+  const token = localStorage.getItem('token')
+  if (!token) {
+    alert('로그인이 필요합니다.')
+    return
+  }
 
-      try {
-        const response = await axios.post('http://localhost:8000/api/threads/', thread)
-        alert('작성 완료!')
-        this.$emit('submit-thread', response.data)  // 필요시 부모에게 전파
-        this.$emit('close')
-      } catch (error) {
-        console.error('스레드 저장 실패:', error)
-        alert('작성 중 오류가 발생했습니다.')
+  const thread = {
+    title: this.title,
+    content: this.content,
+    read_date: this.readDate,
+    book: this.book.id
+  }
+
+  try {
+    const response = await axios.post(
+      'http://localhost:8000/api/threads/',
+      thread,
+      {
+        headers: {
+          Authorization: `Token ${token}`  // 🔐 토큰 설정
+        }
       }
-    }
+    )
+    alert('작성 완료!')
+    this.$emit('submit-thread', response.data)
+    this.$emit('close')
+  } catch (error) {
+    console.error('스레드 저장 실패:', error)
+    alert('작성 중 오류가 발생했습니다.')
+  }
+}
+
   }
 }
 </script>

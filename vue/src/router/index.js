@@ -5,6 +5,7 @@ import BookListView from '../views/BookListView.vue'
 import BookDetailView from '../views/BookDetailView.vue'
 import MyPageView from '@/views/MyPageView.vue'
 import SignUpView from '@/views/SignUpView.vue'
+import ThreadDetail from '@/components/ThreadDetail.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -38,6 +39,12 @@ const router = createRouter({
       path: '/mypage',
       name: 'MyPageView',
       component: MyPageView,
+    },
+    {
+      path: '/threads/:threadId',
+      name: 'ThreadDetail',
+      component: ThreadDetail,
+      props: true,  // URL 파라미터를 props로 받기 위함
     },
   ],
   scrollBehavior(to, from, savedPosition) {

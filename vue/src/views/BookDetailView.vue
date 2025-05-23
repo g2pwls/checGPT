@@ -31,20 +31,26 @@
 
       <!-- 관련 스레드 -->
       <section class="thread-info-section">
-  <h2>관련 스레드</h2>
-  <div v-if="threads.length === 0">등록된 스레드가 없습니다.</div>
-  <div v-else>
-    <div v-for="thread in threads" :key="thread.id" class="thread-box">
-      <div class="thread-text">
-        <p class="title"><strong>{{ thread.title }}</strong></p>
-        <p class="subtitle">- by {{ thread.author }}</p>
-      </div>
-      <div class="meta">
-        ❤️ {{ thread.likes }} ・ 💬 {{ thread.comments }}
-      </div>
-    </div>
-  </div>
-</section>
+        <h2>관련 스레드</h2>
+        <div v-if="threads.length === 0">등록된 스레드가 없습니다.</div>
+        <div v-else>
+          <div
+            v-for="thread in threads"
+            :key="thread.id"
+            class="thread-box"
+            @click="goToThreadDetail(thread.id)"
+            style="cursor: pointer;"
+          >
+            <div class="thread-text">
+              <p class="title"><strong>{{ thread.title }}</strong></p>
+              <p class="subtitle">- by {{ thread.writer.username }}</p>
+            </div>
+            <div class="meta">
+              ❤️ {{ thread.likes_count }} ・ 💬 {{ thread.comments_count }}
+            </div>
+          </div>
+        </div>
+      </section>
 
 
 
@@ -159,6 +165,9 @@ export default {
     },
     goToBookDetail(bookId) {
       this.$router.push(`/books/${bookId}`)
+    },
+    goToThreadDetail(threadId) {
+      this.$router.push(`/threads/${threadId}`)
     },
     getUserLocation() {
       if (navigator.geolocation) {
