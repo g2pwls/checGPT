@@ -19,6 +19,6 @@ class Book(models.Model):
     author_photo = models.URLField()
     customer_review_rank = models.IntegerField()
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="books")
-
+    audio_file = models.FileField(upload_to='audio/', null=True, blank=True) 
     def __str__(self):
         return self.title
