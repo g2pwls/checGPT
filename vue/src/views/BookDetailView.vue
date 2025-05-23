@@ -1,9 +1,8 @@
 <template>
   <div class="book-detail-wrapper">
-    <!-- 제목과 쓰레드 작성 버튼 -->
     <header class="header">
       <h1 class="book-title">{{ book.title }}</h1>
-      <button class="thread-btn" @click="goToThreadWrite">+</button>
+      <button class="thread-btn" @click="isThreadModalOpen = true">스레드 작성하기</button>
     </header>
 
     <div class="backback">
@@ -21,10 +20,7 @@
               <span class="audio-title">AI가 들려주는</span>
               <span class="audio-booktitle">{{ book.title }}</span>
             </div>
-            <audio controls :src="`http://127.0.0.1:8000${book.audio_file}`">
-              <source :src="book.audio_file" type="audio/mpeg" />
-              브라우저가 audio 태그를 지원하지 않습니다.
-            </audio>
+            <audio controls :src="`http://127.0.0.1:8000${book.audio_file}`" />
           </div>
           <div class="sangsae"><strong>출판사:</strong> {{ book.publisher }}</div>
           <div class="sangsae"><strong>출간일:</strong> {{ book.pub_date }}</div>
@@ -36,6 +32,7 @@
       <!-- 관련 스레드 -->
       <section class="thread-info-section">
         <h2>관련 스레드</h2>
+        <!-- 관련 스레드 표시 예정 -->
       </section>
 
       <!-- 추천 도서 + 지도 -->
@@ -58,15 +55,7 @@
 
         <div class="map-section" v-if="mapUrl">
           <h3>현재 위치 주변 도서관</h3>
-          <iframe
-            :src="mapUrl"
-            width="100%"
-            height="300"
-            style="border:0;"
-            allowfullscreen=""
-            loading="lazy"
-            referrerpolicy="no-referrer-when-downgrade">
-          </iframe>
+          <iframe :src="mapUrl" width="100%" height="300" style="border:0;" loading="lazy"></iframe>
         </div>
       </section>
 
@@ -82,20 +71,30 @@
         </div>
       </section>
     </div>
+
+    <!-- 🟡 ThreadWriteModal 컴포넌트 -->
+    <ThreadWriteModal
+      v-if="isThreadModalOpen"
+      :book="book"
+      @close="isThreadModalOpen = false"
+    />
   </div>
 </template>
 
 <script>
 import axios from 'axios'
+import ThreadWriteModal from '@/components/ThreadWriteModal.vue'
 
 export default {
+  components: { ThreadWriteModal },
   data() {
     return {
       book: {},
       isGenerating: false,
       recommendations: [],
       userLocation: null,
-      mapUrl: ''
+      mapUrl: '',
+      isThreadModalOpen: false
     }
   },
   async created() {
@@ -104,16 +103,9 @@ export default {
   mounted() {
     this.getUserLocation()
   },
-  watch: {
-    '$route.params.bookId'(newId, oldId) {
-      if (newId !== oldId) {
-        this.loadBookData()
-      }
-    }
-  },
   methods: {
     async loadBookData() {
-      const bookId = Number(this.$route.params.bookId)
+      const bookId = this.$route.params.bookId
       try {
         const response = await axios.get(`http://127.0.0.1:8000/api/books/${bookId}/`)
         this.book = response.data
@@ -123,9 +115,6 @@ export default {
       } catch (error) {
         console.error('책 정보를 불러오는 데 실패했습니다:', error)
       }
-    },
-    goToThreadWrite() {
-      this.$router.push(`/threads/${this.book.id}/write`)
     },
     async generateAudio() {
       if (this.isGenerating) return
@@ -148,10 +137,7 @@ export default {
         navigator.geolocation.getCurrentPosition((pos) => {
           const lat = pos.coords.latitude
           const lng = pos.coords.longitude
-          this.userLocation = { lat, lng }
           this.mapUrl = `https://www.google.com/maps?q=도서관&ll=${lat},${lng}&z=15&output=embed`
-        }, () => {
-          console.warn('위치 정보를 가져올 수 없습니다.')
         })
       }
     }
@@ -189,10 +175,10 @@ export default {
   background-color: #f44;
   border: none;
   color: white;
-  font-size: 1.8rem;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
+  font-size: 14px;
+  width: 120px;
+  height: 30px;
+  border-radius: 5px;
   cursor: pointer;
   line-height: 1;
   transition: background-color 0.3s ease;
