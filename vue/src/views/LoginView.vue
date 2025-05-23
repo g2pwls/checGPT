@@ -3,7 +3,7 @@
         <form @submit.prevent="login" class="login-card">
             <div>
                 <label for="username">아이디</label>
-                <input type="text" id="usrename" v-model="username">
+                <input type="text" id="username" v-model="username">
             </div>
             <div>
                 <label for="password">비밀번호</label>
@@ -15,33 +15,34 @@
 </template>
 
 <script setup>
-import {ref} from 'vue'
+import { ref } from 'vue'
 import axios from 'axios'
-import {useRouter} from 'vue-router'
+import { useRouter } from 'vue-router'
 
 const username = ref("")
 const password = ref("")
 const router = useRouter()
 
-const login = function () {
-    axios({
-        url: "http://127.0.0.1:8000/accounts/api/login/",
-        method: "POST",
-        data: {
-            username: username.value,
-            password: password.value,
-        }
-    }).then((response) => {
-        console.log(response)
-        router.push('/mypage')
-    }).catch((error) => {
-        console.log(error)
+const login = async () => {
+  try {
+    const response = await axios.post('http://127.0.0.1:8000/accounts/api/login/', {
+      username: username.value,
+      password: password.value,
+    }, {
+      withCredentials: true  // 세션 쿠키 저장
     })
+
+    console.log('로그인 성공:', response.data)
+    router.push('/mypage')
+  } catch (error) {
+    console.error('로그인 실패:', error.response.data)
+  }
 }
+
+
 </script>
 
 <style scoped>
-/* 화면 전체 중앙 정렬용 wrapper */
 .login-wrapper {
   height: 100vh;
   background-color: #000;
@@ -50,7 +51,6 @@ const login = function () {
   align-items: center;
 }
 
-/* 로그인 카드 UI */
 .login-card {
   background-color: #1e1e1e;
   padding: 2rem;
@@ -62,20 +62,17 @@ const login = function () {
   gap: 1rem;
 }
 
-/* 입력 그룹 */
 .login-card div {
   display: flex;
   flex-direction: column;
 }
 
-/* 라벨 */
 label {
   color: white;
   font-weight: bold;
   margin-bottom: 0.5rem;
 }
 
-/* 입력창 */
 input[type="text"],
 input[type="password"] {
   padding: 10px;
@@ -87,7 +84,6 @@ input[type="password"] {
   outline: none;
 }
 
-/* 로그인 버튼 */
 input[type="submit"] {
   padding: 10px;
   background-color: #f44;

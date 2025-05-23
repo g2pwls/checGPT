@@ -20,6 +20,7 @@ class LoginView(APIView):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.validated_data['user']
+            login(request, user)  # ✅ 세션 생성
             return Response({
                 'message': '로그인 성공',
                 'username': user.username,
@@ -27,6 +28,7 @@ class LoginView(APIView):
             })
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
         
 
 class MyPageView(APIView):
