@@ -93,7 +93,7 @@
     /* 전체 컨테이너 */
     .container {
         display: flex;
-        height: 100vh;
+        height: 92vh;
         background-color: #111;
         color: white;
         font-family: 'Noto Sans KR', sans-serif;
@@ -104,7 +104,7 @@
     .sidebar {
         width: 20%;
         padding: 20px 10px 20px 20px;
-        background-color: #000;
+        background-color: #f9f6f2;
 
         display: flex;            /* flex 컨테이너 */
         flex-direction: column;   /* 세로 정렬 */
@@ -130,7 +130,8 @@
         font-size: 15px;
         margin-bottom: 15px;
         cursor: pointer;
-        color: #ccc;
+        color: #715a41;
+        font-weight: bold;
     }
     
     .sidebar li:hover {
@@ -147,7 +148,7 @@
         flex: 1;
         padding: 100px 24px 24px 10px;
         overflow-y: auto;
-        background-color: #000;
+        background-color: #f9f6f2;
         display: flex;
         /* justify-content: center */
         /* overflow: hidden; */
@@ -159,14 +160,19 @@
         padding: 10px;
         /* width: 100%; */
         margin-bottom: 24px;
-        border: 1px solid #666;
-        background-color: #222;
+        border: 1px solid #856f55;
+        background-color: #715a41;
         color: white;
         height: 20px;
         width: 200px;
         border-radius: 3px;
         font-size: 16px;
     }
+    .search-input::placeholder {
+      color: #ffffff; /* 연두색 또는 원하는 색상으로 바꾸세요 */
+      opacity: 1;      /* 불투명하게 */
+    }
+
     
     /* 책 카드 그리드 */
     .book-grid {
@@ -182,13 +188,15 @@
     /* 개별 책 카드 */
     .book-card {
     display: flex;
-    background-color: #222;
+    background-color: #D4CCC3;
     padding: 16px;
     border-radius: 8px;
     gap: 16px; /* 이미지와 텍스트 사이 간격 */
     align-items: flex-start; /* 이미지와 텍스트 상단 정렬 */
     height: 200px;
     overflow: hidden;
+    color: #715a41;
+
     }
 
     .book-cover {
@@ -216,6 +224,8 @@
     font-size: 0.85rem;
     color: #aaa;
     margin-bottom: 4px;
+    color: #715a41;
+
     }
 
     .book-subtitle {

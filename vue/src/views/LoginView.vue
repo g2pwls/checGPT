@@ -43,8 +43,8 @@ const login = function () {
 <style scoped>
 /* 화면 전체 중앙 정렬용 wrapper */
 .login-wrapper {
-  height: 100vh;
-  background-color: #000;
+  height: 92vh;
+  background-color: #f9f6f2;
   display: flex;
   justify-content: center;
   align-items: center;
