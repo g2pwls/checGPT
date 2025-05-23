@@ -15,28 +15,25 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
 
-const username = ref("")
-const password = ref("")
 const router = useRouter()
 
-const login = async () => {
-  try {
-    const response = await axios.post('http://127.0.0.1:8000/accounts/api/login/', {
-      username: username.value,
-      password: password.value,
-    }, {
-      withCredentials: true  // 세션 쿠키 저장
-    })
+const login = function () {
+  axios.post('http://127.0.0.1:8000/accounts/api/login/', {
+    username: username.value,
+    password: password.value
+  }).then(response => {
+    const token = response.data.token
+    localStorage.setItem('token', token)
+    axios.defaults.headers.common['Authorization'] = `Token ${token}`
 
-    console.log('로그인 성공:', response.data)
+    alert(`${response.data.name}님, 환영합니다!`)
     router.push('/mypage')
-  } catch (error) {
-    console.error('로그인 실패:', error.response.data)
-  }
+  }).catch(error => {
+    console.log(error)
+  })
 }
 
 

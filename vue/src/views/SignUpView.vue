@@ -58,25 +58,28 @@ async function submitForm() {
   const formData = new FormData()
   for (const key in form.value) {
     if (key === 'interests') {
-      form.value.interests.forEach(i => formData.append('interests', i))
+      form.value.interests.forEach(i => formData.append('interests[]', i))
     } else {
       formData.append(key, form.value[key])
     }
   }
-
+  console.log(formData)
   try {
-    const res = await axios.post('http://localhost:8000/accounts/api/signup/', formData, {
+    const res = await axios.post('http://127.0.0.1:8000/accounts/api/signup/', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     })
     console.log('회원가입 성공:', res.data)
     alert('회원가입 성공')
+    console.log("라우터 이동 전")
     router.push('/login')
+    console.log("라우터 이동 시도함")
   } catch (err) {
-    console.error('회원가입 실패:', err.response?.data)
-    alert('회원가입 실패')
-  }
+  console.error('회원가입 실패:', err.response?.data)
+  alert('회원가입 실패: ' + JSON.stringify(err.response?.data))
+}
+  
 }
 </script>
 
