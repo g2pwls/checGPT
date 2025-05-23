@@ -3,7 +3,7 @@
         <form @submit.prevent="login" class="login-card">
             <div>
                 <label for="username">아이디</label>
-                <input type="text" id="usrename" v-model="username">
+                <input type="text" id="username" v-model="username">
             </div>
             <div>
                 <label for="password">비밀번호</label>
@@ -15,28 +15,25 @@
 </template>
 
 <script setup>
-import {ref} from 'vue'
 import axios from 'axios'
-import {useRouter} from 'vue-router'
+import { useRouter } from 'vue-router'
 
-const username = ref("")
-const password = ref("")
 const router = useRouter()
 
 const login = function () {
-    axios({
-        url: "http://127.0.0.1:8000/accounts/api/login/",
-        method: "POST",
-        data: {
-            username: username.value,
-            password: password.value,
-        }
-    }).then((response) => {
-        console.log(response)
-        router.push('/mypage')
-    }).catch((error) => {
-        console.log(error)
-    })
+  axios.post('http://127.0.0.1:8000/accounts/api/login/', {
+    username: username.value,
+    password: password.value
+  }).then(response => {
+    const token = response.data.token
+    localStorage.setItem('token', token)
+    axios.defaults.headers.common['Authorization'] = `Token ${token}`
+
+    alert(`${response.data.name}님, 환영합니다!`)
+    router.push('/mypage')
+  }).catch(error => {
+    console.log(error)
+  })
 }
 </script>
 
