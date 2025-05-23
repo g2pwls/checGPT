@@ -29,9 +29,9 @@ User = get_user_model()
 class Thread(models.Model):
     title = models.CharField(max_length=255)
     content = models.TextField()
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='threads')
+    writer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='threads')
     read_date = models.DateField(null=True, blank=True)
-    likes = models.IntegerField(default=0)
+    likes = models.ManyToManyField(User, related_name='liked_threads', blank=True)
     book = models.ForeignKey('Book', on_delete=models.CASCADE, related_name='threads')  # Book 모델과 연결
 
     def __str__(self):

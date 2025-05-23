@@ -64,7 +64,7 @@ class ThreadListCreateView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+        serializer.save(writer=self.request.user)
 
 class ThreadDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Thread.objects.all()

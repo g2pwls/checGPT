@@ -28,13 +28,20 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ThreadSerializer(serializers.ModelSerializer):
-    author = UserSerializer(read_only=True)
+    writer = UserSerializer(read_only=True)
     comments = CommentSerializer(many=True, read_only=True)
     likes_count = serializers.SerializerMethodField()
+    comments_count = serializers.SerializerMethodField()
+
 
     class Meta:
         model = Thread
-        fields = '__all__'
+        fields = [
+            'id', 'title', 'content', 'writer', 'book',
+            'comments', 'likes_count', 'comments_count',
+        ]
 
     def get_likes_count(self, obj):
         return obj.likes.count()
+    def get_comments_count(self, obj):
+        return obj.comments.count()
