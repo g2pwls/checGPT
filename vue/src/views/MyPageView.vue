@@ -15,8 +15,11 @@ const user = ref({})
 
 onMounted(async () => {
   try {
-    const res = await axios.get('http://127.0.0.1:8000/accounts/mypage/', {
-      withCredentials: true,  // ✅ 세션 쿠키 자동 전송
+    const token = localStorage.getItem('token')
+    const res = await axios.get('http://127.0.0.1:8000/accounts/api/mypage/', {
+      headers: {
+        Authorization: `Token ${token}`  // 토큰 헤더 필수
+      }
     })
     console.log("백엔드에서 받은 데이터:", res.data)
     user.value = res.data
@@ -24,6 +27,7 @@ onMounted(async () => {
     console.error("마이페이지 요청 실패:", error)
   }
 })
+
 
 </script>
 
