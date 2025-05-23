@@ -1,9 +1,17 @@
 # accounts/views.py
-from rest_framework.views import APIView
+
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
-from rest_framework import status
-from .serializers import SignUpSerializer, LoginSerializer, MyPageSerializer
+from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
+from .serializers import SignUpSerializer, MyPageSerializer
+from django.http import JsonResponse
+from django.views.decorators.csrf import ensure_csrf_cookie
+
+@ensure_csrf_cookie
+def get_csrf_token(request):
+    return JsonResponse({'detail': 'CSRF cookie set'})
 
 
 class SignUpView(APIView):
@@ -11,29 +19,22 @@ class SignUpView(APIView):
         serializer = SignUpSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response({"message": "회원가입 성공"}, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": "회원가입 성공"}, status=201)
+        return Response(serializer.errors, status=400)
 
-
-class LoginView(APIView):
-    def post(self, request):
-        serializer = LoginSerializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.validated_data['user']
-            return Response({
-                'message': '로그인 성공',
-                'username': user.username,
-                'name': user.name,
-            })
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+class CustomAuthToken(ObtainAuthToken):
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        token = Token.objects.get(key=response.data['token'])
+        return Response({
+            'token': token.key,
+            'username': token.user.username,
+            'name': token.user.name,
+        })
 
 class MyPageView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        user = request.user
-        serializer = MyPageSerializer(user)
+        serializer = MyPageSerializer(request.user)
         return Response(serializer.data)
-
