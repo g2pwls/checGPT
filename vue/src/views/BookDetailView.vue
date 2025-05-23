@@ -31,9 +31,22 @@
 
       <!-- 관련 스레드 -->
       <section class="thread-info-section">
-        <h2>관련 스레드</h2>
-        <!-- 관련 스레드 표시 예정 -->
-      </section>
+  <h2>관련 스레드</h2>
+  <div v-if="threads.length === 0">등록된 스레드가 없습니다.</div>
+  <div v-else>
+    <div v-for="thread in threads" :key="thread.id" class="thread-box">
+      <div class="thread-text">
+        <p class="title"><strong>{{ thread.title }}</strong></p>
+        <p class="subtitle">- by {{ thread.author }}</p>
+      </div>
+      <div class="meta">
+        ❤️ {{ thread.likes }} ・ 💬 {{ thread.comments }}
+      </div>
+    </div>
+  </div>
+</section>
+
+
 
       <!-- 추천 도서 + 지도 -->
       <section class="recommend-map-wrapper" v-if="recommendations.length || mapUrl">
@@ -77,6 +90,7 @@
       v-if="isThreadModalOpen"
       :book="book"
       @close="isThreadModalOpen = false"
+      @submit-thread="addThread"
     />
   </div>
 </template>
@@ -90,6 +104,7 @@ export default {
   data() {
     return {
       book: {},
+      threads: [], // ✅ 추가
       isGenerating: false,
       recommendations: [],
       userLocation: null,
@@ -99,6 +114,7 @@ export default {
   },
   async created() {
     this.loadBookData()
+    await this.loadThreads() // ✅ 스레드 불러오기
   },
   mounted() {
     this.getUserLocation()
@@ -128,6 +144,18 @@ export default {
       } finally {
         this.isGenerating = false
       }
+    },
+    async loadThreads() {
+      try {
+        const bookId = this.$route.params.bookId
+        const res = await axios.get(`http://127.0.0.1:8000/api/threads/?book=${bookId}`)
+        this.threads = res.data
+      } catch (error) {
+        console.error('스레드 불러오기 실패:', error)
+      }
+    },
+    addThread(newThread) {
+      this.threads.unshift(newThread)  // 새 스레드를 목록 맨 위에 추가
     },
     goToBookDetail(bookId) {
       this.$router.push(`/books/${bookId}`)
@@ -186,6 +214,43 @@ export default {
 .thread-btn:hover {
   background-color: #d33;
 }
+
+.thread-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
+  border: 1px solid #cecece;
+  border-radius: 5px;
+  padding: 12px 16px;
+  margin-bottom: 10px;
+  height: 30px;
+}
+
+.thread-text {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.thread-text .title {
+  font-size: 15px;
+  margin: 0;
+  color: #222;
+}
+
+.thread-text .subtitle {
+  font-size: 13px;
+  color: #888;
+}
+
+.meta {
+  font-size: 13px;
+  color: #999;
+  white-space: nowrap;
+}
+
+
 
 .book-info-section {
   display: flex;

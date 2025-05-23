@@ -76,3 +76,11 @@ from .serializers import BookSerializer
 def book_detail(request, id):
     book = Book.objects.get(pk=id)
     return Response(BookSerializer(book).data)
+
+from rest_framework import generics
+from .models import Thread
+from .serializers import ThreadSerializer
+
+class ThreadListCreateView(generics.ListCreateAPIView):
+    queryset = Thread.objects.all().order_by('-id')
+    serializer_class = ThreadSerializer
