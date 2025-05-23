@@ -66,3 +66,13 @@ def recommended_books(request, book_id):
         return Response(serializer.data)
     except Book.DoesNotExist:
         return Response({'error': 'Book not found'}, status=404)
+
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from .models import Book
+from .serializers import BookSerializer
+
+@api_view(['GET'])
+def book_detail(request, id):
+    book = Book.objects.get(pk=id)
+    return Response(BookSerializer(book).data)
