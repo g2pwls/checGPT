@@ -51,3 +51,11 @@ class LoginSerializer(serializers.Serializer):
         
         data['user'] = user
         return data
+    
+
+class MyPageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('username', 'name', 'profile_image', 'interests')
+
+

@@ -53,7 +53,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-# 개발 중엔 이렇게 설정 (배포 시 주의)
+
 CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'finalbooks.urls'
