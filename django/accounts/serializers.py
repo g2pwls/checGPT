@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import User
-from django.contrib.auth import authenticate
+# from django.contrib.auth import authenticate
 from django.contrib.auth import get_user_model
 
 class SignUpSerializer(serializers.ModelSerializer):
@@ -34,23 +34,25 @@ class SignUpSerializer(serializers.ModelSerializer):
 
 User = get_user_model()
 
+# LoginSerializer는 현재 직접 쓰이지 않고 있음
+# → 실제 로그인은 CustomAuthToken에서 ObtainAuthToken 기반으로 작동하므로 주석 처리
 
-class LoginSerializer(serializers.Serializer):
-    username = serializers.CharField()
-    password = serializers.CharField(write_only=True)
+# class LoginSerializer(serializers.Serializer):
+#     username = serializers.CharField()
+#     password = serializers.CharField(write_only=True)
 
-    def validate(self, data):
-        username = data.get('username')
-        password = data.get('password')
+#     def validate(self, data):
+#         username = data.get('username')
+#         password = data.get('password')
 
-        user = authenticate(username=username, password=password)
-        if user is None:
-            raise serializers.ValidationError("아이디 또는 비밀번호가 올바르지 않습니다.")
-        if not user.is_active:
-            raise serializers.ValidationError("비활성화된 계정입니다.")
+#         user = authenticate(username=username, password=password)
+#         if user is None:
+#             raise serializers.ValidationError("아이디 또는 비밀번호가 올바르지 않습니다.")
+#         if not user.is_active:
+#             raise serializers.ValidationError("비활성화된 계정입니다.")
         
-        data['user'] = user
-        return data
+#         data['user'] = user
+#         return data
     
 class MyPageSerializer(serializers.ModelSerializer):
     class Meta:

@@ -5,6 +5,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
+from django.contrib.auth import authenticate
 from .serializers import SignUpSerializer, MyPageSerializer
 from django.http import JsonResponse
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -24,12 +25,18 @@ class SignUpView(APIView):
 
 class CustomAuthToken(ObtainAuthToken):
     def post(self, request, *args, **kwargs):
-        response = super().post(request, *args, **kwargs)
-        token = Token.objects.get(key=response.data['token'])
+        username = request.data.get('username')
+        password = request.data.get('password')
+
+        user = authenticate(username=username, password=password)
+        if user is None:
+            return Response({'non_field_errors': ['Unable to log in with provided credentials.']}, status=400)
+        
+        token, created = Token.objects.get_or_create(user=user)
         return Response({
             'token': token.key,
-            'username': token.user.username,
-            'name': token.user.name,
+            'username': user.username,
+            'name': user.name,
         })
 
 class MyPageView(APIView):
