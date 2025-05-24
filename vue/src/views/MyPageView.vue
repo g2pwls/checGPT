@@ -8,6 +8,8 @@
         <span>팔로잉: {{ user.following_count }}</span>
         <span>팔로워: {{ user.follower_count }}</span>
         <span>작성 쓰레드: {{ user.thread_count }}</span>
+        <br>
+        <span>관심 장르: {{ user.interests }}</span>
       </div>
     </section>
   </div>
@@ -31,11 +33,7 @@
   <!-- ✅ 탭에 따라 아래 내용만 바뀜 -->
   <div class="tab-content">
     <BooksTab v-if="currentTab === 'books'" :user="user" />
-    <!-- <ThreadsTab v-if="currentTab === 'threads'" :userId="user.id || 0" /> -->
-     <div v-if="currentTab === 'threads'">
-      <ThreadsTab v-if="user.id" :userId="user.id" />
-      <p v-else>사용자 정보를 불러오는 중입니다...</p>
-    </div>
+    <ThreadsTab v-if="currentTab === 'threads'" :userId="user.id" />
   </div>
 </template>
 

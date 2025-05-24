@@ -58,12 +58,15 @@ async function submitForm() {
   const formData = new FormData()
   for (const key in form.value) {
     if (key === 'interests') {
-      form.value.interests.forEach(i => formData.append('interests[]', i))
+      form.value.interests.forEach(i => formData.append('interests', i))
     } else {
       formData.append(key, form.value[key])
     }
   }
-  console.log(formData)
+  for (const pair of formData.entries()) {
+    console.log(pair[0], ':', pair[1])
+  }
+  
   try {
     const res = await axios.post('http://127.0.0.1:8000/accounts/api/signup/', formData, {
       headers: {

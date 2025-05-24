@@ -12,30 +12,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import axios from 'axios'
 
-const props = defineProps({
-  userId: Number
-})
-
-const threads = ref([])
-
-console.log('userId:', props.userId)
-onMounted(async () => {
-  try {
-    const token = localStorage.getItem('token')
-    const res = await axios.get(`http://127.0.0.1:8000/threads/api/user/${props.userId}/`, {
-      headers: {
-        Authorization: `Token ${token}`
-      }
-    })
-    threads.value = res.data
-  } catch (err) {
-    console.error('스레드 불러오기 실패:', err)
-    console.log(props.userId)
-  }
-})
 </script>
 
 <style scoped>
