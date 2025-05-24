@@ -33,7 +33,7 @@
   <!-- ✅ 탭에 따라 아래 내용만 바뀜 -->
   <div class="tab-content">
     <BooksTab v-if="currentTab === 'books'" :user="user" />
-    <ThreadsTab v-if="currentTab === 'threads'" :userId="user.id" />
+    <ThreadsTab v-if="currentTab === 'threads'" :user="user" />
   </div>
 </template>
 

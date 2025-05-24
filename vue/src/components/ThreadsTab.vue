@@ -1,8 +1,7 @@
 <template>
   <div>
-    <h3>애 아 느</h3>
-    <p v-if="threads.length === 0">아직 작성한 스레드가 없습니다.</p>
-    <ul v-else>
+    <h3>스레드가 뜰 예정</h3>
+    <ul>
       <li v-for="thread in threads" :key="thread.id">
         <strong>{{ thread.title }}</strong> <br />
         {{ thread.content }}

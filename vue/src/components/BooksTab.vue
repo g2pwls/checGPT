@@ -1,28 +1,25 @@
 <template>
   <div>
-    <h3>관심 장르</h3>
+    <h3>책 목록이 여기 뜰 예정</h3>
     <ul>
-      <li v-for="genre in user.interest_genres" :key="genre">
-        {{ genre }}
-      </li>
-    </ul>
-    <h3>찜한 책</h3>
-    <ul>
-      <li v-for="book in user.liked_books" :key="book.id">
-        {{ book.title }} - {{ book.author }}
+      <li v-for="thread in threads" :key="thread.id">
+        <strong>{{ thread.title }}</strong> <br />
+        {{ thread.content }}
       </li>
     </ul>
   </div>
 </template>
 
 <script setup>
-defineProps({
-  user: Object
-})
 </script>
 
 <style scoped>
 h3 {
-  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+li {
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.5rem;
 }
 </style>
