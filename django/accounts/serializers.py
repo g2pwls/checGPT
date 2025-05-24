@@ -6,6 +6,9 @@ from django.contrib.auth import get_user_model
 class SignUpSerializer(serializers.ModelSerializer):
     password1 = serializers.CharField(write_only=True)
     password2 = serializers.CharField(write_only=True)
+    interests = serializers.ListField(
+        child=serializers.CharField(), required=False, allow_empty=True
+    )
 
     class Meta:
         model = User
@@ -27,6 +30,13 @@ class SignUpSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data.pop('password2')
         password = validated_data.pop('password1')
+
+        interests = validated_data.pop('interests', '')
+        if isinstance(interests, list):
+            validated_data['interests'] = ', '.join(interests)
+        else:
+            validated_data['interests'] = interests
+            
         user = User(**validated_data)
         user.set_password(password)
         user.save()
