@@ -88,3 +88,12 @@ def thread_like(request, pk):
         liked = True
 
     return Response({'liked': liked, 'likes_count': thread.likes.count()})
+
+
+# views.py
+
+@api_view(['GET'])
+def user_threads(request, user_id):
+    threads = Thread.objects.filter(writer__id=user_id).order_by('-id')
+    serializer = ThreadSerializer(threads, many=True)
+    return Response(serializer.data)

@@ -14,6 +14,7 @@ urlpatterns = [
     path('threads/', ThreadListCreateView.as_view(), name='thread-list-create'),
     path('threads/<int:pk>/', ThreadDetailView.as_view()),
     path('threads/<int:pk>/like/', thread_like),
+    path('threads/user/<int:user_id>/', views.user_threads, name='user-threads'),
 ]
 
 if settings.DEBUG:
