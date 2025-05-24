@@ -5,7 +5,7 @@ import BookListView from '../views/BookListView.vue'
 import BookDetailView from '../views/BookDetailView.vue'
 import MyPageView from '@/views/MyPageView.vue'
 import SignUpView from '@/views/SignUpView.vue'
-import ThreadDetail from '@/components/ThreadDetail.vue'
+import ThreadDetail from '@/views/ThreadDetail.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

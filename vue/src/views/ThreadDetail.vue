@@ -1,10 +1,8 @@
 <template>
   <section class="thread-detail">
-    <div class="cover-img"></div>
 
     <div class="content" v-if="thread">
       <div class="book-box" v-if="thread.book">
-        <img :src="thread.book.cover" />
         <div>
           <p class="book-title">{{ thread.book.title }}</p>
           <p>{{ thread.book.published_date }}</p>
@@ -54,20 +52,23 @@ export default {
     };
   },
   async mounted() {
-    try {
-      const id = this.$route.params.threadId;
-      const res = await axios.get(`/api/threads/${id}/`);
-      this.thread = res.data;
-      console.log('thread data:', this.thread);
+  try {
+    const id = this.$route.params.threadId;
+    console.log('불러올 threadId:', id);
 
-      if (this.thread.writer && this.thread.writer.id) {
-        const profileRes = await axios.get(`/api/users/${this.thread.writer.id}/profile/`);
-        this.writerProfile = profileRes.data;
-      }
-    } catch (err) {
-      console.error('스레드 또는 프로필 데이터를 불러오는 중 오류 발생:', err);
+    const res = await axios.get(`http://127.0.0.1:8000/api/threads/${id}/`);
+    this.thread = res.data;
+    console.log('받은 thread:', this.thread);
+
+    if (this.thread.writer && this.thread.writer.id) {
+      const profileRes = await axios.get(`http://127.0.0.1:8000/api/users/${this.thread.writer.id}/profile/`);
+      this.writerProfile = profileRes.data;
     }
-  },
+  } catch (err) {
+    console.error('스레드 불러오기 실패:', err); // ✅ 여기가 뜨면 API 실패
+  }
+}
+,
   methods: {
     async toggleLike() {
       await axios.post(`/api/threads/${this.thread.id}/like/`);
@@ -107,7 +108,7 @@ export default {
 
 <style scoped>
 .thread-detail {
-  background: #111;
+  background: #000000;
   color: white;
   padding: 20px;
 }
