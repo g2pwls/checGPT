@@ -44,7 +44,7 @@ export default {
     title: this.title,
     content: this.content,
     read_date: this.readDate,
-    book: this.book.id
+    book_id: this.book.id
   }
 
   try {

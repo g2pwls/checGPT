@@ -88,3 +88,17 @@ def thread_like(request, pk):
         liked = True
 
     return Response({'liked': liked, 'likes_count': thread.likes.count()})
+
+# views.py
+from rest_framework import generics
+from .models import Comment
+from .serializers import CommentSerializer
+from rest_framework.permissions import IsAuthenticated
+
+class CommentCreateView(generics.CreateAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
