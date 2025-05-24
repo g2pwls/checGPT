@@ -69,6 +69,14 @@ onMounted(async () => {
   margin-bottom: 1rem;
 }
 
+.profile-section img {
+  width: 200px;       /* 원하는 크기로 조절 */
+  height: 200px;      /* 정사각형으로 만들어야 동그랗게 됨 */
+  object-fit: cover;  /* 이미지 비율 유지하며 꽉 채우기 */
+  border-radius: 50%; /* 둥글게 만들기 */
+  /* border: 2px solid #ccc; 선택 사항: 테두리 추가 */
+}
+
 .tabs {
   display: flex;
   gap: 2rem;
