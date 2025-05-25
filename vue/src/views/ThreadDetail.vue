@@ -3,12 +3,14 @@
     <div class="main-container" v-if="thread">
       <!-- 책 정보 -->
       <div class="left-box" v-if="thread.book">
-        <img :src="thread.book.cover" alt="책 이미지" class="book-image" />
-        <div class="book-info">
-          <div class="book-title">{{ thread.book.title }}</div>
-          <div class="book-subtitle">{{ thread.book.subTitle }}</div>
-          <div class="book-pub_date">{{ thread.book.pub_date }}</div>
-        </div>
+        <RouterLink :to="{ name: 'BookDetail', params: { bookId: thread.book.id }}">
+          <img :src="thread.book.cover" alt="책 이미지" class="book-image" />
+          <div class="book-info">
+            <div class="book-title">{{ thread.book.title }}</div>
+            <div class="book-subtitle">{{ thread.book.subTitle }}</div>
+            <div class="book-pub_date">{{ thread.book.pub_date }}</div>
+          </div>
+        </RouterLink>
       </div>
 
       <!-- 스레드 본문 및 조작 -->
@@ -467,11 +469,25 @@ export default {
   border-radius: 10px;
   width: 260px;
 }
+
+.left-box a {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.left-box a:hover {
+  transform: scale(1.02);
+}
+
 .book-image {
   width: 100%;
   border-radius: 6px;
   margin-bottom: 10px;
 }
+
 .book-title {
   font-size: 20px;
   font-weight: bold;
