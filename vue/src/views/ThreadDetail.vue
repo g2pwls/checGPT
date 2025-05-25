@@ -24,9 +24,14 @@
         <!-- 댓글 -->
         <div class="comments" v-if="thread.comments">
           <h3>댓글 ({{ thread.comments_count }})</h3>
-          <input v-model="newComment" placeholder="댓글을 입력하세요..." />
+          <input 
+            v-model="newComment" 
+            placeholder="댓글을 입력하세요..." 
+            id="comment-input"
+            name="comment-input"
+          />
           <div class="actions-comment">
-          <button @click="postComment">댓글 작성</button>
+            <button @click="postComment">댓글 작성</button>
           </div>
 
           <div v-for="comment in thread.comments" :key="comment.id" class="comment">
@@ -40,12 +45,21 @@
     <!-- 프로필 정보 -->
     <div class="profile-box" v-if="thread && thread.writer">
       <img 
-        :src="thread.writer.profile_image ? `http://127.0.0.1:8000${thread.writer.profile_image}` : '/default-profile.png'" 
+        :src="thread.writer.profile_image ? `http://127.0.0.1:8000${thread.writer.profile_image}` : '/default-profile.png'"
         class="avatar" 
         alt="프로필 이미지"
       />
       <span class="username">{{ thread.writer.username }}</span>
-      <button @click="followUser">+ 팔로우</button>
+      <button 
+        v-if="!isOwnThread" 
+        @click="toggleFollow" 
+        class="follow-btn" 
+        :class="{ 'following': isFollowing }"
+        id="follow-button"
+        name="follow-button"
+      >
+        {{ isFollowing ? '팔로우 취소' : '+ 팔로우' }}
+      </button>
       <button @click="goToProfile">프로필가기</button>
     </div>
   </section>
@@ -59,7 +73,14 @@ export default {
     return {
       thread: null,
       newComment: '',
+      isFollowing: false,
     };
+  },
+  computed: {
+    isOwnThread() {
+      const currentUserId = localStorage.getItem('userId')
+      return this.thread?.writer?.id === currentUserId
+    }
   },
   async mounted() {
     try {
@@ -73,6 +94,26 @@ export default {
         }
       });
       this.thread = res.data;
+
+      // Check follow status and get counts
+      if (this.thread.writer) {
+        try {
+          // Get user profile to get follower/following counts and follow status
+          const profileRes = await axios.get(
+            `http://127.0.0.1:8000/api/users/${this.thread.writer.id}/profile/`,
+            {
+              headers: {
+                Authorization: `Token ${token}`
+              }
+            }
+          );
+          this.isFollowing = profileRes.data.is_following;
+          this.thread.writer.followers_count = profileRes.data.followers_count;
+          this.thread.writer.following_count = profileRes.data.following_count;
+        } catch (error) {
+          console.error('Profile data check failed:', error);
+        }
+      }
     } catch (err) {
       console.error('데이터 로딩 실패:', err);
     }
@@ -109,8 +150,63 @@ export default {
 ,
 
 
-    async followUser() {
-      await axios.post(`/api/follow/${this.thread.writer.id}/`);
+    async toggleFollow() {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          alert('로그인이 필요합니다.');
+          return;
+        }
+
+        // Check if trying to follow self
+        const currentUserId = localStorage.getItem('userId');
+        if (currentUserId === this.thread.writer.id.toString()) {
+          alert('자기 자신을 팔로우할 수 없습니다.');
+          return;
+        }
+
+        // Update UI optimistically
+        this.isFollowing = !this.isFollowing;
+        const oldFollowersCount = this.thread.writer.followers_count;
+        this.thread.writer.followers_count = this.isFollowing 
+          ? oldFollowersCount + 1 
+          : oldFollowersCount - 1;
+
+        const response = await axios.post(
+          `http://127.0.0.1:8000/accounts/api/follow/${this.thread.writer.id}/`,
+          {},
+          {
+            headers: {
+              Authorization: `Token ${token}`
+            }
+          }
+        );
+        
+        // Update with actual server response
+        this.isFollowing = response.data.is_following;
+        if (this.thread.writer) {
+          this.thread.writer.followers_count = response.data.followers_count;
+          this.thread.writer.following_count = response.data.following_count;
+          // Force Vue to recognize the change
+          this.thread = { ...this.thread };
+        }
+      } catch (error) {
+        // Revert optimistic update on error
+        this.isFollowing = !this.isFollowing;
+        this.thread.writer.followers_count = this.isFollowing 
+          ? this.thread.writer.followers_count - 1 
+          : this.thread.writer.followers_count + 1;
+
+        console.error("팔로우 토글 실패:", error);
+        if (error.response) {
+          console.error("Error response:", error.response.data);
+          if (error.response.status === 400) {
+            alert(error.response.data.error || '팔로우할 수 없습니다.');
+          } else if (error.response.status === 401) {
+            alert('로그인이 필요합니다.');
+          }
+        }
+      }
     },
     goToProfile() {
       this.$router.push(`/users/${this.thread.writer.id}/profile`);
@@ -252,5 +348,16 @@ export default {
 }
 .username {
   font-weight: bold;
+}
+.follow-btn {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 15px;
+  cursor: pointer;
+}
+.following {
+  background: #333;
 }
 </style>

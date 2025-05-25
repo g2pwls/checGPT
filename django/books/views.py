@@ -176,11 +176,25 @@ class UserThreadsView(APIView):
     
     def get(self, request, user_id=None):
         try:
+            # Log the incoming request details
+            print(f"Request user: {request.user.id}")
+            print(f"Target user_id: {user_id}")
+            
             # Determine which user's threads to fetch
             target_user_id = user_id if user_id else request.user.id
+            print(f"Using target_user_id: {target_user_id}")
             
-            # Get threads
-            threads = Thread.objects.filter(writer_id=target_user_id).order_by('-created_at')
+            # Check if the user exists
+            User = get_user_model()
+            if not User.objects.filter(id=target_user_id).exists():
+                return Response(
+                    {'error': f'User with id {target_user_id} does not exist'}, 
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            # Get threads - ordering by id instead of created_at since that's the field we have
+            threads = Thread.objects.filter(writer_id=target_user_id).select_related('book', 'writer').order_by('-id')
+            print(f"Found {threads.count()} threads")
             
             serializer = ThreadSerializer(threads, many=True)
             return Response(serializer.data)

@@ -12,11 +12,11 @@
       <!-- Follower/Following counts -->
       <div class="follow-stats">
         <div class="stat-item">
-          <span class="stat-value">{{ user.followers_count }}</span>
+          <span class="stat-value">{{ user.followers_count || 0 }}</span>
           <span class="stat-label">팔로워</span>
         </div>
         <div class="stat-item">
-          <span class="stat-value">{{ user.following_count }}</span>
+          <span class="stat-value">{{ user.following_count || 0 }}</span>
           <span class="stat-label">팔로잉</span>
         </div>
       </div>
@@ -36,18 +36,18 @@
     <!-- Tabs -->
     <div class="tabs">
       <button 
-        @click="activeTab = 'threads'" 
-        :class="{ active: activeTab === 'threads' }"
-        class="tab-btn"
-      >
-        {{ user.name }}님의 스레드
-      </button>
-      <button 
         @click="activeTab = 'library'" 
         :class="{ active: activeTab === 'library' }"
         class="tab-btn"
       >
         {{ user.name }}님의 서재
+      </button>
+      <button 
+        @click="activeTab = 'threads'" 
+        :class="{ active: activeTab === 'threads' }"
+        class="tab-btn"
+      >
+        {{ user.name }}님의 스레드
       </button>
     </div>
 
@@ -62,6 +62,7 @@
           <p class="thread-meta">
             ❤️ {{ thread.likes_count }} ・ 💬 {{ thread.comments_count }}
           </p>
+          <p class="thread-book">📚 {{ thread.book.title }}</p>
         </div>
       </div>
     </section>
@@ -93,7 +94,7 @@ const user = ref({})
 const threads = ref([])
 const library = ref([])
 const isFollowing = ref(false)
-const activeTab = ref('threads')
+const activeTab = ref('library')
 
 // Check if this is the user's own profile
 const isOwnProfile = computed(() => {
@@ -114,7 +115,7 @@ onMounted(async () => {
     
     // If no userId in params, it's the user's own profile
     const endpoint = userId 
-      ? `http://127.0.0.1:8000/api/users/${userId}/profile/`
+      ? `http://127.0.0.1:8000/accounts/api/users/${userId}/profile/`
       : 'http://127.0.0.1:8000/accounts/api/mypage/'
     
     console.log('Loading profile from:', endpoint)
@@ -132,26 +133,12 @@ onMounted(async () => {
     if (user.value.id) {
       console.log('User ID found:', user.value.id)
       try {
-        // Load user's threads
-        try {
-          const threadsRes = await axios.get(`http://127.0.0.1:8000/api/users/${user.value.id}/threads/`, {
-            headers: {
-              Authorization: `Token ${token}`
-            }
-          })
-          threads.value = threadsRes.data
-        } catch (error) {
-          console.error('Error loading threads:', error)
-          threads.value = [] // Reset threads on error
-        }
-
-        // Load user's library
+        // Load user's library first since it's the default tab
         const libraryEndpoint = userId
           ? `http://127.0.0.1:8000/api/users/${userId}/library/`
           : 'http://127.0.0.1:8000/api/users/library/'
         
         console.log('Loading library from:', libraryEndpoint)
-        console.log('Using token:', token)
         
         try {
           const libraryRes = await axios.get(libraryEndpoint, {
@@ -160,7 +147,6 @@ onMounted(async () => {
             }
           })
           console.log('Library response:', libraryRes)
-          console.log('Library data:', libraryRes.data)
           library.value = libraryRes.data
         } catch (error) {
           console.error('Library loading error:', error)
@@ -169,6 +155,35 @@ onMounted(async () => {
             console.error('Error status:', error.response.status)
           }
           library.value = [] // Reset library on error
+        }
+
+        // Load user's threads
+        try {
+          const threadsEndpoint = userId
+            ? `http://127.0.0.1:8000/api/users/${userId}/threads/`
+            : `http://127.0.0.1:8000/api/users/${user.value.id}/threads/`
+          
+          console.log('Loading threads from:', threadsEndpoint)
+          const threadsRes = await axios.get(threadsEndpoint, {
+            headers: {
+              Authorization: `Token ${token}`
+            }
+          })
+          console.log('Threads response:', threadsRes.data)
+          threads.value = threadsRes.data
+        } catch (error) {
+          console.error('Error loading threads:', error)
+          if (error.response) {
+            console.error('Error response:', error.response.data)
+            console.error('Error status:', error.response.status)
+            if (error.response.status === 404) {
+              threads.value = [] // User not found
+            } else if (error.response.status === 500) {
+              console.error('Server error loading threads:', error.response.data)
+              threads.value = [] // Server error
+            }
+          }
+          threads.value = [] // Reset threads on error
         }
       } catch (error) {
         console.error('Error loading user data:', error)
@@ -185,6 +200,17 @@ onMounted(async () => {
       console.error("Error response:", error.response.data)
       if (error.response.status === 401) {
         router.push('/login')
+      } else if (error.response.status === 404) {
+        // Handle user not found
+        user.value = {}
+        threads.value = []
+        library.value = []
+      } else if (error.response.status === 500) {
+        console.error('Server error loading profile:', error.response.data)
+        // Handle server error
+        user.value = {}
+        threads.value = []
+        library.value = []
       }
     }
   }
@@ -197,8 +223,20 @@ const editProfile = () => {
 const toggleFollow = async () => {
   try {
     const token = localStorage.getItem('token')
+    if (!token) {
+      alert('로그인이 필요합니다.')
+      return
+    }
+
+    // Check if trying to follow self
+    const currentUserId = localStorage.getItem('userId')
+    if (currentUserId === route.params.userId) {
+      alert('자기 자신을 팔로우할 수 없습니다.')
+      return
+    }
+
     const response = await axios.post(
-      `http://127.0.0.1:8000/api/follow/${route.params.userId}/`,
+      `http://127.0.0.1:8000/accounts/api/follow/${route.params.userId}/`,
       {},
       {
         headers: {
@@ -206,10 +244,24 @@ const toggleFollow = async () => {
         }
       }
     )
+    
+    // Update follow status and counts
     isFollowing.value = response.data.is_following
     user.value.followers_count = response.data.followers_count
+    user.value.following_count = response.data.following_count
+    
+    // Force Vue to recognize the changes
+    user.value = { ...user.value }
   } catch (error) {
     console.error("팔로우 토글 실패:", error)
+    if (error.response) {
+      console.error("Error response:", error.response.data)
+      if (error.response.status === 400) {
+        alert(error.response.data.error || '팔로우할 수 없습니다.')
+      } else if (error.response.status === 401) {
+        alert('로그인이 필요합니다.')
+      }
+    }
   }
 }
 
@@ -342,6 +394,12 @@ const goToBook = (bookId) => {
 }
 
 .thread-meta {
+  color: #666;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+.thread-book {
   color: #666;
   font-size: 14px;
   margin-top: 5px;

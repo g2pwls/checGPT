@@ -73,7 +73,8 @@ class FollowView(APIView):
 
         return Response({
             'is_following': is_following,
-            'followers_count': user_to_follow.get_followers_count()
+            'followers_count': user_to_follow.get_followers_count(),
+            'following_count': request.user.get_following_count()
         })
 
 class FollowStatusView(APIView):
