@@ -8,7 +8,7 @@ from .models import Book, Category, Thread, UserLibrary
 from .serializers import BookSerializer, CategorySerializer, ThreadSerializer, UserLibrarySerializer
 from django.contrib.auth import get_user_model
 from rest_framework.exceptions import PermissionDenied
-
+from .utils import generate_audio_for_book
 # ----------------------
 # 📚 Book 관련 API
 # ----------------------
@@ -60,6 +60,14 @@ class CategoryListView(APIView):
 # 💬 Thread 관련 API
 # ----------------------
 
+class IsOwnerOrReadOnly(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        # 읽기 권한은 모든 요청에 허용
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        # 쓰기 권한은 스레드 작성자에게만 허용
+        return obj.writer == request.user
+
 class ThreadListCreateView(generics.ListCreateAPIView):
     serializer_class = ThreadSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -76,7 +84,7 @@ class ThreadListCreateView(generics.ListCreateAPIView):
 class ThreadDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Thread.objects.all()
     serializer_class = ThreadSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
     def get_object(self):
         return get_object_or_404(Thread, id=self.kwargs['pk'])
