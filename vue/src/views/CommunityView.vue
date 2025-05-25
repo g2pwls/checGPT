@@ -1,6 +1,32 @@
 <template>
   <div class="community-container">
     <h1 class="community-title">커뮤니티</h1>
+    
+    <!-- 정렬 탭 추가 -->
+    <div class="sort-tabs">
+      <button 
+        @click="sortType = 'latest'" 
+        :class="{ active: sortType === 'latest' }"
+        class="sort-tab"
+      >
+        최신순
+      </button>
+      <button 
+        @click="sortType = 'likes'" 
+        :class="{ active: sortType === 'likes' }"
+        class="sort-tab"
+      >
+        좋아요순
+      </button>
+      <button 
+        @click="sortType = 'comments'" 
+        :class="{ active: sortType === 'comments' }"
+        class="sort-tab"
+      >
+        댓글순
+      </button>
+    </div>
+
     <div class="threads-container">
       <div v-for="thread in threads" :key="thread.id" class="thread-card" @click="goToThread(thread.id)">
         <div class="thread-header">
@@ -34,10 +60,16 @@ export default {
   data() {
     return {
       threads: [],
+      sortType: 'latest', // 기본값은 최신순
     }
   },
   async created() {
     await this.loadThreads();
+  },
+  watch: {
+    sortType() {
+      this.loadThreads();
+    }
   },
   methods: {
     async loadThreads() {
@@ -46,6 +78,9 @@ export default {
         const response = await axios.get('http://127.0.0.1:8000/api/threads/', {
           headers: {
             Authorization: `Token ${token}`
+          },
+          params: {
+            sort_by: this.sortType
           }
         });
         this.threads = response.data;
@@ -60,6 +95,7 @@ export default {
       return content.length > 100 ? content.slice(0, 100) + '...' : content;
     },
     formatDate(dateString) {
+      if (!dateString) return '';
       const date = new Date(dateString);
       const year = date.getFullYear();
       const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -72,7 +108,7 @@ export default {
 
 <style scoped>
 .community-container {
-  max-width: 900px;
+  max-width: 1200px;
   margin: 40px auto;
   padding: 0 20px;
 }
@@ -84,19 +120,52 @@ export default {
   color: #333;
 }
 
-.threads-container {
+/* 정렬 탭 스타일 */
+.sort-tabs {
   display: flex;
-  flex-direction: column;
-  gap: 20px;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.sort-tab {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 20px;
+  background-color: #f5f5f5;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+}
+
+.sort-tab:hover {
+  background-color: #e0e0e0;
+}
+
+.sort-tab.active {
+  background-color: #3498db;
+  color: white;
+}
+
+.threads-container {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 15px;
+  margin-top: 20px;
 }
 
 .thread-card {
   background: white;
+  border: 1px solid #ddd;
   border-radius: 10px;
-  padding: 20px;
+  padding: 15px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   cursor: pointer;
   transition: transform 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  height: 250px;
+  min-width: 200px;
 }
 
 .thread-card:hover {
@@ -105,8 +174,8 @@ export default {
 
 .thread-header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 10px;
   margin-bottom: 15px;
 }
 
@@ -117,46 +186,69 @@ export default {
 }
 
 .book-cover {
-  width: 40px;
-  height: 60px;
+  width: 35px;
+  height: 50px;
   object-fit: cover;
   border-radius: 4px;
 }
 
 .book-title {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: #666;
+  flex: 1;
+  word-break: break-word;
 }
 
 .thread-meta {
   display: flex;
-  gap: 15px;
+  justify-content: space-between;
   color: #888;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
 }
 
 .thread-title {
-  font-size: 1.2rem;
-  margin-bottom: 10px;
+  font-size: 1.1rem;
+  margin-bottom: 8px;
   color: #333;
+  word-break: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .thread-content {
+  font-size: 0.9rem;
   color: #666;
-  line-height: 1.5;
-  margin-bottom: 15px;
+  line-height: 1.4;
+  margin-bottom: 12px;
+  flex-grow: 1;
+  word-break: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .thread-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 15px;
+  margin-top: auto;
+  border-top: 1px solid #eee;
+  padding-top: 10px;
 }
 
 .interactions {
   display: flex;
-  gap: 15px;
+  gap: 12px;
   color: #888;
+  font-size: 0.9rem;
+}
+
+.author {
+  font-weight: bold;
+  color: #333;
+}
+
+.date {
+  color: #999;
 }
 </style> 

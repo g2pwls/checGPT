@@ -1,14 +1,15 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, generics, permissions
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from django.shortcuts import get_object_or_404
-from django.db.models import Q
-from .models import Book, Category, Thread, UserLibrary
-from .serializers import BookSerializer, CategorySerializer, ThreadSerializer, UserLibrarySerializer
+from django.db.models import Q, Count
+from .models import Book, Category, Thread, UserLibrary, Comment
+from .serializers import BookSerializer, CategorySerializer, ThreadSerializer, UserLibrarySerializer, CommentSerializer
 from django.contrib.auth import get_user_model
 from rest_framework.exceptions import PermissionDenied
 from .utils import generate_audio_for_book
+from rest_framework.permissions import IsAuthenticated
 # ----------------------
 # 📚 Book 관련 API
 # ----------------------
@@ -74,9 +75,23 @@ class ThreadListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         book_id = self.kwargs.get('book_id')
+        sort_by = self.request.query_params.get('sort_by', 'latest')  # 기본값은 최신순
+        
         if book_id:
-            return Thread.objects.filter(book_id=book_id).order_by('-id')
-        return Thread.objects.all().order_by('-id')
+            queryset = Thread.objects.filter(book_id=book_id)
+        else:
+            queryset = Thread.objects.all()
+
+        # 정렬 적용
+        if sort_by == 'likes':
+            # 좋아요 수로 정렬
+            return queryset.annotate(likes_count=Count('likes')).order_by('-likes_count')
+        elif sort_by == 'comments':
+            # 댓글 수로 정렬
+            return queryset.annotate(comments_count=Count('comments')).order_by('-comments_count')
+        else:  # 'latest'
+            # 최신순 정렬 (ID 기준)
+            return queryset.order_by('-id')
 
     def perform_create(self, serializer):
         serializer.save(writer=self.request.user)
@@ -236,3 +251,22 @@ class UserThreadsView(APIView):
                 {'error': str(e)}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def comment_like(request, pk):
+    comment = get_object_or_404(Comment, pk=pk)
+    user = request.user
+
+    if comment.likes.filter(id=user.id).exists():
+        comment.likes.remove(user)
+        liked = False
+    else:
+        comment.likes.add(user)
+        liked = True
+
+    serializer = CommentSerializer(comment, context={'request': request})
+    return Response({
+        'is_liked': liked,
+        'likes_count': comment.likes.count()
+    })

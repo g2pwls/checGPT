@@ -23,6 +23,7 @@ urlpatterns = [
     path('comments/', CommentCreateView.as_view(), name='comment-create'),
     path('comments/<int:pk>/', CommentUpdateView.as_view(), name='comment-update'),
     path('comments/<int:pk>/delete/', CommentDeleteView.as_view(), name='comment-delete'),
+    path('comments/<int:pk>/like/', views.comment_like, name='comment-like'),
     # Library endpoints
     path('books/<int:book_id>/add-to-library/', add_to_library),
     path('books/<int:book_id>/remove-from-library/', remove_from_library),

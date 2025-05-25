@@ -52,14 +52,21 @@
 <script setup>
   import { ref, watch, onMounted } from "vue";
   import axios from "axios";
-  import { useRouter } from "vue-router";
+  import { useRouter, useRoute } from "vue-router";
   
   const books = ref([]);
   const categories = ref([]);
   const searchQuery = ref("");
   const selectedCategory = ref(0);
   const router = useRouter();
+  const route = useRoute();
   
+  // URL에서 카테고리 파라미터 가져오기
+  const categoryParam = route.query.category;
+  if (categoryParam) {
+    selectedCategory.value = Number(categoryParam);
+  }
+
   const fetchBooks = async () => {
     const params = {};
     if (selectedCategory.value) {
@@ -77,12 +84,32 @@
     categories.value = response.data;
   };
   
+  // 카테고리 변경 감시
+  watch(selectedCategory, (newCategory) => {
+    fetchBooks();
+    // URL 쿼리 파라미터 업데이트
+    router.push({
+      query: { 
+        ...route.query,
+        category: newCategory || undefined
+      }
+    });
+  });
+  
+  // 검색어 변경 감시
+  watch(searchQuery, fetchBooks);
+  
+  // URL 쿼리 파라미터 변경 감시
+  watch(() => route.query.category, (newCategory) => {
+    if (newCategory !== selectedCategory.value?.toString()) {
+      selectedCategory.value = Number(newCategory) || 0;
+    }
+  });
+  
   onMounted(async () => {
     await fetchCategories();
     await fetchBooks();
   });
-  
-  watch([selectedCategory, searchQuery], fetchBooks);
   
   const goToDetail = (bookId) => {
     router.push(`/books/${bookId}`);

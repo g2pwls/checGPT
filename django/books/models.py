@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.conf import settings
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
@@ -38,10 +39,12 @@ class Thread(models.Model):
         return self.title
     
 class Comment(models.Model):
-    thread = models.ForeignKey(Thread, on_delete=models.CASCADE, related_name='comments')
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField()
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    thread = models.ForeignKey(Thread, on_delete=models.CASCADE, related_name='comments')
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    likes = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='liked_comments', blank=True)
 
 class UserLibrary(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='library')

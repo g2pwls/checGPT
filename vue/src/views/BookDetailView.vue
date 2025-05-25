@@ -39,8 +39,31 @@
         <h2>관련 스레드</h2>
         <div v-if="threads.length === 0">등록된 스레드가 없습니다.</div>
         <div v-else>
+          <div class="thread-sort-tabs">
+            <button 
+              @click="sortType = 'latest'" 
+              :class="{ active: sortType === 'latest' }"
+              class="sort-tab"
+            >
+              최신순
+            </button>
+            <button 
+              @click="sortType = 'likes'" 
+              :class="{ active: sortType === 'likes' }"
+              class="sort-tab"
+            >
+              좋아요순
+            </button>
+            <button 
+              @click="sortType = 'comments'" 
+              :class="{ active: sortType === 'comments' }"
+              class="sort-tab"
+            >
+              댓글순
+            </button>
+          </div>
           <div
-            v-for="thread in threads"
+            v-for="thread in displayedThreads"
             :key="thread.id"
             class="thread-box"
             @click="goToThreadDetail(thread.id)"
@@ -54,10 +77,16 @@
               ❤️ {{ thread.likes_count }} ・ 💬 {{ thread.comments_count }}
             </div>
           </div>
+          <button 
+            v-if="threads.length > 5"
+            @click="toggleThreads" 
+            class="toggle-btn"
+          >
+            {{ showAllThreads ? '접기' : '더보기' }}
+            <span class="toggle-icon">{{ showAllThreads ? '▲' : '▼' }}</span>
+          </button>
         </div>
       </section>
-
-
 
       <!-- 추천 도서 + 지도 -->
       <section class="recommend-map-wrapper" v-if="recommendations.length || mapUrl">
@@ -116,6 +145,9 @@ export default {
     return {
       book: {},
       threads: [],
+      displayedThreads: [],
+      showAllThreads: false,
+      sortType: 'latest',
       isGenerating: false,
       recommendations: [],
       userLocation: null,
@@ -131,6 +163,9 @@ export default {
         await this.loadThreads();
         await this.checkLibraryStatus();
       },
+    },
+    sortType() {
+      this.loadThreads()
     }
   },
   async created() {
@@ -170,14 +205,29 @@ export default {
     async loadThreads() {
       try {
         const bookId = this.$route.params.bookId
-        const res = await axios.get(`http://127.0.0.1:8000/api/books/${bookId}/threads/`)
+        const res = await axios.get(`http://127.0.0.1:8000/api/books/${bookId}/threads/`, {
+          params: {
+            sort_by: this.sortType
+          }
+        })
         this.threads = res.data
+        this.updateDisplayedThreads()
       } catch (error) {
         console.error('스레드 불러오기 실패:', error)
       }
     },
+    updateDisplayedThreads() {
+      this.displayedThreads = this.showAllThreads 
+        ? this.threads 
+        : this.threads.slice(0, 5)
+    },
+    toggleThreads() {
+      this.showAllThreads = !this.showAllThreads;
+      this.updateDisplayedThreads();
+    },
     addThread(newThread) {
-      this.threads.unshift(newThread)  // 새 스레드를 목록 맨 위에 추가
+      this.threads.unshift(newThread)
+      this.updateDisplayedThreads()
     },
     goToBookDetail(bookId) {
       this.$router.push(`/books/${bookId}`);
@@ -329,8 +379,6 @@ export default {
   white-space: nowrap;
 }
 
-
-
 .book-info-section {
   display: flex;
   gap: 20px;
@@ -428,7 +476,6 @@ export default {
   box-shadow: 0 0 5px rgba(0,0,0,0.1);
 }
 
-
 .recommend-title {
   margin-top: 8px;
   font-size: 14px;
@@ -508,5 +555,72 @@ export default {
 
 .action-btn.in-library:hover {
   background-color: #7f8c8d;
+}
+
+.show-more-btn {
+  background-color: #3498db;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 10px;
+}
+
+.show-more-btn:hover {
+  background-color: #2980b9;
+}
+
+.thread-sort-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.sort-tab {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 20px;
+  background-color: #f5f5f5;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+}
+
+.sort-tab:hover {
+  background-color: #e0e0e0;
+}
+
+.sort-tab.active {
+  background-color: #3498db;
+  color: white;
+}
+
+.toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: #3498db;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.toggle-btn:hover {
+  background-color: #2980b9;
+}
+
+.toggle-icon {
+  font-size: 12px;
+  transition: transform 0.3s ease;
 }
 </style>
