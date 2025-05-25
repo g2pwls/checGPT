@@ -18,7 +18,7 @@ class BookSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'profile_image']
+        fields = ['id', 'username', 'name', 'profile_image']
 
 class CommentSerializer(serializers.ModelSerializer):
     author = UserSerializer(read_only=True)

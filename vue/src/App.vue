@@ -26,7 +26,7 @@ function logout() {
   <header class="custom-navbar">
     <nav class="nav-container">
       <div class="nav-left">
-        <RouterLink to="/">Home</RouterLink>
+        <RouterLink to="/">Starbooks</RouterLink>
       </div>
       <div class="nav-right">
         <template v-if="userStore.isLoggedIn">

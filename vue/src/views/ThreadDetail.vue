@@ -62,13 +62,13 @@
               :to="{ name: 'UserProfile', params: { userId: thread.writer?.id } }"
               class="username-link"
             >
-              {{ thread.writer?.name }}
+              {{ thread.writer?.name }} 
             </RouterLink>
             <RouterLink 
               :to="{ name: 'UserProfile', params: { userId: thread.writer?.id } }"
               class="username"
             >
-              @{{ thread.writer?.username }}
+              @{{ thread.writer?.username }} 
             </RouterLink>
           </div>
         </div>
