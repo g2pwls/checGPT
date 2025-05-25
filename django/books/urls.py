@@ -4,7 +4,7 @@ from .views import (
     BookListView, CategoryListView, BookDetailView, BookAudioGenerateView,
     ThreadListCreateView, ThreadDetailView, thread_like, CommentCreateView,
     CommentUpdateView, CommentDeleteView, add_to_library, remove_from_library,
-    UserLibraryView, UserThreadsView
+    UserLibraryView, UserThreadsView, TopBooksView
 )
 from django.conf import settings
 from django.conf.urls.static import static
@@ -30,6 +30,8 @@ urlpatterns = [
     path('users/<int:user_id>/library/', UserLibraryView.as_view()),
     # User threads endpoint
     path('users/<int:user_id>/threads/', UserThreadsView.as_view()),
+    path('users/top-books/', TopBooksView.as_view(), name='user-top-books'),
+    path('users/<int:user_id>/top-books/', TopBooksView.as_view(), name='user-top-books-detail'),
 ]
 
 if settings.DEBUG:

@@ -52,6 +52,27 @@
         <div class="tab-content">
           <!-- Library Tab -->
           <div v-if="activeTab === 'library'" class="library-content">
+            <div v-if="isOwnProfile" class="library-actions">
+              <button class="edit-btn" @click="openLibraryEdit">
+                대표 도서 관리
+              </button>
+            </div>
+
+            <!-- Top Books Section -->
+            <div v-if="topBooks.length > 0" class="top-books-section">
+              <h3 class="section-title">대표 도서</h3>
+              <div class="top-books-grid">
+                <div v-for="topBook in topBooks" :key="topBook.id" class="top-book-item" @click="goToBook(topBook.book.id)">
+                  <div class="rank-badge">{{ topBook.rank }}순위</div>
+                  <div class="book-cover-container">
+                    <img :src="topBook.book.cover" :alt="topBook.book.title" class="book-cover">
+                  </div>
+                  <h3 class="book-title">{{ topBook.book.title }}</h3>
+                  <p class="book-author">{{ topBook.book.author }}</p>
+                </div>
+              </div>
+            </div>
+
             <div v-if="library.length === 0" class="empty-state">
               <p>서재에 추가된 책이 없습니다.</p>
             </div>
@@ -106,6 +127,17 @@
         </div>
       </div>
     </div>
+
+    <!-- Library Edit Modal -->
+    <div v-if="showLibraryEdit" class="modal-overlay">
+      <div class="modal-content">
+        <LibraryEdit 
+          :library="library"
+          @close="closeLibraryEdit"
+          @update="updateLibrary"
+        />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -113,14 +145,17 @@
 import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
+import LibraryEdit from '@/components/LibraryEdit.vue'
 
 const route = useRoute()
 const router = useRouter()
 const user = ref({})
 const threads = ref([])
 const library = ref([])
+const topBooks = ref([])
 const isFollowing = ref(false)
 const activeTab = ref('library')
+const showLibraryEdit = ref(false)
 
 // Check if this is the user's own profile
 const isOwnProfile = computed(() => {
@@ -212,6 +247,20 @@ const loadProfileData = async () => {
             console.error('Error loading threads:', error)
             threads.value = []
           }
+
+          // Load user's top books
+          try {
+            const topBooksEndpoint = `http://127.0.0.1:8000/api/users/${userId}/top-books/`
+            console.log('Loading top books from:', topBooksEndpoint)
+            const topBooksResponse = await axios.get(topBooksEndpoint, {
+              headers: { Authorization: `Token ${token}` }
+            })
+            console.log('Top books response:', topBooksResponse.data)
+            topBooks.value = topBooksResponse.data
+          } catch (error) {
+            console.error('Error loading top books:', error)
+            topBooks.value = []
+          }
         } catch (error) {
           console.error('Error loading user data:', error)
         }
@@ -221,6 +270,7 @@ const loadProfileData = async () => {
       user.value = {}
       threads.value = []
       library.value = []
+      topBooks.value = []
     }
   } catch (error) {
     console.error("프로필 로딩 실패:", error)
@@ -231,6 +281,7 @@ const loadProfileData = async () => {
         user.value = {}
         threads.value = []
         library.value = []
+        topBooks.value = []
       }
     }
   }
@@ -302,6 +353,18 @@ const goToThread = (threadId) => {
 
 const goToBook = (bookId) => {
   router.push(`/books/${bookId}`)
+}
+
+const openLibraryEdit = () => {
+  showLibraryEdit.value = true
+}
+
+const closeLibraryEdit = () => {
+  showLibraryEdit.value = false
+}
+
+const updateLibrary = () => {
+  loadProfileData()
 }
 
 onMounted(() => {
@@ -589,7 +652,6 @@ watch(
   overflow: hidden;
 }
 
-
 .book-cover {
   width: 80px;
   height: 120px;
@@ -669,5 +731,138 @@ watch(
   display: flex;
   gap: 15px;
   color: #888;
+}
+
+.library-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+  padding: 0 1rem;
+}
+
+.edit-btn {
+  background: rgb(0, 105, 0);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.edit-btn:hover {
+  background: rgb(0, 85, 0);
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  width: 90%;
+  max-width: 1200px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.top-books-section {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.section-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.top-books-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.top-book-item {
+  position: relative;
+  background: white;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  transition: transform 0.2s;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.top-book-item:hover {
+  transform: translateY(-2px);
+}
+
+.rank-badge {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  background: rgb(0, 105, 0);
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.top-book-item .book-cover-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
+.top-book-item .book-cover {
+  width: 100%;
+  max-width: 180px;
+  aspect-ratio: 2/3;
+  object-fit: cover;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.top-book-item .book-title {
+  font-size: 0.9rem;
+  font-weight: bold;
+  margin-bottom: 0.25rem;
+  color: #333;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.3;
+  height: 2.6em;
+  width: 100%;
+}
+
+.top-book-item .book-author {
+  font-size: 0.8rem;
+  color: #666;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  width: 100%;
 }
 </style>
