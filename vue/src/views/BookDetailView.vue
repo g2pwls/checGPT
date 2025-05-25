@@ -154,7 +154,7 @@ export default {
     async loadThreads() {
       try {
         const bookId = this.$route.params.bookId
-        const res = await axios.get(`http://127.0.0.1:8000/api/threads/?book=${bookId}`)
+        const res = await axios.get(`http://127.0.0.1:8000/api/books/${bookId}/threads/`)
         this.threads = res.data
       } catch (error) {
         console.error('스레드 불러오기 실패:', error)

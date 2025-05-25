@@ -11,6 +11,7 @@ urlpatterns = [
     path('books/<int:book_id>/', BookDetailView.as_view(), name='book_detail'),
     path('books/<int:book_id>/generate-audio/', BookAudioGenerateView.as_view()),
     path('books/<int:book_id>/recommendations/', views.recommended_books),
+    path('books/<int:book_id>/threads/', ThreadListCreateView.as_view(), name='book-threads'),
     path('threads/', ThreadListCreateView.as_view(), name='thread-list-create'),
     path('threads/<int:pk>/', ThreadDetailView.as_view()),
     path('threads/<int:pk>/like/', thread_like),

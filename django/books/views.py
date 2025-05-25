@@ -59,9 +59,14 @@ class CategoryListView(APIView):
 # ----------------------
 
 class ThreadListCreateView(generics.ListCreateAPIView):
-    queryset = Thread.objects.all().order_by('-id')
     serializer_class = ThreadSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def get_queryset(self):
+        book_id = self.kwargs.get('book_id')
+        if book_id:
+            return Thread.objects.filter(book_id=book_id).order_by('-id')
+        return Thread.objects.all().order_by('-id')
 
     def perform_create(self, serializer):
         serializer.save(writer=self.request.user)
