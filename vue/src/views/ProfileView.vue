@@ -29,8 +29,8 @@
       </div>
       
       <!-- Follow button only shows on other users' profiles -->
-      <button v-if="!isOwnProfile" @click="toggleFollow" class="follow-btn" :class="{ 'following': isFollowing }">
-        {{ isFollowing ? '팔로잉' : '+ 팔로우' }}
+      <button v-if="!isOwnProfile" @click="toggleFollow" class="follow-btn" :class="{ 'following': user.is_following }">
+        {{ user.is_following ? '팔로우 취소' : '+ 팔로우' }}
       </button>
     </section>
 
