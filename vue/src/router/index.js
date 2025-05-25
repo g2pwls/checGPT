@@ -6,6 +6,7 @@ import BookDetailView from '../views/BookDetailView.vue'
 import ProfileView from '@/views/ProfileView.vue'
 import SignUpView from '@/views/SignUpView.vue'
 import ThreadDetail from '@/views/ThreadDetail.vue'
+import CommunityView from '@/views/CommunityView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -46,6 +47,12 @@ const router = createRouter({
       name: 'ThreadDetail',
       component: ThreadDetail,
       props: true,
+    },
+    {
+      path: '/community',
+      name: 'Community',
+      component: CommunityView,
+      meta: { requiresAuth: true }
     },
   ],
   scrollBehavior(to, from, savedPosition) {
