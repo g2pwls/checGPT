@@ -81,11 +81,11 @@
                       class="book-cover"
                       @error="handleImageError"
                     />
+                    <span class="book-title">{{ thread.book.title }}</span>
                     <div class="book-details">
-                      <h4 class="book-title">{{ thread.book.title }}</h4>
                       <div class="thread-meta">
-                        <span class="author">by {{ user.name }}</span>
-                        <span class="date">{{ formatDate(thread.created_at) }}</span>
+                        <span class="author">by {{ thread.writer.username }}</span>
+                        <span class="date">{{ formatDate(thread.read_date) }}</span>
                       </div>
                     </div>
                   </div>
@@ -95,15 +95,9 @@
                   <p class="thread-content">{{ thread.content }}</p>
                 </div>
                 <div class="thread-footer">
-                  <div class="engagement-stats">
-                    <span class="likes">
-                      <i class="fas fa-heart"></i>
-                      {{ thread.likes_count || 0 }}
-                    </span>
-                    <span class="comments">
-                      <i class="fas fa-comment"></i>
-                      {{ thread.comments_count || 0 }}
-                    </span>
+                  <div class="interactions">
+                    <span>❤️ {{ thread.likes_count }}</span>
+                    <span>💬 {{ thread.comments_count }}</span>
                   </div>
                 </div>
               </div>
@@ -149,10 +143,8 @@ const formatDate = (dateString) => {
     const year = date.getFullYear()
     const month = String(date.getMonth() + 1).padStart(2, '0')
     const day = String(date.getDate()).padStart(2, '0')
-    const hours = String(date.getHours()).padStart(2, '0')
-    const minutes = String(date.getMinutes()).padStart(2, '0')
     
-    return `${year}/${month}/${day} ${hours}:${minutes}`
+    return `${year}/${month}/${day}`
   } catch (error) {
     console.error('Date formatting error:', error)
     return ''
@@ -590,10 +582,13 @@ watch(
 }
 
 .book-info {
+  flex: 1; /* 텍스트 영역이 남는 공간 차지 */
   display: flex;
   gap: 1rem;
   align-items: center;
+  overflow: hidden;
 }
+
 
 .book-cover {
   width: 80px;
@@ -651,7 +646,7 @@ watch(
 
 .thread-footer {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   padding-top: 1rem;
   border-top: 1px solid #eee;
 }
@@ -663,13 +658,16 @@ watch(
   font-size: 0.9rem;
 }
 
-.likes, .comments {
+.thread-meta {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  gap: 15px;
+  color: #888;
+  font-size: 0.9rem;
 }
 
-.likes i, .comments i {
-  color: #007bff;
+.interactions {
+  display: flex;
+  gap: 15px;
+  color: #888;
 }
 </style>
