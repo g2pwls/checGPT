@@ -5,7 +5,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from .serializers import SignUpSerializer, MyPageSerializer
+from .serializers import SignUpSerializer
 from django.http import JsonResponse
 from django.views.decorators.csrf import ensure_csrf_cookie
 from rest_framework import status
@@ -33,14 +33,12 @@ class CustomAuthToken(ObtainAuthToken):
             'token': token.key,
             'username': token.user.username,
             'name': token.user.name,
+            'user': {
+                'id': token.user.id,
+                'username': token.user.username,
+                'name': token.user.name
+            }
         })
-
-class MyPageView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        serializer = MyPageSerializer(request.user)
-        return Response(serializer.data)
 
 class UserProfileView(APIView):
     def get(self, request, user_id):

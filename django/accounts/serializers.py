@@ -52,11 +52,6 @@ class LoginSerializer(serializers.Serializer):
         data['user'] = user
         return data
     
-class MyPageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ('id', 'username', 'name', 'profile_image', 'interests')
-
 class UserProfileSerializer(serializers.ModelSerializer):
     followers_count = serializers.SerializerMethodField()
     following_count = serializers.SerializerMethodField()

@@ -36,14 +36,18 @@ const login = async () => {
 
     const token = response.data.token
     const name = response.data.name
+    const userId = response.data.user.id
+
+    axios.defaults.headers.common['Authorization'] = `Token ${token}`
 
     localStorage.setItem('token', token)
     localStorage.setItem('name', name)
-    axios.defaults.headers.common['Authorization'] = `Token ${token}`
+    localStorage.setItem('userId', userId)
 
     userStore.login(name)
+    
     alert(`${name}님, 환영합니다!`)
-    router.push('/mypage')
+    router.push({ name: 'UserProfile', params: { userId: userId } })
   } catch (error) {
     console.error(error)
     alert('로그인에 실패했습니다.')

@@ -36,12 +36,6 @@ const router = createRouter({
       component: BookDetailView,
     },
     {
-      path: '/profile',
-      name: 'Profile',
-      component: ProfileView,
-      meta: { requiresAuth: true }
-    },
-    {
       path: '/users/:userId/profile',
       name: 'UserProfile',
       component: ProfileView,
@@ -51,7 +45,7 @@ const router = createRouter({
       path: '/threads/:threadId',
       name: 'ThreadDetail',
       component: ThreadDetail,
-      props: true,  // URL 파라미터를 props로 받기 위함
+      props: true,
     },
   ],
   scrollBehavior(to, from, savedPosition) {

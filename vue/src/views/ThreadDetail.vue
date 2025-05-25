@@ -54,11 +54,11 @@
         v-if="!isOwnThread" 
         @click="toggleFollow" 
         class="follow-btn" 
-        :class="{ 'following': isFollowing }"
+        :class="{ 'following': thread.writer.is_following }"
         id="follow-button"
         name="follow-button"
       >
-        {{ isFollowing ? '팔로우 취소' : '+ 팔로우' }}
+        {{ thread.writer.is_following ? '팔로우 취소' : '+ 팔로우' }}
       </button>
       <button @click="goToProfile">프로필가기</button>
     </div>
@@ -73,7 +73,6 @@ export default {
     return {
       thread: null,
       newComment: '',
-      isFollowing: false,
     };
   },
   computed: {
@@ -100,14 +99,14 @@ export default {
         try {
           // Get user profile to get follower/following counts and follow status
           const profileRes = await axios.get(
-            `http://127.0.0.1:8000/api/users/${this.thread.writer.id}/profile/`,
+            `http://127.0.0.1:8000/accounts/api/users/${this.thread.writer.id}/profile/`,
             {
               headers: {
                 Authorization: `Token ${token}`
               }
             }
           );
-          this.isFollowing = profileRes.data.is_following;
+          this.thread.writer.is_following = profileRes.data.is_following;
           this.thread.writer.followers_count = profileRes.data.followers_count;
           this.thread.writer.following_count = profileRes.data.following_count;
         } catch (error) {
@@ -135,21 +134,18 @@ export default {
       this.$router.push(`/threads/${this.thread.id}/edit`);
     },
     async deleteThread() {
-  try {
-    const token = localStorage.getItem('token'); // 로그인 시 저장한 토큰 불러오기
-    await axios.delete(`http://127.0.0.1:8000/api/threads/${this.thread.id}/`, {
-      headers: {
-        Authorization: `Token ${token}`
+      try {
+        const token = localStorage.getItem('token'); // 로그인 시 저장한 토큰 불러오기
+        await axios.delete(`http://127.0.0.1:8000/api/threads/${this.thread.id}/`, {
+          headers: {
+            Authorization: `Token ${token}`
+          }
+        });
+        this.$router.push(`/books/${this.thread.book.id}`);
+      } catch (error) {
+        console.error('삭제 실패:', error);
       }
-    });
-    this.$router.push(`/books/${this.thread.book.id}`);
-  } catch (error) {
-    console.error('삭제 실패:', error);
-  }
-}
-,
-
-
+    },
     async toggleFollow() {
       try {
         const token = localStorage.getItem('token');
@@ -165,12 +161,10 @@ export default {
           return;
         }
 
-        // Update UI optimistically
-        this.isFollowing = !this.isFollowing;
-        const oldFollowersCount = this.thread.writer.followers_count;
-        this.thread.writer.followers_count = this.isFollowing 
-          ? oldFollowersCount + 1 
-          : oldFollowersCount - 1;
+        // Optimistically update UI
+        const newFollowStatus = !this.thread.writer.is_following;
+        this.thread.writer.is_following = newFollowStatus;
+        this.thread.writer.followers_count += newFollowStatus ? 1 : -1;
 
         const response = await axios.post(
           `http://127.0.0.1:8000/accounts/api/follow/${this.thread.writer.id}/`,
@@ -181,23 +175,31 @@ export default {
             }
           }
         );
-        
-        // Update with actual server response
-        this.isFollowing = response.data.is_following;
-        if (this.thread.writer) {
-          this.thread.writer.followers_count = response.data.followers_count;
-          this.thread.writer.following_count = response.data.following_count;
-          // Force Vue to recognize the change
-          this.thread = { ...this.thread };
-        }
-      } catch (error) {
-        // Revert optimistic update on error
-        this.isFollowing = !this.isFollowing;
-        this.thread.writer.followers_count = this.isFollowing 
-          ? this.thread.writer.followers_count - 1 
-          : this.thread.writer.followers_count + 1;
 
+        // Refresh profile data to get updated counts
+        const profileRes = await axios.get(
+          `http://127.0.0.1:8000/accounts/api/users/${this.thread.writer.id}/profile/`,
+          {
+            headers: {
+              Authorization: `Token ${token}`
+            }
+          }
+        );
+
+        // Update with fresh data from server
+        this.thread.writer.is_following = profileRes.data.is_following;
+        this.thread.writer.followers_count = profileRes.data.followers_count;
+        this.thread.writer.following_count = profileRes.data.following_count;
+
+        // Force Vue to recognize the changes
+        this.thread = { ...this.thread };
+      } catch (error) {
         console.error("팔로우 토글 실패:", error);
+        // Revert optimistic update on error
+        this.thread.writer.is_following = !this.thread.writer.is_following;
+        this.thread.writer.followers_count += this.thread.writer.is_following ? 1 : -1;
+        this.thread = { ...this.thread };
+
         if (error.response) {
           console.error("Error response:", error.response.data);
           if (error.response.status === 400) {
@@ -211,31 +213,6 @@ export default {
     goToProfile() {
       this.$router.push(`/users/${this.thread.writer.id}/profile`);
     },
-    async postComment() {
-  try {
-    const token = localStorage.getItem('token'); // 로그인된 사용자 토큰
-    const res = await axios.post('/api/comments/', {
-      thread: this.thread.id,          // 스레드 ID
-      content: this.newComment         // 작성한 댓글 내용
-    }, {
-      headers: {
-        Authorization: `Token ${token}`  // 인증 헤더 추가
-      }
-    });
-
-    // 댓글 목록에 새 댓글 추가
-    this.thread.comments.push(res.data);
-
-    // 댓글 수 수동 증가
-    this.thread.comments_count += 1;
-
-    // 댓글 입력창 초기화
-    this.newComment = '';
-  } catch (err) {
-    console.error('댓글 작성 실패:', err);
-  }
-}
-
   }
 }
 </script>

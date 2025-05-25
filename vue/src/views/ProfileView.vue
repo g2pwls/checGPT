@@ -2,9 +2,10 @@
   <div class="profile-container">
     <section class="profile-section">
       <img
-        :src="user.profile_image ? `http://127.0.0.1:8000${user.profile_image}` : '/default-profile.png'"
+        :src="getProfileImageUrl(user.profile_image)"
         alt="프로필 사진"
         class="profile-image"
+        @error="handleImageError"
       />
       <h2>{{ user.name }}</h2>
       <p class="username">@{{ user.username }}</p>
@@ -84,7 +85,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
 
@@ -102,7 +103,15 @@ const isOwnProfile = computed(() => {
   return !route.params.userId || route.params.userId === currentUserId
 })
 
-onMounted(async () => {
+const getProfileImageUrl = (imagePath) => {
+  if (!imagePath) return '/default-profile.png'
+  // If the image path is already a full URL, return it as is
+  if (imagePath.startsWith('http')) return imagePath
+  // Otherwise, prepend the Django media URL
+  return `http://127.0.0.1:8000${imagePath}`
+}
+
+const loadProfileData = async () => {
   try {
     const token = localStorage.getItem('token')
     if (!token) {
@@ -110,13 +119,11 @@ onMounted(async () => {
       return
     }
 
-    const userId = route.params.userId // Get userId from route params
+    const userId = route.params.userId
     console.log('Current route userId:', userId)
     
-    // If no userId in params, it's the user's own profile
-    const endpoint = userId 
-      ? `http://127.0.0.1:8000/accounts/api/users/${userId}/profile/`
-      : 'http://127.0.0.1:8000/accounts/api/mypage/'
+    // Always use the user-specific endpoint
+    const endpoint = `http://127.0.0.1:8000/accounts/api/users/${userId}/profile/`
     
     console.log('Loading profile from:', endpoint)
     const res = await axios.get(endpoint, {
@@ -125,74 +132,77 @@ onMounted(async () => {
       }
     })
     console.log('Profile response:', res.data)
-    user.value = res.data
-    console.log('User value after setting:', user.value)
-    isFollowing.value = user.value.is_following
+    
+    // Ensure we have a valid user object
+    if (res.data) {
+      user.value = res.data
+      console.log('User value after setting:', user.value)
+      isFollowing.value = user.value.is_following
 
-    // Only load threads and library if we have a valid user ID
-    if (user.value.id) {
-      console.log('User ID found:', user.value.id)
-      try {
-        // Load user's library first since it's the default tab
-        const libraryEndpoint = userId
-          ? `http://127.0.0.1:8000/api/users/${userId}/library/`
-          : 'http://127.0.0.1:8000/api/users/library/'
-        
-        console.log('Loading library from:', libraryEndpoint)
-        
+      // Load threads and library
+      if (user.value.id) {
+        console.log('User ID found:', user.value.id)
         try {
-          const libraryRes = await axios.get(libraryEndpoint, {
-            headers: {
-              Authorization: `Token ${token}`
-            }
-          })
-          console.log('Library response:', libraryRes)
-          library.value = libraryRes.data
-        } catch (error) {
-          console.error('Library loading error:', error)
-          if (error.response) {
-            console.error('Error response:', error.response.data)
-            console.error('Error status:', error.response.status)
-          }
-          library.value = [] // Reset library on error
-        }
-
-        // Load user's threads
-        try {
-          const threadsEndpoint = userId
-            ? `http://127.0.0.1:8000/api/users/${userId}/threads/`
-            : `http://127.0.0.1:8000/api/users/${user.value.id}/threads/`
+          // Load user's library
+          const libraryEndpoint = `http://127.0.0.1:8000/api/users/${userId}/library/`
+          console.log('Loading library from:', libraryEndpoint)
           
-          console.log('Loading threads from:', threadsEndpoint)
-          const threadsRes = await axios.get(threadsEndpoint, {
-            headers: {
-              Authorization: `Token ${token}`
+          try {
+            const libraryRes = await axios.get(libraryEndpoint, {
+              headers: {
+                Authorization: `Token ${token}`
+              }
+            })
+            console.log('Library response:', libraryRes)
+            library.value = libraryRes.data
+          } catch (error) {
+            console.error('Library loading error:', error)
+            if (error.response) {
+              console.error('Error response:', error.response.data)
+              console.error('Error status:', error.response.status)
             }
-          })
-          console.log('Threads response:', threadsRes.data)
-          threads.value = threadsRes.data
+            library.value = [] // Reset library on error
+          }
+
+          // Load user's threads
+          try {
+            const threadsEndpoint = `http://127.0.0.1:8000/api/users/${userId}/threads/`
+            console.log('Loading threads from:', threadsEndpoint)
+            const threadsRes = await axios.get(threadsEndpoint, {
+              headers: {
+                Authorization: `Token ${token}`
+              }
+            })
+            console.log('Threads response:', threadsRes.data)
+            threads.value = threadsRes.data
+          } catch (error) {
+            console.error('Error loading threads:', error)
+            if (error.response) {
+              console.error('Error response:', error.response.data)
+              console.error('Error status:', error.response.status)
+              if (error.response.status === 404) {
+                threads.value = [] // User not found
+              } else if (error.response.status === 500) {
+                console.error('Server error loading threads:', error.response.data)
+                threads.value = [] // Server error
+              }
+            }
+            threads.value = [] // Reset threads on error
+          }
         } catch (error) {
-          console.error('Error loading threads:', error)
+          console.error('Error loading user data:', error)
           if (error.response) {
             console.error('Error response:', error.response.data)
-            console.error('Error status:', error.response.status)
-            if (error.response.status === 404) {
-              threads.value = [] // User not found
-            } else if (error.response.status === 500) {
-              console.error('Server error loading threads:', error.response.data)
-              threads.value = [] // Server error
-            }
           }
-          threads.value = [] // Reset threads on error
         }
-      } catch (error) {
-        console.error('Error loading user data:', error)
-        if (error.response) {
-          console.error('Error response:', error.response.data)
-        }
+      } else {
+        console.error('No user ID available')
       }
     } else {
-      console.error('No user ID available')
+      console.error('No user data received')
+      user.value = {}
+      threads.value = []
+      library.value = []
     }
   } catch (error) {
     console.error("프로필 로딩 실패:", error)
@@ -214,6 +224,26 @@ onMounted(async () => {
       }
     }
   }
+}
+
+// Watch for route changes to reload profile data
+watch(
+  () => route.params.userId,
+  (newUserId, oldUserId) => {
+    if (newUserId !== oldUserId) {
+      loadProfileData()
+    }
+  },
+  { immediate: true }
+)
+
+const handleImageError = (e) => {
+  console.log('Image load error, using default image')
+  e.target.src = '/default-profile.png'
+}
+
+onMounted(() => {
+  loadProfileData()
 })
 
 const editProfile = () => {
@@ -235,6 +265,11 @@ const toggleFollow = async () => {
       return
     }
 
+    // Optimistically update UI
+    const newFollowStatus = !user.value.is_following
+    user.value.is_following = newFollowStatus
+    user.value.followers_count += newFollowStatus ? 1 : -1
+
     const response = await axios.post(
       `http://127.0.0.1:8000/accounts/api/follow/${route.params.userId}/`,
       {},
@@ -245,15 +280,28 @@ const toggleFollow = async () => {
       }
     )
     
-    // Update follow status and counts
-    isFollowing.value = response.data.is_following
-    user.value.followers_count = response.data.followers_count
-    user.value.following_count = response.data.following_count
+    // Refresh profile data to get updated counts
+    const profileRes = await axios.get(
+      `http://127.0.0.1:8000/accounts/api/users/${route.params.userId}/profile/`,
+      {
+        headers: {
+          Authorization: `Token ${token}`
+        }
+      }
+    )
+    
+    // Update with fresh data from server
+    user.value = profileRes.data
     
     // Force Vue to recognize the changes
     user.value = { ...user.value }
   } catch (error) {
     console.error("팔로우 토글 실패:", error)
+    // Revert optimistic update on error
+    user.value.is_following = !user.value.is_following
+    user.value.followers_count += user.value.is_following ? 1 : -1
+    user.value = { ...user.value }
+
     if (error.response) {
       console.error("Error response:", error.response.data)
       if (error.response.status === 400) {
