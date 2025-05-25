@@ -30,7 +30,7 @@ function logout() {
       </div>
       <div class="nav-right">
         <template v-if="userStore.isLoggedIn">
-          <span class="namename">{{ userStore.username }}님</span>
+          <span class="namename">{{ userStore.username }}님, 환영합니다!</span>
           <RouterLink :to="{ name: 'BookList' }">책 리스트</RouterLink>
           <RouterLink :to="{ name: 'UserProfile', params: { userId: userStore.userId } }">마이페이지</RouterLink>
           <span @click="logout" class="logout">로그아웃</span>
@@ -60,7 +60,13 @@ function logout() {
   align-items: center;
 }
 
-.namename,
+.namename {
+  color: rgb(0, 105, 0);
+  text-decoration: none;
+  cursor: pointer;
+  font-size: smaller;
+}
+
 .logout,
 .nav-left a,
 .nav-right a {
