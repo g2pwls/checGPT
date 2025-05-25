@@ -2,7 +2,12 @@
   <div class="book-detail-wrapper">
     <header class="header">
       <h1 class="book-title">{{ book.title }}</h1>
-      <button class="thread-btn" @click="isThreadModalOpen = true">스레드 작성하기</button>
+      <div class="actions">
+        <button @click="addToLibrary" class="action-btn" :class="{ 'in-library': isInLibrary }">
+          {{ isInLibrary ? '서재에서 제거' : '내 서재에 추가하기' }}
+        </button>
+        <button @click="isThreadModalOpen = true">스레드 작성하기</button>
+      </div>
     </header>
 
     <div class="backback">
@@ -115,12 +120,14 @@ export default {
       recommendations: [],
       userLocation: null,
       mapUrl: '',
-      isThreadModalOpen: false
+      isThreadModalOpen: false,
+      isInLibrary: false,
     }
   },
   async created() {
-    this.loadBookData()
-    await this.loadThreads() // ✅ 스레드 불러오기
+    await this.loadBookData()
+    await this.loadThreads()
+    await this.checkLibraryStatus()
   },
   mounted() {
     this.getUserLocation()
@@ -177,7 +184,61 @@ export default {
           this.mapUrl = `https://www.google.com/maps?q=도서관&ll=${lat},${lng}&z=15&output=embed`
         })
       }
-    }
+    },
+    async checkLibraryStatus() {
+      try {
+        const token = localStorage.getItem('token')
+        const libraryRes = await axios.get(
+          'http://127.0.0.1:8000/api/users/library/',
+          {
+            headers: {
+              Authorization: `Token ${token}`
+            }
+          }
+        )
+        this.isInLibrary = libraryRes.data.some(item => item.book.id === this.book.id)
+      } catch (error) {
+        console.error('서재 상태 확인 실패:', error)
+      }
+    },
+    async addToLibrary() {
+      try {
+        const token = localStorage.getItem('token')
+        if (!token) {
+          alert('로그인이 필요합니다.')
+          return
+        }
+
+        if (this.isInLibrary) {
+          await axios.delete(
+            `http://127.0.0.1:8000/api/books/${this.book.id}/remove-from-library/`,
+            {
+              headers: {
+                Authorization: `Token ${token}`
+              }
+            }
+          )
+        } else {
+          await axios.post(
+            `http://127.0.0.1:8000/api/books/${this.book.id}/add-to-library/`,
+            {},
+            {
+              headers: {
+                Authorization: `Token ${token}`
+              }
+            }
+          )
+        }
+        this.isInLibrary = !this.isInLibrary
+      } catch (error) {
+        console.error('서재 업데이트 실패:', error)
+        if (error.response?.status === 400) {
+          alert('이미 서재에 추가된 책입니다.')
+        } else {
+          alert('서재 업데이트에 실패했습니다.')
+        }
+      }
+    },
   }
 }
 </script>
@@ -409,5 +470,33 @@ export default {
   font-size: 0.9rem;
   line-height: 1.4;
   white-space: pre-wrap;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.action-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 20px;
+  background-color: #e74c3c;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.action-btn:hover {
+  background-color: #c0392b;
+}
+
+.action-btn.in-library {
+  background-color: #95a5a6;
+}
+
+.action-btn.in-library:hover {
+  background-color: #7f8c8d;
 }
 </style>

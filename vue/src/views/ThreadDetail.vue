@@ -39,8 +39,11 @@
 
     <!-- 프로필 정보 -->
     <div class="profile-box" v-if="thread && thread.writer">
-
-      <img :src="writerProfile.image" class="avatar" />
+      <img 
+        :src="thread.writer.profile_image ? `http://127.0.0.1:8000${thread.writer.profile_image}` : '/default-profile.png'" 
+        class="avatar" 
+        alt="프로필 이미지"
+      />
       <span class="username">{{ thread.writer.username }}</span>
       <button @click="followUser">+ 팔로우</button>
       <button @click="goToProfile">프로필가기</button>
@@ -56,27 +59,24 @@ export default {
     return {
       thread: null,
       newComment: '',
-      writerProfile: {},
     };
   },
   async mounted() {
-  try {
-    const id = this.$route.params.threadId;
-    console.log('불러올 threadId:', id);
+    try {
+      const id = this.$route.params.threadId;
+      const token = localStorage.getItem('token');
 
-    const res = await axios.get(`http://127.0.0.1:8000/api/threads/${id}/`);
-    this.thread = res.data;
-    console.log('받은 thread:', this.thread);
-
-    if (this.thread.writer && this.thread.writer.id) {
-      const profileRes = await axios.get(`http://127.0.0.1:8000/api/users/${this.thread.writer.id}/profile/`);
-      this.writerProfile = profileRes.data;
+      // Load thread data
+      const res = await axios.get(`http://127.0.0.1:8000/api/threads/${id}/`, {
+        headers: {
+          Authorization: `Token ${token}`
+        }
+      });
+      this.thread = res.data;
+    } catch (err) {
+      console.error('데이터 로딩 실패:', err);
     }
-  } catch (err) {
-    console.error('스레드 불러오기 실패:', err); // ✅ 여기가 뜨면 API 실패
-  }
-}
-,
+  },
   methods: {
     async toggleLike() {
       await axios.post(`/api/threads/${this.thread.id}/like/`);

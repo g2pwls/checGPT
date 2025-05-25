@@ -55,9 +55,26 @@ class LoginSerializer(serializers.Serializer):
 class MyPageSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('username', 'name', 'profile_image', 'interests')
+        fields = ('id', 'username', 'name', 'profile_image', 'interests')
 
 class UserProfileSerializer(serializers.ModelSerializer):
+    followers_count = serializers.SerializerMethodField()
+    following_count = serializers.SerializerMethodField()
+    is_following = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ['id', 'username', 'name', 'profile_image', 'interests']
+        fields = ['id', 'username', 'name', 'profile_image', 'interests', 
+                 'followers_count', 'following_count', 'is_following']
+
+    def get_followers_count(self, obj):
+        return obj.get_followers_count()
+
+    def get_following_count(self, obj):
+        return obj.get_following_count()
+
+    def get_is_following(self, obj):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return request.user.following.filter(id=obj.id).exists()
+        return False

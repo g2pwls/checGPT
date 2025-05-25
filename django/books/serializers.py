@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Book, Category, Thread, Comment
+from .models import Book, Category, Thread, Comment, UserLibrary
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 
@@ -18,7 +18,7 @@ class BookSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username']
+        fields = ['id', 'username', 'profile_image']
 
 class CommentSerializer(serializers.ModelSerializer):
     author = UserSerializer(read_only=True)
@@ -52,9 +52,15 @@ class ThreadSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'writer', 'book', 'comments', 'likes_count', 'comments_count']
 
-
     def get_likes_count(self, obj):
         return obj.likes.count()
 
     def get_comments_count(self, obj):
         return obj.comments.count()
+
+class UserLibrarySerializer(serializers.ModelSerializer):
+    book = BookSerializer(read_only=True)
+    
+    class Meta:
+        model = UserLibrary
+        fields = ['id', 'book', 'added_date']

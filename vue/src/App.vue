@@ -31,7 +31,7 @@ function logout() {
         <template v-if="userStore.isLoggedIn">
           <span class="namename">{{ userStore.username }}님</span>
           <RouterLink :to="{ name: 'BookList' }">책 리스트</RouterLink>
-          <RouterLink :to="{ name: 'MyPageView' }">마이페이지</RouterLink>
+          <RouterLink :to="{ name: 'Profile' }">마이페이지</RouterLink>
           <span @click="logout" class="logout">로그아웃</span>
         </template>
         <template v-else>

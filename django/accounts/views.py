@@ -8,6 +8,9 @@ from rest_framework.permissions import IsAuthenticated
 from .serializers import SignUpSerializer, MyPageSerializer
 from django.http import JsonResponse
 from django.views.decorators.csrf import ensure_csrf_cookie
+from rest_framework import status
+from .models import User
+from .serializers import UserProfileSerializer
 
 @ensure_csrf_cookie
 def get_csrf_token(request):
@@ -39,12 +42,6 @@ class MyPageView(APIView):
         serializer = MyPageSerializer(request.user)
         return Response(serializer.data)
 
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from .models import User
-from .serializers import UserProfileSerializer
-
 class UserProfileView(APIView):
     def get(self, request, user_id):
         try:
@@ -52,5 +49,41 @@ class UserProfileView(APIView):
         except User.DoesNotExist:
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
         
-        serializer = UserProfileSerializer(user)
+        serializer = UserProfileSerializer(user, context={'request': request})
         return Response(serializer.data)
+
+class FollowView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, user_id):
+        try:
+            user_to_follow = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        if request.user.id == user_to_follow.id:
+            return Response({'error': 'You cannot follow yourself'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if request.user.following.filter(id=user_to_follow.id).exists():
+            request.user.following.remove(user_to_follow)
+            is_following = False
+        else:
+            request.user.following.add(user_to_follow)
+            is_following = True
+
+        return Response({
+            'is_following': is_following,
+            'followers_count': user_to_follow.get_followers_count()
+        })
+
+class FollowStatusView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, user_id):
+        try:
+            user_to_check = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        is_following = request.user.following.filter(id=user_to_check.id).exists()
+        return Response({'is_following': is_following})

@@ -1,0 +1,397 @@
+<template>
+  <div class="profile-container">
+    <section class="profile-section">
+      <img
+        :src="user.profile_image ? `http://127.0.0.1:8000${user.profile_image}` : '/default-profile.png'"
+        alt="프로필 사진"
+        class="profile-image"
+      />
+      <h2>{{ user.name }}</h2>
+      <p class="username">@{{ user.username }}</p>
+      
+      <!-- Follower/Following counts -->
+      <div class="follow-stats">
+        <div class="stat-item">
+          <span class="stat-value">{{ user.followers_count }}</span>
+          <span class="stat-label">팔로워</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value">{{ user.following_count }}</span>
+          <span class="stat-label">팔로잉</span>
+        </div>
+      </div>
+
+      <div class="interests" v-if="user.interests">
+        <span v-for="interest in user.interests" :key="interest" class="interest-tag">
+          {{ interest }}
+        </span>
+      </div>
+      
+      <!-- Follow button only shows on other users' profiles -->
+      <button v-if="!isOwnProfile" @click="toggleFollow" class="follow-btn" :class="{ 'following': isFollowing }">
+        {{ isFollowing ? '팔로잉' : '+ 팔로우' }}
+      </button>
+    </section>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button 
+        @click="activeTab = 'threads'" 
+        :class="{ active: activeTab === 'threads' }"
+        class="tab-btn"
+      >
+        {{ user.name }}님의 스레드
+      </button>
+      <button 
+        @click="activeTab = 'library'" 
+        :class="{ active: activeTab === 'library' }"
+        class="tab-btn"
+      >
+        {{ user.name }}님의 서재
+      </button>
+    </div>
+
+    <!-- Threads Tab -->
+    <section v-if="activeTab === 'threads'" class="threads-section">
+      <div v-if="threads.length === 0" class="no-threads">
+        작성한 스레드가 없습니다.
+      </div>
+      <div v-else class="threads-list">
+        <div v-for="thread in threads" :key="thread.id" class="thread-item" @click="goToThread(thread.id)">
+          <h4>{{ thread.title }}</h4>
+          <p class="thread-meta">
+            ❤️ {{ thread.likes_count }} ・ 💬 {{ thread.comments_count }}
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Library Tab -->
+    <section v-if="activeTab === 'library'" class="library-section">
+      <div v-if="library.length === 0" class="no-books">
+        서재에 추가된 책이 없습니다.
+      </div>
+      <div v-else class="library-grid">
+        <div v-for="item in library" :key="item.id" class="book-item" @click="goToBook(item.book.id)">
+          <img :src="item.book.cover" :alt="item.book.title" class="book-cover" />
+          <h4>{{ item.book.title }}</h4>
+          <p class="book-author">{{ item.book.author }}</p>
+        </div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import axios from 'axios'
+
+const route = useRoute()
+const router = useRouter()
+const user = ref({})
+const threads = ref([])
+const library = ref([])
+const isFollowing = ref(false)
+const activeTab = ref('threads')
+
+// Check if this is the user's own profile
+const isOwnProfile = computed(() => {
+  const currentUserId = localStorage.getItem('userId')
+  return !route.params.userId || route.params.userId === currentUserId
+})
+
+onMounted(async () => {
+  try {
+    const token = localStorage.getItem('token')
+    if (!token) {
+      router.push('/login')
+      return
+    }
+
+    const userId = route.params.userId // Get userId from route params
+    console.log('Current route userId:', userId)
+    
+    // If no userId in params, it's the user's own profile
+    const endpoint = userId 
+      ? `http://127.0.0.1:8000/api/users/${userId}/profile/`
+      : 'http://127.0.0.1:8000/accounts/api/mypage/'
+    
+    console.log('Loading profile from:', endpoint)
+    const res = await axios.get(endpoint, {
+      headers: {
+        Authorization: `Token ${token}`
+      }
+    })
+    console.log('Profile response:', res.data)
+    user.value = res.data
+    console.log('User value after setting:', user.value)
+    isFollowing.value = user.value.is_following
+
+    // Only load threads and library if we have a valid user ID
+    if (user.value.id) {
+      console.log('User ID found:', user.value.id)
+      try {
+        // Load user's threads
+        try {
+          const threadsRes = await axios.get(`http://127.0.0.1:8000/api/users/${user.value.id}/threads/`, {
+            headers: {
+              Authorization: `Token ${token}`
+            }
+          })
+          threads.value = threadsRes.data
+        } catch (error) {
+          console.error('Error loading threads:', error)
+          threads.value = [] // Reset threads on error
+        }
+
+        // Load user's library
+        const libraryEndpoint = userId
+          ? `http://127.0.0.1:8000/api/users/${userId}/library/`
+          : 'http://127.0.0.1:8000/api/users/library/'
+        
+        console.log('Loading library from:', libraryEndpoint)
+        console.log('Using token:', token)
+        
+        try {
+          const libraryRes = await axios.get(libraryEndpoint, {
+            headers: {
+              Authorization: `Token ${token}`
+            }
+          })
+          console.log('Library response:', libraryRes)
+          console.log('Library data:', libraryRes.data)
+          library.value = libraryRes.data
+        } catch (error) {
+          console.error('Library loading error:', error)
+          if (error.response) {
+            console.error('Error response:', error.response.data)
+            console.error('Error status:', error.response.status)
+          }
+          library.value = [] // Reset library on error
+        }
+      } catch (error) {
+        console.error('Error loading user data:', error)
+        if (error.response) {
+          console.error('Error response:', error.response.data)
+        }
+      }
+    } else {
+      console.error('No user ID available')
+    }
+  } catch (error) {
+    console.error("프로필 로딩 실패:", error)
+    if (error.response) {
+      console.error("Error response:", error.response.data)
+      if (error.response.status === 401) {
+        router.push('/login')
+      }
+    }
+  }
+})
+
+const editProfile = () => {
+  router.push('/profile/edit')
+}
+
+const toggleFollow = async () => {
+  try {
+    const token = localStorage.getItem('token')
+    const response = await axios.post(
+      `http://127.0.0.1:8000/api/follow/${route.params.userId}/`,
+      {},
+      {
+        headers: {
+          Authorization: `Token ${token}`
+        }
+      }
+    )
+    isFollowing.value = response.data.is_following
+    user.value.followers_count = response.data.followers_count
+  } catch (error) {
+    console.error("팔로우 토글 실패:", error)
+  }
+}
+
+const goToThread = (threadId) => {
+  router.push(`/threads/${threadId}`)
+}
+
+const goToBook = (bookId) => {
+  router.push(`/books/${bookId}`)
+}
+</script>
+
+<style scoped>
+.profile-container {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+.profile-section {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.profile-image {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 20px;
+}
+
+.username {
+  color: #666;
+  margin-bottom: 15px;
+}
+
+.follow-stats {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin: 20px 0;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-value {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #666;
+}
+
+.interests {
+  margin: 20px 0;
+}
+
+.interest-tag {
+  display: inline-block;
+  background: #f0f0f0;
+  padding: 5px 12px;
+  border-radius: 15px;
+  margin: 0 5px 5px 0;
+  font-size: 14px;
+}
+
+.follow-btn {
+  padding: 8px 20px;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.follow-btn.following {
+  background-color: #ddd;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.tab-btn {
+  padding: 10px 20px;
+  border: none;
+  background: none;
+  font-size: 16px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.tab-btn.active {
+  border-bottom-color: #e74c3c;
+  color: #e74c3c;
+}
+
+/* Threads Section */
+.threads-section {
+  margin-top: 20px;
+}
+
+.thread-item {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.thread-item:hover {
+  transform: translateY(-2px);
+}
+
+.thread-meta {
+  color: #666;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+/* Library Section */
+.library-section {
+  margin-top: 20px;
+}
+
+.library-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 20px;
+  padding: 20px 0;
+}
+
+.book-item {
+  background: white;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.book-item:hover {
+  transform: translateY(-2px);
+}
+
+.book-cover {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+.book-author {
+  color: #666;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+.no-threads, .no-books {
+  text-align: center;
+  color: #666;
+  padding: 40px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+</style>

@@ -3,7 +3,7 @@ import HomeView from '../views/HomeView.vue'
 import LoginView from '../views/LoginView.vue'
 import BookListView from '../views/BookListView.vue'
 import BookDetailView from '../views/BookDetailView.vue'
-import MyPageView from '@/views/MyPageView.vue'
+import ProfileView from '@/views/ProfileView.vue'
 import SignUpView from '@/views/SignUpView.vue'
 import ThreadDetail from '@/views/ThreadDetail.vue'
 
@@ -36,9 +36,16 @@ const router = createRouter({
       component: BookDetailView,
     },
     {
-      path: '/mypage',
-      name: 'MyPageView',
-      component: MyPageView,
+      path: '/profile',
+      name: 'Profile',
+      component: ProfileView,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/users/:userId/profile',
+      name: 'UserProfile',
+      component: ProfileView,
+      meta: { requiresAuth: true }
     },
     {
       path: '/threads/:threadId',
