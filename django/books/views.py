@@ -189,11 +189,28 @@ class UserLibraryView(APIView):
                 )
             
             # Get library items
-            library_items = UserLibrary.objects.filter(user_id=target_user_id).select_related('book').order_by('-added_date')
+            library_items = UserLibrary.objects.filter(user_id=target_user_id).select_related('book', 'book__category').order_by('-added_date')
             print(f"Found {library_items.count()} library items")
             
+            # Calculate top 3 genres
+            genre_counts = {}
+            for item in library_items:
+                category = item.book.category
+                if category:
+                    genre_counts[category.id] = {
+                        'id': category.id,
+                        'name': category.name,
+                        'count': genre_counts.get(category.id, {}).get('count', 0) + 1
+                    }
+            
+            # Sort genres by count and get top 3
+            top_genres = sorted(genre_counts.values(), key=lambda x: x['count'], reverse=True)[:3]
+            
             serializer = UserLibrarySerializer(library_items, many=True)
-            return Response(serializer.data)
+            return Response({
+                'library': serializer.data,
+                'top_genres': top_genres
+            })
             
         except Exception as e:
             print(f"Error in UserLibraryView: {str(e)}")
