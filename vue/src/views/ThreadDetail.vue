@@ -66,11 +66,11 @@
               </div>
               <div class="comment-actions" v-if="isCommentAuthor(comment)">
                 <template v-if="editingComment?.id === comment.id">
-                  <button @click="saveEdit" class="save-btn">저장</button>
-                  <button @click="cancelEdit" class="cancel-btn">취소</button>
+                  <button @click="saveCommentEdit" class="save-btn">저장</button>
+                  <button @click="cancelCommentEdit" class="cancel-btn">취소</button>
                 </template>
                 <template v-else>
-                  <button @click="startEdit(comment)" class="edit-btn">수정</button>
+                  <button @click="startCommentEdit(comment)" class="edit-btn">수정</button>
                   <button @click="deleteComment(comment.id)" class="delete-btn">삭제</button>
                 </template>
               </div>
@@ -295,13 +295,13 @@ export default {
         }
       }
     },
-    startEdit(comment) {
+    startCommentEdit(comment) {
       this.editingComment = { ...comment };
     },
-    cancelEdit() {
+    cancelCommentEdit() {
       this.editingComment = null;
     },
-    async saveEdit() {
+    async saveCommentEdit() {
       if (!this.editingComment.content.trim()) {
         alert('댓글 내용을 입력해주세요.');
         return;
@@ -322,7 +322,7 @@ export default {
           }
         );
 
-        // Update the comment in the list
+        // 수정된 댓글로 업데이트
         const index = this.thread.comments.findIndex(c => c.id === this.editingComment.id);
         if (index !== -1) {
           this.thread.comments[index] = response.data;
@@ -334,28 +334,6 @@ export default {
           console.error('Error details:', error.response.data);
         }
         alert('댓글 수정에 실패했습니다.');
-      }
-    },
-    async deleteComment(commentId) {
-      if (!confirm('댓글을 삭제하시겠습니까?')) return;
-
-      try {
-        const token = localStorage.getItem('token');
-        await axios.delete(
-          `http://127.0.0.1:8000/api/comments/${commentId}/delete/`,
-          {
-            headers: {
-              Authorization: `Token ${token}`
-            }
-          }
-        );
-
-        // Remove the comment from the list
-        this.thread.comments = this.thread.comments.filter(c => c.id !== commentId);
-        this.thread.comments_count -= 1;
-      } catch (error) {
-        console.error('댓글 삭제 실패:', error);
-        alert('댓글 삭제에 실패했습니다.');
       }
     },
     startEditing() {
@@ -481,6 +459,28 @@ export default {
     handleImageError(e) {
       console.log('Image load error, using default image')
       e.target.src = '/default-profile.png'
+    },
+    async deleteComment(commentId) {
+      if (!confirm('댓글을 삭제하시겠습니까?')) return;
+
+      try {
+        const token = localStorage.getItem('token');
+        await axios.delete(
+          `http://127.0.0.1:8000/api/comments/${commentId}/delete/`,
+          {
+            headers: {
+              Authorization: `Token ${token}`
+            }
+          }
+        );
+
+        // Remove the comment from the list
+        this.thread.comments = this.thread.comments.filter(c => c.id !== commentId);
+        this.thread.comments_count -= 1;
+      } catch (error) {
+        console.error('댓글 삭제 실패:', error);
+        alert('댓글 삭제에 실패했습니다.');
+      }
     },
   }
 }
