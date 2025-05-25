@@ -205,7 +205,7 @@ export default {
             }
           }
         )
-        this.isInLibrary = libraryRes.data.some(item => item.book.id === this.book.id)
+        this.isInLibrary = libraryRes.data.library.some(item => item.book.id === this.book.id)
       } catch (error) {
         console.error('서재 상태 확인 실패:', error)
       }
@@ -241,8 +241,8 @@ export default {
         this.isInLibrary = !this.isInLibrary
       } catch (error) {
         console.error('서재 업데이트 실패:', error)
-        if (error.response?.status === 400) {
-          alert('이미 서재에 추가된 책입니다.')
+        if (error.response?.status === 401) {
+          alert('로그인이 필요합니다.')
         } else {
           alert('서재 업데이트에 실패했습니다.')
         }

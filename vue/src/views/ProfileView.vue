@@ -73,6 +73,18 @@
               </div>
             </div>
 
+            <!-- Top Genres Section -->
+            <div v-if="topGenres.length > 0" class="top-genres-section">
+              <h3 class="section-title">선호 장르</h3>
+              <div class="top-genres-grid">
+                <div v-for="(genre, index) in topGenres" :key="genre.id" class="genre-item">
+                  <div class="rank-badge">{{ index + 1 }}순위</div>
+                  <h4 class="genre-name">{{ genre.name }}</h4>
+                  <p class="genre-count">{{ genre.count }}권</p>
+                </div>
+              </div>
+            </div>
+
             <div v-if="library.length === 0" class="empty-state">
               <p>서재에 추가된 책이 없습니다.</p>
             </div>
@@ -153,6 +165,7 @@ const user = ref({})
 const threads = ref([])
 const library = ref([])
 const topBooks = ref([])
+const topGenres = ref([])
 const isFollowing = ref(false)
 const activeTab = ref('library')
 const showLibraryEdit = ref(false)
@@ -226,10 +239,12 @@ const loadProfileData = async () => {
               }
             })
             console.log('Library response:', libraryRes)
-            library.value = libraryRes.data
+            library.value = libraryRes.data.library
+            topGenres.value = libraryRes.data.top_genres
           } catch (error) {
             console.error('Library loading error:', error)
             library.value = []
+            topGenres.value = []
           }
 
           // Load user's threads
@@ -271,6 +286,7 @@ const loadProfileData = async () => {
       threads.value = []
       library.value = []
       topBooks.value = []
+      topGenres.value = []
     }
   } catch (error) {
     console.error("프로필 로딩 실패:", error)
@@ -282,6 +298,7 @@ const loadProfileData = async () => {
         threads.value = []
         library.value = []
         topBooks.value = []
+        topGenres.value = []
       }
     }
   }
@@ -724,7 +741,6 @@ watch(
   display: flex;
   gap: 15px;
   color: #888;
-  font-size: 0.9rem;
 }
 
 .interactions {
@@ -864,5 +880,44 @@ watch(
   -webkit-box-orient: vertical;
   overflow: hidden;
   width: 100%;
+}
+
+.top-genres-section {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.top-genres-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.genre-item {
+  position: relative;
+  background: #f8f9fa;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  text-align: center;
+  transition: transform 0.2s;
+}
+
+.genre-item:hover {
+  transform: translateY(-2px);
+}
+
+.genre-name {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.genre-count {
+  font-size: 0.9rem;
+  color: #666;
 }
 </style>
