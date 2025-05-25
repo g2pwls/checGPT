@@ -33,15 +33,28 @@ class ThreadSerializer(serializers.ModelSerializer):
     likes_count = serializers.SerializerMethodField()
     comments_count = serializers.SerializerMethodField()
 
+    # ✅ 읽기용 (프론트에 전체 book 정보 전달)
+    book = BookSerializer(read_only=True)
+
+    # ✅ 쓰기용 (프론트에서 book.id를 보낼 수 있도록 허용)
+    book_id = serializers.PrimaryKeyRelatedField(
+        queryset=Book.objects.all(),
+        source='book',
+        write_only=True
+    )
 
     class Meta:
         model = Thread
         fields = [
-            'id', 'title', 'content', 'writer', 'book',
+            'id', 'title', 'content', 'writer',
+            'book', 'book_id', 'read_date',
             'comments', 'likes_count', 'comments_count',
         ]
+        read_only_fields = ['id', 'writer', 'book', 'comments', 'likes_count', 'comments_count']
+
 
     def get_likes_count(self, obj):
         return obj.likes.count()
+
     def get_comments_count(self, obj):
         return obj.comments.count()
