@@ -16,7 +16,13 @@
         <h1 class="thread-title">{{ thread.title }}</h1>
         <p class="thread-content">{{ thread.content }}</p>
         <div class="actions">
-          <button @click="toggleLike">❤️ {{ thread.likes_count }}</button>
+          <button 
+            @click="toggleLike" 
+            class="like-btn" 
+            :class="{ 'liked': thread.is_liked }"
+          >
+            ❤️ {{ thread.likes_count }}
+          </button>
           <button @click="editThread">수정</button>
           <button @click="deleteThread">삭제</button>
         </div>
@@ -151,8 +157,45 @@ export default {
   },
   methods: {
     async toggleLike() {
-      await axios.post(`/api/threads/${this.thread.id}/like/`);
-      this.thread.likes_count += 1;
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          alert('로그인이 필요합니다.');
+          return;
+        }
+
+        // Optimistically update UI
+        const newLikeStatus = !this.thread.is_liked;
+        this.thread.is_liked = newLikeStatus;
+        this.thread.likes_count += newLikeStatus ? 1 : -1;
+
+        const response = await axios.post(
+          `http://127.0.0.1:8000/api/threads/${this.thread.id}/like/`,
+          {},
+          {
+            headers: {
+              Authorization: `Token ${token}`
+            }
+          }
+        );
+
+        // Update with server response
+        this.thread.is_liked = response.data.is_liked;
+        this.thread.likes_count = response.data.likes_count;
+      } catch (error) {
+        console.error("좋아요 토글 실패:", error);
+        // Revert optimistic update on error
+        this.thread.is_liked = !this.thread.is_liked;
+        this.thread.likes_count += this.thread.is_liked ? 1 : -1;
+
+        if (error.response) {
+          if (error.response.status === 401) {
+            alert('로그인이 필요합니다.');
+          } else {
+            alert('좋아요 처리에 실패했습니다.');
+          }
+        }
+      }
     },
     async postComment() {
       const res = await axios.post(`/api/comments/`, {
@@ -474,5 +517,25 @@ export default {
 
 .following:hover {
   background: #444;
+}
+
+.like-btn {
+  margin-right: 10px;
+  background: #f0f0f0;
+  color: #333;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.like-btn.liked {
+  background: #e74c3c;
+  color: white;
+}
+
+.like-btn:hover {
+  transform: scale(1.05);
 }
 </style>
