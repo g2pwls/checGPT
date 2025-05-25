@@ -57,7 +57,9 @@
             </div>
             <div v-else class="library-grid">
               <div v-for="item in library" :key="item.id" class="library-item" @click="goToBook(item.book.id)">
-                <img :src="item.book.cover" :alt="item.book.title" class="book-cover">
+                <div class="book-cover-container">
+                  <img :src="item.book.cover" :alt="item.book.title" class="book-cover">
+                </div>
                 <h3 class="book-title">{{ item.book.title }}</h3>
                 <p class="book-author">{{ item.book.author }}</p>
               </div>
@@ -71,21 +73,38 @@
             </div>
             <div v-else class="threads-list">
               <div v-for="thread in threads" :key="thread.id" class="thread-item" @click="goToThread(thread.id)">
-                <div class="thread-main">
+                <div class="thread-header">
+                  <div class="book-info">
+                    <img 
+                      :src="thread.book.cover" 
+                      :alt="thread.book.title" 
+                      class="book-cover"
+                      @error="handleImageError"
+                    />
+                    <div class="book-details">
+                      <h4 class="book-title">{{ thread.book.title }}</h4>
+                      <div class="thread-meta">
+                        <span class="author">by {{ user.name }}</span>
+                        <span class="date">{{ formatDate(thread.created_at) }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="thread-body">
                   <h3 class="thread-title">{{ thread.title }}</h3>
                   <p class="thread-content">{{ thread.content }}</p>
                 </div>
                 <div class="thread-footer">
-                  <div class="thread-book-info">
-                    <img 
-                      :src="thread.book.cover" 
-                      :alt="thread.book.title" 
-                      class="thread-book-cover"
-                      @error="handleImageError"
-                    />
-                    <span class="thread-book-title">{{ thread.book.title }}</span>
+                  <div class="engagement-stats">
+                    <span class="likes">
+                      <i class="fas fa-heart"></i>
+                      {{ thread.likes_count || 0 }}
+                    </span>
+                    <span class="comments">
+                      <i class="fas fa-comment"></i>
+                      {{ thread.comments_count || 0 }}
+                    </span>
                   </div>
-                  <span class="thread-date">{{ formatDate(thread.created_at) }}</span>
                 </div>
               </div>
             </div>
@@ -459,52 +478,105 @@ watch(
 
 .library-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 1.5rem;
+  padding: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+@media (max-width: 1200px) {
+  .library-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 992px) {
+  .library-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .library-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .library-grid {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
 }
 
 .library-item {
-  background: #f8f9fa;
+  background: white;
   border-radius: 0.5rem;
   padding: 1rem;
   transition: transform 0.2s;
   cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
 .library-item:hover {
   transform: translateY(-2px);
 }
 
-.book-cover {
+.book-cover-container {
   width: 100%;
-  aspect-ratio: 2/3;
-  object-fit: cover;
-  border-radius: 0.5rem;
+  display: flex;
+  justify-content: center;
   margin-bottom: 0.5rem;
 }
 
+.book-cover {
+  width: 100%;
+  max-width: 180px;
+  aspect-ratio: 2/3;
+  object-fit: cover;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
 .book-title {
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: bold;
   margin-bottom: 0.25rem;
   color: #333;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.3;
+  height: 2.6em;
+  width: 100%;
 }
 
 .book-author {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   color: #666;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  width: 100%;
 }
 
 .threads-list {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.5rem;
 }
 
 .thread-item {
-  background: #f8f9fa;
-  border-radius: 0.5rem;
+  background: white;
+  border-radius: 1rem;
   padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s;
   cursor: pointer;
 }
@@ -513,51 +585,91 @@ watch(
   transform: translateY(-2px);
 }
 
-.thread-main {
+.thread-header {
+  margin-bottom: 1rem;
+}
+
+.book-info {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.book-cover {
+  width: 80px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.book-details {
+  flex: 1;
+}
+
+.book-title {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.thread-meta {
+  display: flex;
+  gap: 1rem;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.author {
+  font-weight: 500;
+}
+
+.date {
+  color: #888;
+}
+
+.thread-body {
   margin-bottom: 1rem;
 }
 
 .thread-title {
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   font-weight: bold;
-  margin-bottom: 0.5rem;
   color: #333;
+  margin-bottom: 0.5rem;
 }
 
 .thread-content {
   color: #666;
-  line-height: 1.5;
-  margin-bottom: 1rem;
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .thread-footer {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  justify-content: flex-end;
   padding-top: 1rem;
   border-top: 1px solid #eee;
 }
 
-.thread-book-info {
+.engagement-stats {
+  display: flex;
+  gap: 1.5rem;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.likes, .comments {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
-.thread-book-cover {
-  width: 40px;
-  height: 60px;
-  object-fit: cover;
-  border-radius: 0.25rem;
-}
-
-.thread-book-title {
-  color: #666;
-  font-size: 0.9rem;
-}
-
-.thread-date {
-  color: #888;
-  font-size: 0.9rem;
+.likes i, .comments i {
+  color: #007bff;
 }
 </style>
