@@ -6,7 +6,7 @@
         <button @click="addToLibrary" class="action-btn" :class="{ 'in-library': isInLibrary }">
           {{ isInLibrary ? '서재에서 제거' : '내 서재에 추가하기' }}
         </button>
-        <button @click="isThreadModalOpen = true">스레드 작성하기</button>
+        <button @click="isThreadModalOpen = true" class="action-btn">스레드 작성하기</button>
       </div>
     </header>
 
