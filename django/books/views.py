@@ -37,7 +37,7 @@ class BookDetailView(APIView):
 def recommended_books(request, book_id):
     book = get_object_or_404(Book, id=book_id)
     recommended = Book.objects.filter(
-        Q(category=book.category) | Q(author=book.author)
+        Q(author=book.author) | Q(category=book.category)
     ).exclude(id=book.id).order_by('?')[:3]
     serializer = BookSerializer(recommended, many=True)
     return Response(serializer.data)

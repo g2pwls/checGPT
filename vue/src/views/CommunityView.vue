@@ -1,50 +1,52 @@
 <template>
-  <div class="community-container">
-    <h1 class="community-title">커뮤니티</h1>
-    
-    <!-- 정렬 탭 추가 -->
-    <div class="sort-tabs">
-      <button 
-        @click="sortType = 'latest'" 
-        :class="{ active: sortType === 'latest' }"
-        class="sort-tab"
-      >
-        최신순
-      </button>
-      <button 
-        @click="sortType = 'likes'" 
-        :class="{ active: sortType === 'likes' }"
-        class="sort-tab"
-      >
-        좋아요순
-      </button>
-      <button 
-        @click="sortType = 'comments'" 
-        :class="{ active: sortType === 'comments' }"
-        class="sort-tab"
-      >
-        댓글순
-      </button>
-    </div>
+  <div class="community-view">
+    <div class="community-container">
+      <h1 class="community-title">커뮤니티</h1>
+      
+      <!-- 정렬 탭 추가 -->
+      <div class="sort-tabs">
+        <button 
+          @click="sortType = 'latest'" 
+          :class="{ active: sortType === 'latest' }"
+          class="sort-tab"
+        >
+          최신순
+        </button>
+        <button 
+          @click="sortType = 'likes'" 
+          :class="{ active: sortType === 'likes' }"
+          class="sort-tab"
+        >
+          좋아요순
+        </button>
+        <button 
+          @click="sortType = 'comments'" 
+          :class="{ active: sortType === 'comments' }"
+          class="sort-tab"
+        >
+          댓글순
+        </button>
+      </div>
 
-    <div class="threads-container">
-      <div v-for="thread in threads" :key="thread.id" class="thread-card" @click="goToThread(thread.id)">
-        <div class="thread-header">
-          <div class="book-info">
-            <img :src="thread.book.cover" alt="책 표지" class="book-cover">
-            <span class="book-title">{{ thread.book.title }}</span>
+      <div class="threads-container">
+        <div v-for="thread in threads" :key="thread.id" class="thread-card" @click="goToThread(thread.id)">
+          <div class="thread-header">
+            <div class="book-info">
+              <img :src="thread.book.cover" alt="책 표지" class="book-cover">
+              <span class="book-title">{{ thread.book.title }}</span>
+            </div>
+            <div class="thread-meta">
+              <span class="author">by {{ thread.writer.username }}</span>
+              <span class="date">{{ formatDate(thread.read_date) }}</span>
+            </div>
           </div>
-          <div class="thread-meta">
-            <span class="author">by {{ thread.writer.username }}</span>
-            <span class="date">{{ formatDate(thread.read_date) }}</span>
-          </div>
-        </div>
-        <h2 class="thread-title">{{ thread.title }}</h2>
-        <p class="thread-content">{{ truncateContent(thread.content) }}</p>
-        <div class="thread-footer">
-          <div class="interactions">
-            <span>❤️ {{ thread.likes_count }}</span>
-            <span>💬 {{ thread.comments_count }}</span>
+          <h2 class="thread-title">{{ thread.title }}</h2>
+          <p class="thread-content">{{ truncateContent(thread.content) }}</p>
+          <div class="thread-footer">
+            <div class="interactions">
+              <span>❤️ {{ thread.likes_count }}</span>
+              <span>💬 {{ thread.comments_count }}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -107,10 +109,17 @@ export default {
 </script>
 
 <style scoped>
+.community-view {
+  background-color: #f9f6f2;
+  min-height: 100vh;
+  width: 100%;
+  padding-top: 1px; /* margin collapse 방지 */
+}
+
 .community-container {
   max-width: 1200px;
-  margin: 40px auto;
-  padding: 0 20px;
+  margin: 0 auto;
+  padding: 40px 20px;
 }
 
 .community-title {
@@ -136,6 +145,8 @@ export default {
   cursor: pointer;
   transition: all 0.3s ease;
   font-size: 14px;
+  border: 1px solid #ddd;
+
 }
 
 .sort-tab:hover {

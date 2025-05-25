@@ -107,7 +107,8 @@
         </div>
 
         <div class="map-section" v-if="mapUrl">
-          <h3>현재 위치 주변 도서관</h3>
+          <h3>이 책을 읽으면 좋은 장소</h3>
+          <p class="recommend-place" v-if="recommendedPlace">{{ recommendedPlace }}</p>
           <iframe :src="mapUrl" width="100%" height="300" style="border:0;" loading="lazy"></iframe>
         </div>
       </section>
@@ -150,7 +151,7 @@ export default {
       sortType: 'latest',
       isGenerating: false,
       recommendations: [],
-      userLocation: null,
+      recommendedPlace: '',
       mapUrl: '',
       isThreadModalOpen: false,
       isInLibrary: false,
@@ -172,6 +173,7 @@ export default {
     await this.loadBookData();
     await this.loadThreads();
     await this.checkLibraryStatus();
+    await this.getRecommendedPlace();
   },
   mounted() {
     this.getUserLocation();
@@ -297,6 +299,58 @@ export default {
           alert('서재 업데이트에 실패했습니다.')
         }
       }
+    },
+    async getRecommendedPlace() {
+      try {
+        const prompt = `다음 책의 실제 내용에서 가장 중요한 장면이 일어나는 구체적인 장소 하나만 알려주세요:
+제목: ${this.book.title}
+작가: ${this.book.author}
+줄거리: ${this.book.description}
+
+다음 조건을 반드시 지켜주세요:
+1. 책의 내용에서 실제로 언급된 구체적인 장소만 알려주세요
+2. 작가의 이름이나 책 제목과 관련된 일반적인 장소는 피해주세요 (예: 작가가 '한강'이라고 무조건 '한강'을 추천하지 말 것)
+3. 장소는 최대한 구체적으로 알려주세요 (예: '서울'보다는 '서울 광화문 광장' 처럼)
+4. 장소 이름만 알려주세요. 설명은 필요 없습니다.`;
+        
+        const response = await axios.post('https://api.openai.com/v1/chat/completions', {
+          model: "gpt-3.5-turbo",
+          messages: [{
+            role: "user",
+            content: prompt
+          }],
+          temperature: 0.7,
+          max_tokens: 100
+        }, {
+          headers: {
+            'Authorization': `Bearer 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`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        // GPT 응답에서 장소 추출
+        const content = response.data.choices[0].message.content;
+        const place = this.extractPlace(content);
+        if (place) {
+          this.recommendedPlace = place;
+          this.updateMapUrl(place);
+        }
+      } catch (error) {
+        console.error('장소 추천 실패:', error);
+      }
+    },
+    extractPlace(content) {
+      // 불필요한 설명이나 부가 정보를 제거하고 장소명만 추출
+      const cleanedContent = content
+        .replace(/^[^가-힣a-zA-Z\d]*/, '') // 시작 부분의 특수문자 제거
+        .replace(/[.!?][^가-힣a-zA-Z\d]*$/, '') // 끝 부분의 특수문자와 마침표 제거
+        .replace(/^장소[:：]\s*/, '') // "장소:" 같은 텍스트 제거
+        .trim();
+      
+      return cleanedContent;
+    },
+    updateMapUrl(place) {
+      this.mapUrl = `https://www.google.com/maps?q=${encodeURIComponent(place)}&output=embed`;
     },
   }
 }
@@ -622,5 +676,14 @@ export default {
 .toggle-icon {
   font-size: 12px;
   transition: transform 0.3s ease;
+}
+
+.recommend-place {
+  margin: 10px 0;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  color: #2c3e50;
 }
 </style>
