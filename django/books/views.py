@@ -7,6 +7,7 @@ from django.db.models import Q
 from .models import Book, Category, Thread, UserLibrary
 from .serializers import BookSerializer, CategorySerializer, ThreadSerializer, UserLibrarySerializer
 from django.contrib.auth import get_user_model
+from rest_framework.exceptions import PermissionDenied
 
 # ----------------------
 # 📚 Book 관련 API
@@ -108,6 +109,28 @@ class CommentCreateView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+
+class CommentUpdateView(generics.UpdateAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        comment = get_object_or_404(Comment, pk=self.kwargs['pk'])
+        if comment.author != self.request.user:
+            raise PermissionDenied("You can only edit your own comments.")
+        return comment
+
+class CommentDeleteView(generics.DestroyAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        comment = get_object_or_404(Comment, pk=self.kwargs['pk'])
+        if comment.author != self.request.user:
+            raise PermissionDenied("You can only delete your own comments.")
+        return comment
 
 @api_view(['POST'])
 def add_to_library(request, book_id):

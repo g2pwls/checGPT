@@ -3,7 +3,8 @@ from django.urls import path
 from .views import (
     BookListView, CategoryListView, BookDetailView, BookAudioGenerateView,
     ThreadListCreateView, ThreadDetailView, thread_like, CommentCreateView,
-    add_to_library, remove_from_library, UserLibraryView, UserThreadsView
+    CommentUpdateView, CommentDeleteView, add_to_library, remove_from_library,
+    UserLibraryView, UserThreadsView
 )
 from django.conf import settings
 from django.conf.urls.static import static
@@ -20,6 +21,8 @@ urlpatterns = [
     path('threads/<int:pk>/', ThreadDetailView.as_view()),
     path('threads/<int:pk>/like/', thread_like),
     path('comments/', CommentCreateView.as_view(), name='comment-create'),
+    path('comments/<int:pk>/', CommentUpdateView.as_view(), name='comment-update'),
+    path('comments/<int:pk>/delete/', CommentDeleteView.as_view(), name='comment-delete'),
     # Library endpoints
     path('books/<int:book_id>/add-to-library/', add_to_library),
     path('books/<int:book_id>/remove-from-library/', remove_from_library),
