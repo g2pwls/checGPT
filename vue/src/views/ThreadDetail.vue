@@ -44,23 +44,55 @@
 
     <!-- 프로필 정보 -->
     <div class="profile-box" v-if="thread && thread.writer">
-      <img 
-        :src="thread.writer.profile_image ? `http://127.0.0.1:8000${thread.writer.profile_image}` : '/default-profile.png'"
-        class="avatar" 
-        alt="프로필 이미지"
-      />
-      <span class="username">{{ thread.writer.username }}</span>
-      <button 
-        v-if="!isOwnThread" 
-        @click="toggleFollow" 
-        class="follow-btn" 
-        :class="{ 'following': thread.writer.is_following }"
-        id="follow-button"
-        name="follow-button"
-      >
-        {{ thread.writer.is_following ? '팔로우 취소' : '+ 팔로우' }}
-      </button>
-      <button @click="goToProfile">프로필가기</button>
+      <div class="thread-header">
+        <div class="user-info">
+          <RouterLink 
+            :to="{ name: 'UserProfile', params: { userId: thread.writer?.id } }"
+            class="profile-image-link"
+          >
+            <img
+              :src="getProfileImageUrl(thread.writer?.profile_image)"
+              alt="프로필 사진"
+              class="profile-image"
+              @error="handleImageError"
+            />
+          </RouterLink>
+          <div class="user-details">
+            <RouterLink 
+              :to="{ name: 'UserProfile', params: { userId: thread.writer?.id } }"
+              class="username-link"
+            >
+              {{ thread.writer?.name }}
+            </RouterLink>
+            <RouterLink 
+              :to="{ name: 'UserProfile', params: { userId: thread.writer?.id } }"
+              class="username"
+            >
+              @{{ thread.writer?.username }}
+            </RouterLink>
+          </div>
+        </div>
+        <div class="follow-stats">
+          <div class="stat-item">
+            <span class="stat-value">{{ thread.writer?.followers_count || 0 }}</span>
+            <span class="stat-label">팔로워</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value">{{ thread.writer?.following_count || 0 }}</span>
+            <span class="stat-label">팔로잉</span>
+          </div>
+        </div>
+        <button 
+          v-if="!isOwnThread" 
+          @click="toggleFollow" 
+          class="follow-btn" 
+          :class="{ 'following': thread.writer.is_following }"
+          id="follow-button"
+          name="follow-button"
+        >
+          {{ thread.writer.is_following ? '팔로우 취소' : '+ 팔로우' }}
+        </button>
+      </div>
     </div>
   </section>
 </template>
@@ -210,8 +242,16 @@ export default {
         }
       }
     },
-    goToProfile() {
-      this.$router.push(`/users/${this.thread.writer.id}/profile`);
+    getProfileImageUrl(imagePath) {
+      if (!imagePath) return '/default-profile.png'
+      // If the image path is already a full URL, return it as is
+      if (imagePath.startsWith('http')) return imagePath
+      // Otherwise, prepend the Django media URL
+      return `http://127.0.0.1:8000${imagePath}`
+    },
+    handleImageError(e) {
+      console.log('Image load error, using default image')
+      e.target.src = '/default-profile.png'
     },
   }
 }
@@ -324,7 +364,13 @@ export default {
   border-radius: 50%;
 }
 .username {
-  font-weight: bold;
+  color: #aaa;
+  text-decoration: none;
+  font-size: 0.9em;
+  transition: color 0.3s ease;
+}
+.username:hover {
+  color: #e74c3c;
 }
 .follow-btn {
   background: #e74c3c;
@@ -336,5 +382,97 @@ export default {
 }
 .following {
   background: #333;
+}
+
+.thread-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.profile-image {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.profile-image-link {
+  display: block;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.profile-image-link:hover {
+  transform: scale(1.05);
+}
+
+.username-link {
+  color: #f1f1f1;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 1.1em;
+  transition: color 0.3s ease;
+}
+
+.username-link:hover {
+  color: #e74c3c;
+}
+
+.follow-stats {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-value {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #aaa;
+}
+
+.follow-btn {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.follow-btn:hover {
+  background: #c0392b;
+}
+
+.following {
+  background: #333;
+}
+
+.following:hover {
+  background: #444;
 }
 </style>
