@@ -115,7 +115,7 @@ export default {
   data() {
     return {
       book: {},
-      threads: [], // ✅ 추가
+      threads: [],
       isGenerating: false,
       recommendations: [],
       userLocation: null,
@@ -124,25 +124,34 @@ export default {
       isInLibrary: false,
     }
   },
+  watch: {
+    '$route.params.bookId': {
+      handler: async function() {
+        await this.loadBookData();
+        await this.loadThreads();
+        await this.checkLibraryStatus();
+      },
+    }
+  },
   async created() {
-    await this.loadBookData()
-    await this.loadThreads()
-    await this.checkLibraryStatus()
+    await this.loadBookData();
+    await this.loadThreads();
+    await this.checkLibraryStatus();
   },
   mounted() {
-    this.getUserLocation()
+    this.getUserLocation();
   },
   methods: {
     async loadBookData() {
-      const bookId = this.$route.params.bookId
+      const bookId = this.$route.params.bookId;
       try {
-        const response = await axios.get(`http://127.0.0.1:8000/api/books/${bookId}/`)
-        this.book = response.data
+        const response = await axios.get(`http://127.0.0.1:8000/api/books/${bookId}/`);
+        this.book = response.data;
 
-        const recRes = await axios.get(`http://127.0.0.1:8000/api/books/${bookId}/recommendations/`)
-        this.recommendations = recRes.data
+        const recRes = await axios.get(`http://127.0.0.1:8000/api/books/${bookId}/recommendations/`);
+        this.recommendations = recRes.data;
       } catch (error) {
-        console.error('책 정보를 불러오는 데 실패했습니다:', error)
+        console.error('책 정보를 불러오는 데 실패했습니다:', error);
       }
     },
     async generateAudio() {
@@ -171,7 +180,7 @@ export default {
       this.threads.unshift(newThread)  // 새 스레드를 목록 맨 위에 추가
     },
     goToBookDetail(bookId) {
-      this.$router.push(`/books/${bookId}`)
+      this.$router.push(`/books/${bookId}`);
     },
     goToThreadDetail(threadId) {
       this.$router.push(`/threads/${threadId}`)
@@ -374,6 +383,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-top: 10px;
 }
 
 /* 추천 도서 + 지도 섹션 */

@@ -1,131 +1,133 @@
 <template>
   <section class="thread-detail">
     <div class="main-container" v-if="thread">
-      <!-- 책 정보 -->
-      <div class="left-box" v-if="thread.book">
-        <RouterLink :to="{ name: 'BookDetail', params: { bookId: thread.book.id }}">
-          <img :src="thread.book.cover" alt="책 이미지" class="book-image" />
-          <div class="book-info">
-            <div class="book-title">{{ thread.book.title }}</div>
-            <div class="book-subtitle">{{ thread.book.subTitle }}</div>
-            <div class="book-pub_date">{{ thread.book.pub_date }}</div>
-          </div>
-        </RouterLink>
-      </div>
-
-      <!-- 스레드 본문 및 조작 -->
-      <div class="right-box">
-        <h1 class="thread-title">{{ thread.title }}</h1>
-        <p class="thread-content">{{ thread.content }}</p>
-        <div class="actions">
-          <button 
-            @click="toggleLike" 
-            class="like-btn" 
-            :class="{ 'liked': thread.is_liked }"
-          >
-            ❤️ {{ thread.likes_count }}
-          </button>
-          <button @click="editThread">수정</button>
-          <button @click="deleteThread">삭제</button>
-        </div>
-
-        <!-- 댓글 -->
-        <div class="comments" v-if="thread.comments">
-          <h3>댓글 ({{ thread.comments_count }})</h3>
-          <div class="comment-input-section">
-            <textarea 
-              v-model="newComment" 
-              placeholder="댓글을 입력하세요..." 
-              id="comment-input"
-              name="comment-input"
-              @keyup.enter="postComment"
-              @input="autoResize"
-              ref="commentInput"
-              class="comment-textarea"
-            ></textarea>
-            <button @click="postComment" class="comment-btn">댓글 작성</button>
-          </div>
-
-          <div v-for="comment in thread.comments" :key="comment.id" class="comment">
-            <div class="comment-content">
-              <div v-if="editingComment?.id === comment.id" class="edit-form">
-                <textarea 
-                  v-model="editingComment.content" 
-                  class="edit-textarea"
-                  rows="2"
-                ></textarea>
-              </div>
-              <p v-else>{{ comment.content }}</p>
-              <div class="comment-meta">
-                <span class="comment-author">@{{ comment.author.username }}</span>
-                <span class="comment-date">{{ formatDate(comment.created_at) }}</span>
-              </div>
+      <div class="content-wrapper">
+        <!-- 스레드 본문 및 조작 -->
+        <div class="right-box">
+          <h1 class="thread-title">{{ thread.title }}</h1>
+          <div v-if="!isEditing">
+            <p class="thread-content">{{ thread.content }}</p>
+            <div class="actions" v-if="isOwnThread">
+              <button @click="startEditing">수정</button>
+              <button @click="deleteThread">삭제</button>
             </div>
-            <div class="comment-actions" v-if="isCommentAuthor(comment)">
-              <template v-if="editingComment?.id === comment.id">
-                <button @click="saveEdit" class="save-btn">저장</button>
-                <button @click="cancelEdit" class="cancel-btn">취소</button>
-              </template>
-              <template v-else>
-                <button @click="startEdit(comment)" class="edit-btn">수정</button>
-                <button @click="deleteComment(comment.id)" class="delete-btn">삭제</button>
-              </template>
+            <div class="actions" v-if="!isOwnThread">
+              <button 
+                @click="toggleLike" 
+                class="like-btn" 
+                :class="{ 'liked': thread.is_liked }"
+              >
+                ❤️ {{ thread.likes_count }}
+              </button>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
+          <div v-else class="edit-form">
+            <input v-model="editForm.title" class="edit-input" placeholder="제목을 입력하세요" />
+            <textarea v-model="editForm.content" class="edit-textarea" placeholder="내용을 입력하세요"></textarea>
+            <div class="edit-actions">
+              <button @click="saveEdit">저장</button>
+              <button @click="cancelEdit">취소</button>
+            </div>
+          </div>
 
-    <!-- 프로필 정보 -->
-    <div class="profile-box" v-if="thread && thread.writer">
-      <div class="thread-header">
-        <div class="user-info">
-          <RouterLink 
-            :to="{ name: 'UserProfile', params: { userId: thread.writer?.id } }"
-            class="profile-image-link"
-          >
-            <img
-              :src="getProfileImageUrl(thread.writer?.profile_image)"
-              alt="프로필 사진"
-              class="profile-image"
-              @error="handleImageError"
-            />
-          </RouterLink>
-          <div class="user-details">
-            <RouterLink 
-              :to="{ name: 'UserProfile', params: { userId: thread.writer?.id } }"
-              class="username-link"
-            >
-              {{ thread.writer?.name }} 
-            </RouterLink>
-            <RouterLink 
-              :to="{ name: 'UserProfile', params: { userId: thread.writer?.id } }"
-              class="username"
-            >
-              @{{ thread.writer?.username }} 
-            </RouterLink>
+          <!-- 댓글 섹션 -->
+          <div class="comments" v-if="thread.comments">
+            <h3>댓글 ({{ thread.comments_count }})</h3>
+            <div class="comment-input-section">
+              <textarea 
+                v-model="newComment" 
+                placeholder="댓글을 입력하세요..." 
+                id="comment-input"
+                name="comment-input"
+                @keyup.enter="postComment"
+                @input="autoResize"
+                ref="commentInput"
+                class="comment-textarea"
+              ></textarea>
+              <div class="comment-btn-wrapper">
+                <button @click="postComment" class="comment-btn">댓글 작성</button>
+              </div>
+            </div>
+
+            <div v-for="comment in thread.comments" :key="comment.id" class="comment">
+              <div class="comment-content">
+                <div v-if="editingComment?.id === comment.id" class="edit-form">
+                  <textarea 
+                    v-model="editingComment.content" 
+                    class="edit-textarea"
+                    rows="2"
+                  ></textarea>
+                </div>
+                <p v-else>{{ comment.content }}</p>
+                <div class="comment-meta">
+                  <span class="comment-author">@{{ comment.author.username }}</span>
+                  <span class="comment-date">{{ formatDate(comment.created_at) }}</span>
+                </div>
+              </div>
+              <div class="comment-actions" v-if="isCommentAuthor(comment)">
+                <template v-if="editingComment?.id === comment.id">
+                  <button @click="saveEdit" class="save-btn">저장</button>
+                  <button @click="cancelEdit" class="cancel-btn">취소</button>
+                </template>
+                <template v-else>
+                  <button @click="startEdit(comment)" class="edit-btn">수정</button>
+                  <button @click="deleteComment(comment.id)" class="delete-btn">삭제</button>
+                </template>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="follow-stats">
-          <div class="stat-item">
-            <span class="stat-value">{{ thread.writer?.followers_count || 0 }}</span>
-            <span class="stat-label">팔로워</span>
+
+        <div class="left-sidebar">
+          <!-- 책 정보 -->
+          <div class="left-box" v-if="thread.book">
+            <RouterLink :to="{ name: 'BookDetail', params: { bookId: thread.book.id }}" class="book-card">
+              <div class="book-cover">
+                <img :src="thread.book.cover" alt="책 이미지" class="book-image" />
+              </div>
+              <div class="book-info">
+                <h3 class="book-title">{{ thread.book.title }}</h3>
+                <p class="book-subtitle">{{ thread.book.subTitle }}</p>
+                <p class="book-author">{{ thread.book.author }}</p>
+                <p class="book-pub_date">{{ thread.book.pub_date }}</p>
+              </div>
+            </RouterLink>
           </div>
-          <div class="stat-item">
-            <span class="stat-value">{{ thread.writer?.following_count || 0 }}</span>
-            <span class="stat-label">팔로잉</span>
+
+          <!-- 프로필 정보 -->
+          <div class="left-box profile-section" v-if="thread && thread.writer">
+            <RouterLink 
+              :to="{ name: 'UserProfile', params: { userId: thread.writer?.id } }"
+              class="profile-card"
+            >
+              <div class="profile-image-container">
+                <img
+                  :src="getProfileImageUrl(thread.writer?.profile_image)"
+                  alt="프로필 사진"
+                  class="profile-image"
+                  @error="handleImageError"
+                />
+              </div>
+              <div class="profile-info">
+                <div class="profile-name">{{ thread.writer?.name }}</div>
+                <div class="profile-username">@{{ thread.writer?.username }}</div>
+                <div class="follow-stats">
+                  <span class="stat-item">팔로워 {{ thread.writer?.followers_count || 0 }}</span>
+                  <span class="stat-divider">·</span>
+                  <span class="stat-item">팔로잉 {{ thread.writer?.following_count || 0 }}</span>
+                </div>
+              </div>
+            </RouterLink>
+            <button 
+              v-if="!isOwnThread" 
+              @click="toggleFollow" 
+              class="follow-btn" 
+              :class="{ 'following': thread.writer.is_following }"
+            >
+              {{ thread.writer.is_following ? '팔로우 취소' : '+ 팔로우' }}
+            </button>
           </div>
         </div>
-        <button 
-          v-if="!isOwnThread" 
-          @click="toggleFollow" 
-          class="follow-btn" 
-          :class="{ 'following': thread.writer.is_following }"
-          id="follow-button"
-          name="follow-button"
-        >
-          {{ thread.writer.is_following ? '팔로우 취소' : '+ 팔로우' }}
-        </button>
       </div>
     </div>
   </section>
@@ -140,12 +142,17 @@ export default {
       thread: null,
       newComment: '',
       editingComment: null,
+      isEditing: false,
+      editForm: {
+        title: '',
+        content: ''
+      }
     };
   },
   computed: {
     isOwnThread() {
       const currentUserId = localStorage.getItem('userId')
-      return this.thread?.writer?.id === currentUserId
+      return this.thread?.writer?.id.toString() === currentUserId
     }
   },
   async mounted() {
@@ -351,8 +358,41 @@ export default {
         alert('댓글 삭제에 실패했습니다.');
       }
     },
-    async editThread() {
-      this.$router.push(`/threads/${this.thread.id}/edit`);
+    startEditing() {
+      this.editForm.title = this.thread.title;
+      this.editForm.content = this.thread.content;
+      this.isEditing = true;
+    },
+    cancelEdit() {
+      this.isEditing = false;
+      this.editForm.title = '';
+      this.editForm.content = '';
+    },
+    async saveEdit() {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.put(
+          `http://127.0.0.1:8000/api/threads/${this.thread.id}/`,
+          {
+            title: this.editForm.title,
+            content: this.editForm.content,
+            book_id: this.thread.book.id
+          },
+          {
+            headers: {
+              Authorization: `Token ${token}`
+            }
+          }
+        );
+        
+        this.thread = response.data;
+        this.isEditing = false;
+        this.editForm.title = '';
+        this.editForm.content = '';
+      } catch (error) {
+        console.error('스레드 수정 실패:', error);
+        alert('스레드 수정에 실패했습니다.');
+      }
     },
     async deleteThread() {
       try {
@@ -451,69 +491,115 @@ export default {
   background: #f1f1f1;
   color: black;
   padding-bottom: 40px;
-  height: 95vh;
+  min-height: 95vh;
 }
 
-/* 가운데 정렬 */
 .main-container {
-  display: flex;
-  padding: 20px;
-  gap: 40px;
-  max-width: 1000px;
+  padding: 40px;
+  max-width: 1200px;
   margin: 0 auto;
 }
 
-.left-box {
-  background: #222;
-  padding: 20px;
-  border-radius: 10px;
-  width: 260px;
-}
-
-.left-box a {
-  text-decoration: none;
-  color: inherit;
-  display: block;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
-
-.left-box a:hover {
-  transform: scale(1.02);
-}
-
-.book-image {
-  width: 100%;
-  border-radius: 6px;
-  margin-bottom: 10px;
-}
-
-.book-title {
-  font-size: 20px;
-  font-weight: bold;
-  color: #f1f1f1;
-}
-.book-subtitle {
-  font-size: 14px;
-  color: #aaa;
-}
-.book-pub_date {
-  font-size: 14px;
-  color: #aaa;
+.content-wrapper {
+  display: flex;
+  flex-direction: row-reverse;
+  gap: 60px;
+  margin-top: 20px;
 }
 
 .right-box {
   flex: 1;
+  background: white;
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
-.thread-title {
-  font-size: 26px;
+
+.left-sidebar {
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.left-box {
+  background: white;
+  padding: 25px;
+  border-radius: 10px;
+  width: 96%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.book-card {
+  display: flex;
+  text-decoration: none;
+  color: inherit;
+  gap: 15px;
+  transition: transform 0.2s ease;
+}
+
+.book-card:hover {
+  transform: scale(1.02);
+}
+
+.book-cover {
+  width: 100px;
+  flex-shrink: 0;
+}
+
+.book-image {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.book-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.book-title {
+  font-size: 16px;
   font-weight: bold;
-  margin-bottom: 10px;
+  color: #333;
+  margin: 0;
 }
+
+.book-subtitle {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
+}
+
+.book-author {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
+}
+
+.book-pub_date {
+  font-size: 14px;
+  color: #888;
+  margin: 0;
+}
+
+.thread-title {
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #333;
+}
+
 .thread-content {
   font-size: 16px;
-  margin-bottom: 20px;
+  line-height: 1.6;
+  margin-bottom: 30px;
+  color: #444;
 }
+
 .actions button {
   margin-right: 10px;
   background: #e74c3c;
@@ -523,6 +609,7 @@ export default {
   border-radius: 15px;
   cursor: pointer;
 }
+
 .actions-comment button {
   display: flex;
   margin-right: 10px;
@@ -533,9 +620,11 @@ export default {
   border-radius: 15px;
   cursor: pointer;
 }
+
 .comments {
   margin-top: 40px;
 }
+
 .comments input {
   width: 80%;
   padding: 10px;
@@ -544,6 +633,7 @@ export default {
   border: none;
   border: 1px solid #cecece;
 }
+
 .comment {
   background: white;
   padding: 15px;
@@ -554,132 +644,85 @@ export default {
   box-sizing: border-box;
 }
 
-.profile-box {
+.profile-section {
+  height: auto;
+  padding: 25px;
+}
+
+.profile-card {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 20px;
-  margin: 20px auto;
-  background: #1c1c1c;
-  border-top: 1px solid #333;
-  max-width: 1000px;
-}
-.avatar {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-}
-.username {
-  color: #aaa;
   text-decoration: none;
-  font-size: 0.9em;
-  transition: color 0.3s ease;
-}
-.username:hover {
-  color: #e74c3c;
-}
-.follow-btn {
-  background: #e74c3c;
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 15px;
-  cursor: pointer;
-}
-.following {
-  background: #333;
+  color: inherit;
+  gap: 15px;
+  margin-bottom: 15px;
+  width: 320px;
 }
 
-.thread-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.user-info {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.profile-image-container {
+  width: 60px;
+  height: 60px;
+  flex-shrink: 0;
 }
 
 .profile-image {
-  width: 50px;
-  height: 50px;
-  object-fit: cover;
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
+  object-fit: cover;
 }
 
-.user-details {
+.profile-info {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.profile-image-link {
-  display: block;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
-
-.profile-image-link:hover {
-  transform: scale(1.05);
-}
-
-.username-link {
-  color: #f1f1f1;
-  text-decoration: none;
+.profile-name {
+  font-size: 16px;
   font-weight: bold;
-  font-size: 1.1em;
-  transition: color 0.3s ease;
+  color: #333;
 }
 
-.username-link:hover {
-  color: #e74c3c;
+.profile-username {
+  font-size: 14px;
+  color: #666;
 }
 
 .follow-stats {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  font-size: 13px;
+  color: #666;
 }
 
-.stat-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.stat-value {
-  font-size: 18px;
-  font-weight: bold;
-}
-
-.stat-label {
-  font-size: 14px;
-  color: #aaa;
+.stat-divider {
+  color: #ccc;
 }
 
 .follow-btn {
+  width: 100%;
+  padding: 8px;
+  border: none;
+  border-radius: 20px;
   background: #e74c3c;
   color: white;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 15px;
+  font-size: 14px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s;
+}
+
+.follow-btn.following {
+  background: #666;
 }
 
 .follow-btn:hover {
   background: #c0392b;
 }
 
-.following {
-  background: #333;
-}
-
-.following:hover {
-  background: #444;
+.follow-btn.following:hover {
+  background: #555;
 }
 
 .like-btn {
@@ -703,43 +746,33 @@ export default {
 }
 
 .comment-input-section {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
-  width: 100%;
+  margin: 20px 0;
 }
 
 .comment-textarea {
-  flex: 1;
+  width: 96%;
   padding: 12px;
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 14px;
-  min-height: 40px;
-  max-height: 200px;
+  min-height: 80px;
   resize: none;
-  overflow-y: auto;
-  line-height: 1.4;
-  box-sizing: border-box;
-  transition: height 0.1s ease;
+  margin-bottom: 10px;
 }
 
-.comment-textarea:focus {
-  outline: none;
-  border-color: #3498db;
-  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+.comment-btn-wrapper {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .comment-btn {
-  padding: 10px 20px;
+  padding: 8px 16px;
   background: #e74c3c;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 15px;
   cursor: pointer;
   transition: background-color 0.3s;
-  align-self: flex-start;
-  white-space: nowrap;
 }
 
 .comment-btn:hover {
@@ -819,23 +852,51 @@ export default {
 }
 
 .edit-form {
+  margin: 20px 0;
+}
+
+.edit-input {
+  width: 96%;
+  padding: 10px;
   margin-bottom: 10px;
-  width: 100%;
-  box-sizing: border-box;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 18px;
 }
 
 .edit-textarea {
-  width: 100%;
-  padding: 8px;
+  width: 96%;
+  min-height: 150px;
+  padding: 10px;
+  margin-bottom: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
-  margin-bottom: 8px;
+  font-size: 16px;
+  resize: vertical;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  justify-content: flex-end;
+}
+
+.edit-actions button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
   font-size: 14px;
-  resize: none;
-  min-height: 40px;
-  max-height: 100px;
-  overflow-y: auto;
-  box-sizing: border-box;
-  line-height: 1.4;
+}
+
+.edit-actions button:first-child {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.edit-actions button:last-child {
+  background-color: #f44336;
+  color: white;
 }
 </style>
