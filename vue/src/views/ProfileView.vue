@@ -444,7 +444,7 @@ watch(
 }
 
 .tab-button.active {
-  color: #007bff;
+  color: rgb(0, 105, 0);
   font-weight: bold;
 }
 
@@ -455,7 +455,7 @@ watch(
   left: 0;
   right: 0;
   height: 2px;
-  background-color: #007bff;
+  background-color: rgb(0, 105, 0);
 }
 
 .tab-content {
