@@ -31,14 +31,14 @@ function logout() {
       <div class="nav-right">
         <template v-if="userStore.isLoggedIn">
           <span class="namename">{{ userStore.username }}님, 환영합니다!</span>
-          <RouterLink :to="{ name: 'BookList' }">책 리스트</RouterLink>
-          <RouterLink :to="{ name: 'Community' }">커뮤니티</RouterLink>
-          <RouterLink :to="{ name: 'UserProfile', params: { userId: userStore.userId } }">마이페이지</RouterLink>
-          <span @click="logout" class="logout">로그아웃</span>
+          <RouterLink :to="{ name: 'BookList' }">책마루</RouterLink>
+          <RouterLink :to="{ name: 'Report' }">감상문</RouterLink>
+          <RouterLink :to="{ name: 'UserProfile', params: { userId: userStore.userId } }">나의 책갈피</RouterLink>
+          <span @click="logout" class="logout">떠나기</span>
         </template>
         <template v-else>
-          <RouterLink :to="{ name: 'Login' }">로그인</RouterLink>
-          <RouterLink :to="{ name: 'BookList' }">책 리스트</RouterLink>
+          <RouterLink :to="{ name: 'Login' }">들르기</RouterLink>
+          <RouterLink :to="{ name: 'BookList' }">책마루</RouterLink>
         </template>
       </div>
     </nav>
@@ -94,3 +94,19 @@ function logout() {
   margin: 0 0.5rem;
 }
 </style>
+
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  background-color: #f9f6f2;
+  min-height: 100vh;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #f9f6f2;
+}
