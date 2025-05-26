@@ -1,7 +1,26 @@
 <template>
   <div class="book-detail-wrapper">
     <header class="header">
-      <h1 class="book-title">{{ book.title }}</h1>
+      <div class="title-section">
+        <h1 class="book-title">{{ book.title }}</h1>
+        <div class="action-buttons">
+          <button 
+            @click="toggleLike" 
+            class="like-btn"
+            :class="{ 'liked': book.is_liked }"
+          >
+            <span class="heart-icon">{{ book.is_liked ? '❤️' : '🤍' }}</span>
+            <span class="likes-count">{{ book.likes_count }}</span>
+          </button>
+          <button 
+            v-if="book.likes_count >= 2"
+            @click="goToCommunity" 
+            class="community-btn"
+          >
+            이야기마당
+          </button>
+        </div>
+      </div>
       <div class="actions">
         <button @click="addToLibrary" class="action-btn" :class="{ 'in-library': isInLibrary }">
           {{ isInLibrary ? '서재에서 제거' : '내 서재에 추가하기' }}
@@ -182,10 +201,19 @@ export default {
     async loadBookData() {
       const bookId = this.$route.params.bookId;
       try {
-        const response = await axios.get(`http://127.0.0.1:8000/api/books/${bookId}/`);
+        const token = localStorage.getItem('token');
+        const response = await axios.get(`http://127.0.0.1:8000/api/books/${bookId}/`, {
+          headers: {
+            Authorization: `Token ${token}`
+          }
+        });
         this.book = response.data;
 
-        const recRes = await axios.get(`http://127.0.0.1:8000/api/books/${bookId}/recommendations/`);
+        const recRes = await axios.get(`http://127.0.0.1:8000/api/books/${bookId}/recommendations/`, {
+          headers: {
+            Authorization: `Token ${token}`
+          }
+        });
         this.recommendations = recRes.data;
       } catch (error) {
         console.error('책 정보를 불러오는 데 실패했습니다:', error);
@@ -351,6 +379,35 @@ export default {
     },
     updateMapUrl(place) {
       this.mapUrl = `https://www.google.com/maps?q=${encodeURIComponent(place)}&output=embed`;
+    },
+    async toggleLike() {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          alert('로그인이 필요한 기능입니다.');
+          return;
+        }
+        
+        const response = await axios.post(
+          `http://127.0.0.1:8000/api/books/${this.book.id}/like/`,
+          {},
+          {
+            headers: {
+              Authorization: `Token ${token}`
+            }
+          }
+        );
+        this.book.is_liked = response.data.liked;
+        this.book.likes_count = response.data.likes_count;
+      } catch (error) {
+        console.error('좋아요 토글 실패:', error);
+        if (error.response?.status === 401) {
+          alert('로그인이 필요한 기능입니다.');
+        }
+      }
+    },
+    goToCommunity() {
+      this.$router.push(`/books/${this.book.id}/community`);
     },
   }
 }
@@ -685,5 +742,69 @@ export default {
   border-radius: 4px;
   font-size: 0.9rem;
   color: #2c3e50;
+}
+
+.title-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.like-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  background: white;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.like-btn:hover {
+  transform: scale(1.05);
+}
+
+.heart-icon {
+  font-size: 1.2rem;
+}
+
+.likes-count {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #666;
+}
+
+.like-btn.liked {
+  background: #ffebee;
+}
+
+.like-btn.liked .likes-count {
+  color: #e53935;
+}
+
+.community-btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  background: #4CAF50;
+  color: white;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: bold;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.community-btn:hover {
+  background: #45a049;
+  transform: scale(1.05);
 }
 </style>

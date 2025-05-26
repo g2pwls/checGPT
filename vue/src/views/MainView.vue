@@ -3,7 +3,7 @@
     <div class="main-container">
       <!-- 베스트셀러 섹션 -->
       <section class="bestseller-section">
-        <h2 class="section-title">베스트셀러</h2>
+        <h2 class="section-title">지금 인기있어요!</h2>
         <div class="book-slider">
           <div v-for="book in bestSellers" :key="book.isbn" class="book-card" @click="goToBookDetail(book)">
             <img :src="book.cover" alt="book cover" class="book-cover" />
@@ -17,7 +17,7 @@
 
       <!-- 카테고리 섹션 -->
       <section class="category-section">
-        <h2 class="section-title">카테고리별 보기</h2>
+        <h2 class="section-title">갈래별 보기</h2>
         <div class="category-grid">
           <div 
             v-for="category in categories" 
