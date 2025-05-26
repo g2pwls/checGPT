@@ -32,7 +32,7 @@ function logout() {
         <template v-if="userStore.isLoggedIn">
           <span class="namename">{{ userStore.username }}님, 환영합니다!</span>
           <RouterLink :to="{ name: 'BookList' }">책 리스트</RouterLink>
-          <RouterLink :to="{ name: 'Community' }">커뮤니티</RouterLink>
+          <RouterLink :to="{ name: 'Report' }">감상문</RouterLink>
           <RouterLink :to="{ name: 'UserProfile', params: { userId: userStore.userId } }">마이페이지</RouterLink>
           <span @click="logout" class="logout">로그아웃</span>
         </template>

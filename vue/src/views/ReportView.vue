@@ -1,7 +1,7 @@
 <template>
-  <div class="community-view">
-    <div class="community-container">
-      <h1 class="community-title">커뮤니티</h1>
+  <div class="report-view">
+    <div class="report-container">
+      <h1 class="report-title">감상문</h1>
       
       <!-- 정렬 탭 추가 -->
       <div class="sort-tabs">
@@ -109,20 +109,20 @@ export default {
 </script>
 
 <style scoped>
-.community-view {
+.report-view {
   background-color: #f9f6f2;
   min-height: 100vh;
   width: 100%;
   padding-top: 1px; /* margin collapse 방지 */
 }
 
-.community-container {
+.report-container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 40px 20px;
 }
 
-.community-title {
+.report-title {
   font-size: 2rem;
   font-weight: bold;
   margin-bottom: 30px;

@@ -61,7 +61,7 @@ export default {
     },
     async loadBestSellers() {
       try {
-        const ttbKey = 'ttbyhjyhw10041939001';
+        const ttbKey = 'ttbyhjyhw10041939002';
         const script = document.createElement('script');
         const callbackName = 'aladin' + Date.now();
         

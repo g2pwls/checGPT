@@ -1,13 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import MainView from '@/views/MainView.vue'
-import HomeView from '../views/HomeView.vue'
 import LoginView from '../views/LoginView.vue'
 import BookListView from '../views/BookListView.vue'
 import BookDetailView from '../views/BookDetailView.vue'
 import ProfileView from '@/views/ProfileView.vue'
 import SignUpView from '@/views/SignUpView.vue'
 import ThreadDetail from '@/views/ThreadDetail.vue'
-import CommunityView from '@/views/CommunityView.vue'
+import ReportView from '@/views/ReportView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -16,11 +15,6 @@ const router = createRouter({
       path: '/',
       name: 'main',
       component: MainView
-    },
-    {
-      path: '/home',
-      name: 'home',
-      component: HomeView,
     },
     {
       path: '/login',
@@ -55,9 +49,9 @@ const router = createRouter({
       props: true,
     },
     {
-      path: '/community',
-      name: 'Community',
-      component: CommunityView,
+      path: '/report',
+      name: 'Report',
+      component: ReportView,
       meta: { requiresAuth: true }
     },
   ],
