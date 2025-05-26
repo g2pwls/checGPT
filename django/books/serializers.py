@@ -7,6 +7,7 @@ from .models import (
     UserLibrary,
     Community,
     CommunityComment,
+    TopBook,
 )
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
@@ -172,3 +173,11 @@ class CommunitySerializer(serializers.ModelSerializer):
 
     def get_is_popular(self, obj):
         return obj.is_popular
+
+class TopBookSerializer(serializers.ModelSerializer):
+    book = BookSerializer(read_only=True)
+    
+    class Meta:
+        model = TopBook
+        fields = ['id', 'book', 'rank']
+        read_only_fields = ['id']

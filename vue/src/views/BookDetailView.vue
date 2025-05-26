@@ -271,8 +271,16 @@ export default {
     },
     async checkLibraryStatus() {
       try {
-        const response = await axios.get(`http://127.0.0.1:8000/api/users/library/`);
-        this.isInLibrary = response.data.some(item => item.book.id === this.book.id);
+        const token = localStorage.getItem('token')
+        const libraryRes = await axios.get(
+          'http://127.0.0.1:8000/api/users/library/',
+          {
+            headers: {
+              Authorization: `Token ${token}`
+            }
+          }
+        )
+        this.isInLibrary = libraryRes.data.library.some(item => item.book.id === this.book.id)
       } catch (error) {
         if (error.response?.status === 401) {
           this.setAuthToken();
@@ -300,36 +308,65 @@ export default {
         }
         this.isInLibrary = !this.isInLibrary;
       } catch (error) {
+        console.error('서재 업데이트 실패:', error)
         if (error.response?.status === 401) {
-          this.setAuthToken();
-          try {
-            if (this.isInLibrary) {
-              await axios.delete(
-                `http://127.0.0.1:8000/api/books/${this.book.id}/remove-from-library/`
-              );
-            } else {
-              await axios.post(
-                `http://127.0.0.1:8000/api/books/${this.book.id}/add-to-library/`
-              );
-            }
-            this.isInLibrary = !this.isInLibrary;
-          } catch (retryError) {
-            console.error('서재 업데이트 실패:', retryError);
-            if (retryError.response?.status === 400) {
-              alert('이미 서재에 추가된 책입니다.');
-            } else {
-              alert('서재 업데이트에 실패했습니다.');
-            }
-          }
+          alert('로그인이 필요합니다.')
         } else {
-          console.error('서재 업데이트 실패:', error);
-          if (error.response?.status === 400) {
-            alert('이미 서재에 추가된 책입니다.');
-          } else {
-            alert('서재 업데이트에 실패했습니다.');
-          }
+          alert('서재 업데이트에 실패했습니다.')
         }
       }
+    },
+    async getRecommendedPlace() {
+      try {
+        const prompt = `다음 책의 실제 내용에서 가장 중요한 장면이 일어나는 구체적인 장소 하나만 알려주세요:
+제목: ${this.book.title}
+작가: ${this.book.author}
+줄거리: ${this.book.description}
+
+다음 조건을 반드시 지켜주세요:
+1. 책의 내용에서 실제로 언급된 구체적인 장소만 알려주세요
+2. 작가의 이름이나 책 제목과 관련된 일반적인 장소는 피해주세요 (예: 작가가 '한강'이라고 무조건 '한강'을 추천하지 말 것)
+3. 장소는 최대한 구체적으로 알려주세요 (예: '서울'보다는 '서울 광화문 광장' 처럼)
+4. 장소 이름만 알려주세요. 설명은 필요 없습니다.`;
+        
+        const response = await axios.post('https://api.openai.com/v1/chat/completions', {
+          model: "gpt-3.5-turbo",
+          messages: [{
+            role: "user",
+            content: prompt
+          }],
+          temperature: 0.7,
+          max_tokens: 100
+        }, {
+          headers: {
+            'Authorization': `Bearer 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`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        // GPT 응답에서 장소 추출
+        const content = response.data.choices[0].message.content;
+        const place = this.extractPlace(content);
+        if (place) {
+          this.recommendedPlace = place;
+          this.updateMapUrl(place);
+        }
+      } catch (error) {
+        console.error('장소 추천 실패:', error);
+      }
+    },
+    extractPlace(content) {
+      // 불필요한 설명이나 부가 정보를 제거하고 장소명만 추출
+      const cleanedContent = content
+        .replace(/^[^가-힣a-zA-Z\d]*/, '') // 시작 부분의 특수문자 제거
+        .replace(/[.!?][^가-힣a-zA-Z\d]*$/, '') // 끝 부분의 특수문자와 마침표 제거
+        .replace(/^장소[:：]\s*/, '') // "장소:" 같은 텍스트 제거
+        .trim();
+      
+      return cleanedContent;
+    },
+    updateMapUrl(place) {
+      this.mapUrl = `https://www.google.com/maps?q=${encodeURIComponent(place)}&output=embed`;
     },
     async toggleLike() {
       try {

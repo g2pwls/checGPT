@@ -139,3 +139,17 @@ class CommunityComment(models.Model):
 
     def __str__(self):
         return f"Comment by {self.writer.username} on {self.post.title}"
+
+
+class TopBook(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='top_books')
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    rank = models.IntegerField()  # 1, 2, or 3
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'rank')
+        ordering = ['rank']
+
+    def __str__(self):
+        return f"{self.user.username}'s {self.rank}th top book: {self.book.title}"

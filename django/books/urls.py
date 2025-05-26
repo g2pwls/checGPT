@@ -14,7 +14,7 @@ from .views import (
     add_to_library,
     remove_from_library,
     UserLibraryView,
-    UserThreadsView,
+    UserThreadsView, TopBooksView,
     toggle_book_like,
     CommunityListCreateView,
     CommunityDetailView,
@@ -51,6 +51,9 @@ urlpatterns = [
     path("users/library/", UserLibraryView.as_view()),
     path("users/<int:user_id>/library/", UserLibraryView.as_view()),
     # User threads endpoint
+    path('users/<int:user_id>/threads/', UserThreadsView.as_view()),
+    path('users/top-books/', TopBooksView.as_view(), name='user-top-books'),
+    path('users/<int:user_id>/top-books/', TopBooksView.as_view(), name='user-top-books-detail'),
     path("users/<int:user_id>/threads/", UserThreadsView.as_view()),
     path(
         "books/<int:book_id>/community/",

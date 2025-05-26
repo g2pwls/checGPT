@@ -12,6 +12,7 @@ from .models import (
     Comment,
     Community,
     CommunityComment,
+    TopBook,
 )
 from .serializers import (
     BookSerializer,
@@ -21,6 +22,7 @@ from .serializers import (
     CommentSerializer,
     CommunitySerializer,
     CommunityCommentSerializer,
+    TopBookSerializer,
 )
 from django.contrib.auth import get_user_model
 from rest_framework.exceptions import PermissionDenied, NotFound
@@ -246,16 +248,29 @@ class UserLibraryView(APIView):
                 )
 
             # Get library items
-            library_items = (
-                UserLibrary.objects.filter(user_id=target_user_id)
-                .select_related("book")
-                .order_by("-added_date")
-            )
+            library_items = UserLibrary.objects.filter(user_id=target_user_id).select_related('book', 'book__category').order_by('-added_date')
             print(f"Found {library_items.count()} library items")
-
+            
+            # Calculate top 3 genres
+            genre_counts = {}
+            for item in library_items:
+                category = item.book.category
+                if category:
+                    genre_counts[category.id] = {
+                        'id': category.id,
+                        'name': category.name,
+                        'count': genre_counts.get(category.id, {}).get('count', 0) + 1
+                    }
+            
+            # Sort genres by count and get top 3
+            top_genres = sorted(genre_counts.values(), key=lambda x: x['count'], reverse=True)[:3]
+            
             serializer = UserLibrarySerializer(library_items, many=True)
-            return Response(serializer.data)
-
+            return Response({
+                'library': serializer.data,
+                'top_genres': top_genres
+            })
+            
         except Exception as e:
             print(f"Error in UserLibraryView: {str(e)}")
             return Response(
@@ -433,3 +448,73 @@ def delete_community_comment(request, comment_id):
 
     comment.delete()
     return Response(status=204)
+
+class TopBooksView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, user_id=None):
+        """Get user's top books"""
+        try:
+            # Determine which user's top books to fetch
+            target_user_id = user_id if user_id else request.user.id
+            
+            # Check if the user exists
+            User = get_user_model()
+            if not User.objects.filter(id=target_user_id).exists():
+                return Response(
+                    {'error': f'User with id {target_user_id} does not exist'}, 
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            # Get top books
+            top_books = TopBook.objects.filter(user_id=target_user_id).select_related('book').order_by('rank')
+            serializer = TopBookSerializer(top_books, many=True)
+            return Response(serializer.data)
+        except Exception as e:
+            return Response(
+                {'error': str(e)}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+    def post(self, request):
+        """Update user's top books"""
+        try:
+            # Get the user's library books
+            user_library = UserLibrary.objects.filter(user=request.user).values_list('book_id', flat=True)
+            
+            # Delete existing top books
+            TopBook.objects.filter(user=request.user).delete()
+            
+            # Create new top books
+            top_books_data = request.data.get('top_books', [])
+            created_books = []
+            
+            for rank, book_id in enumerate(top_books_data, 1):
+                # Check if the book is in the user's library
+                if book_id not in user_library:
+                    return Response(
+                        {'error': f'Book with id {book_id} is not in your library'}, 
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+                
+                try:
+                    book = Book.objects.get(id=book_id)
+                    top_book = TopBook.objects.create(
+                        user=request.user,
+                        book=book,
+                        rank=rank
+                    )
+                    created_books.append(top_book)
+                except Book.DoesNotExist:
+                    return Response(
+                        {'error': f'Book with id {book_id} does not exist'}, 
+                        status=status.HTTP_404_NOT_FOUND
+                    )
+            
+            serializer = TopBookSerializer(created_books, many=True)
+            return Response(serializer.data, status=201)
+        except Exception as e:
+            return Response(
+                {'error': str(e)}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
