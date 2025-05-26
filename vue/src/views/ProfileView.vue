@@ -792,7 +792,7 @@ watch(
 }
 
 .top-books-section {
-  margin-bottom: 2rem;
+  margin-bottom: 10px;
   padding: 1.5rem;
   background: white;
   border-radius: 1rem;
@@ -804,6 +804,7 @@ watch(
   font-weight: bold;
   margin-bottom: 1rem;
   color: #333;
+  margin-top: 10px;
 }
 
 .top-books-grid {
