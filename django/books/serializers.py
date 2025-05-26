@@ -8,6 +8,7 @@ from .models import (
     Community,
     CommunityComment,
     TopBook,
+    AIReport,
 )
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
@@ -23,11 +24,35 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class BookSerializer(serializers.ModelSerializer):
     likes_count = serializers.IntegerField(source="likes.count", read_only=True)
+    like_count = serializers.IntegerField(read_only=True)
+    has_community = serializers.BooleanField(read_only=True)
+    community_created_at = serializers.DateTimeField(read_only=True)
+    comment_count = serializers.IntegerField(read_only=True)
     is_liked = serializers.SerializerMethodField()
 
     class Meta:
         model = Book
-        fields = "__all__"
+        fields = (
+            'id',
+            'title',
+            'subTitle',
+            'description',
+            'isbn',
+            'cover',
+            'publisher',
+            'pub_date',
+            'author',
+            'author_info',
+            'author_photo',
+            'customer_review_rank',
+            'category',
+            'likes_count',
+            'like_count',
+            'has_community',
+            'community_created_at',
+            'comment_count',
+            'is_liked',
+        )
 
     def get_is_liked(self, obj):
         request = self.context.get("request")
@@ -181,3 +206,11 @@ class TopBookSerializer(serializers.ModelSerializer):
         model = TopBook
         fields = ['id', 'book', 'rank']
         read_only_fields = ['id']
+
+class AIReportSerializer(serializers.ModelSerializer):
+    book = BookSerializer(read_only=True)
+    
+    class Meta:
+        model = AIReport
+        fields = ['id', 'book', 'report_file', 'created_at']
+        read_only_fields = ['created_at']

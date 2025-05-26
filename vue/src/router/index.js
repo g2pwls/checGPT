@@ -10,6 +10,7 @@ import ReportView from '@/views/ReportView.vue'
 import CommunityView from '../views/CommunityView.vue'
 import CommunityDetailView from '@/views/CommunityDetailView.vue'
 import AIView from '../views/AIView.vue'
+import StoryView from '@/views/StoryView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -73,6 +74,17 @@ const router = createRouter({
       name: 'communityDetail',
       component: CommunityDetailView,
       props: true
+    },
+    {
+      path: '/ai/:book',
+      name: 'ai',
+      component: AIView,
+      props: true
+    },
+    {
+      path: '/story',
+      name: 'story',
+      component: StoryView
     }
   ],
   scrollBehavior(to, from, savedPosition) {

@@ -26,7 +26,7 @@
           {{ isInLibrary ? '서재에서 제거' : '내 서재에 추가하기' }}
         </button>
         <button @click="isThreadModalOpen = true" class="action-btn thread-write-btn">스레드 작성하기</button>
-        <button @click="goToAIAnalysis" class="action-btn ai-analysis-btn">
+        <button @click="navigateToAI" class="action-btn ai-analysis-btn">
           <i class="fas fa-robot"></i> AI 분석 시작하기
         </button>
       </div>
@@ -399,8 +399,13 @@ export default {
     goToCommunity() {
       this.$router.push(`/books/${this.book.id}/community`);
     },
-    goToAIAnalysis() {
-      this.$router.push(`/books/${this.book.id}/ai`);
+    navigateToAI() {
+      this.$router.push({
+        name: 'ai',
+        params: {
+          book: JSON.stringify(this.book)
+        }
+      });
     }
   }
 }

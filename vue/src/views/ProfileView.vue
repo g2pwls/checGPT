@@ -47,6 +47,12 @@
           >
             {{ user.name }}님의 스레드
           </button>
+          <button 
+            @click="activeTab = 'ai-reports'" 
+            :class="['tab-button', { active: activeTab === 'ai-reports' }]"
+          >
+            AI 레포트
+          </button>
         </div>
 
         <div class="tab-content">
@@ -136,6 +142,25 @@
               </div>
             </div>
           </div>
+
+          <!-- AI Reports Tab -->
+          <div v-if="activeTab === 'ai-reports'" class="ai-reports-section">
+            <h3>📊 AI 분석 레포트</h3>
+            <div class="reports-grid">
+              <div v-for="report in aiReports" :key="report.id" class="report-card">
+                <div class="report-content" @click="showReport(report)">
+                  <img :src="report.book.cover" :alt="report.book.title" class="book-cover">
+                  <div class="report-info">
+                    <h4>{{ report.book.title }}</h4>
+                    <p class="report-date">{{ formatDate(report.created_at) }}</p>
+                  </div>
+                </div>
+                <button v-if="isOwnProfile" @click.stop="deleteReport(report)" class="delete-button">
+                  삭제
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -148,6 +173,29 @@
           @close="closeLibraryEdit"
           @update="updateLibrary"
         />
+      </div>
+    </div>
+
+    <!-- AI Report Modal -->
+    <div v-if="showReportModal" class="modal-overlay" @click="closeReportModal">
+      <div class="modal-content" @click.stop>
+        <button class="close-button" @click="closeReportModal">×</button>
+        <h3>{{ selectedReport?.book.title }} AI 레포트</h3>
+        <div class="report-viewer">
+          <object
+            :data="getReportUrl(selectedReport?.report_file)"
+            type="application/pdf"
+            width="100%"
+            height="600px"
+          >
+            <div class="pdf-fallback">
+              <p>PDF를 표시할 수 없습니다.</p>
+              <a :href="getReportUrl(selectedReport?.report_file)" target="_blank" class="download-btn">
+                PDF 다운로드
+              </a>
+            </div>
+          </object>
+        </div>
       </div>
     </div>
   </div>
@@ -169,6 +217,9 @@ const topGenres = ref([])
 const isFollowing = ref(false)
 const activeTab = ref('library')
 const showLibraryEdit = ref(false)
+const aiReports = ref([])
+const showReportModal = ref(false)
+const selectedReport = ref(null)
 
 // Check if this is the user's own profile
 const isOwnProfile = computed(() => {
@@ -384,8 +435,58 @@ const updateLibrary = () => {
   loadProfileData()
 }
 
+const fetchAIReports = async () => {
+  try {
+    const response = await axios.get('http://127.0.0.1:8000/api/ai-reports/', {
+      headers: {
+        Authorization: `Token ${localStorage.getItem('token')}`
+      }
+    })
+    aiReports.value = response.data
+  } catch (error) {
+    console.error('AI 레포트 로딩 실패:', error)
+  }
+}
+
+const showReport = (report) => {
+  selectedReport.value = report
+  showReportModal.value = true
+}
+
+const closeReportModal = () => {
+  showReportModal.value = false
+  selectedReport.value = null
+}
+
+const getReportUrl = (reportFile) => {
+  if (!reportFile) return ''
+  if (reportFile.startsWith('http')) return reportFile
+  return `http://127.0.0.1:8000${reportFile}`
+}
+
+const deleteReport = async (report) => {
+  if (!confirm('정말로 이 AI 레포트를 삭제하시겠습니까?')) {
+    return
+  }
+
+  try {
+    await axios.delete(`http://127.0.0.1:8000/api/ai-reports/${report.id}/`, {
+      headers: {
+        Authorization: `Token ${localStorage.getItem('token')}`
+      }
+    })
+    
+    // 삭제 후 목록 새로고침
+    aiReports.value = aiReports.value.filter(r => r.id !== report.id)
+  } catch (error) {
+    console.error('AI 레포트 삭제 실패:', error)
+    alert('레포트 삭제에 실패했습니다. 다시 시도해주세요.')
+  }
+}
+
 onMounted(() => {
   loadProfileData()
+  fetchAIReports()
 })
 
 watch(
@@ -785,10 +886,14 @@ watch(
 }
 
 .modal-content {
-  width: 90%;
-  max-width: 1200px;
-  max-height: 90vh;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 95%;
+  max-width: 900px;
+  max-height: 95vh;
   overflow-y: auto;
+  position: relative;
 }
 
 .top-books-section {
@@ -920,5 +1025,128 @@ watch(
 .genre-count {
   font-size: 0.9rem;
   color: #666;
+}
+
+.ai-reports-section {
+  padding: 20px;
+}
+
+.reports-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.report-card {
+  position: relative;
+  background: white;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+  display: flex;
+  flex-direction: column;
+}
+
+.report-content {
+  flex: 1;
+  padding: 1rem;
+  cursor: pointer;
+}
+
+.report-content:hover {
+  background-color: #f8f9fa;
+}
+
+.book-cover {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.report-info {
+  padding: 15px;
+}
+
+.report-info h4 {
+  margin: 0 0 10px 0;
+  font-size: 1.1em;
+  color: #2c3e50;
+}
+
+.report-date {
+  color: #666;
+  font-size: 0.9em;
+  margin-bottom: 10px;
+}
+
+.view-report-btn {
+  background-color: #1976d2;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.3s ease;
+}
+
+.view-report-btn:hover {
+  background-color: #1565c0;
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+}
+
+.report-viewer {
+  margin-top: 20px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.pdf-fallback {
+  text-align: center;
+  padding: 20px;
+  background: #f5f5f5;
+  border-radius: 8px;
+}
+
+.download-btn {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 8px 16px;
+  background-color: #1976d2;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.download-btn:hover {
+  background-color: #1565c0;
+}
+
+.delete-button {
+  padding: 0.5rem;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  width: 100%;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.delete-button:hover {
+  background-color: #c82333;
 }
 </style>

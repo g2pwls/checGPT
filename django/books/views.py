@@ -13,6 +13,7 @@ from .models import (
     Community,
     CommunityComment,
     TopBook,
+    AIReport,
 )
 from .serializers import (
     BookSerializer,
@@ -23,11 +24,15 @@ from .serializers import (
     CommunitySerializer,
     CommunityCommentSerializer,
     TopBookSerializer,
+    AIReportSerializer,
 )
 from django.contrib.auth import get_user_model
-from rest_framework.exceptions import PermissionDenied, NotFound
+from rest_framework.exceptions import PermissionDenied, NotFound, ValidationError, APIException
 from .utils import generate_audio_for_book
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import action
+from django.utils import timezone
+from rest_framework import viewsets
 
 # ----------------------
 # 📚 Book 관련 API
@@ -517,4 +522,96 @@ class TopBooksView(APIView):
             return Response(
                 {'error': str(e)}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class BookViewSet(viewsets.ModelViewSet):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def get_queryset(self):
+        queryset = Book.objects.all()
+        # 각 책의 댓글 수 계산
+        for book in queryset:
+            book.comment_count = book.community_posts.count()
+        return queryset
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        # 단일 책 조회 시에도 댓글 수 계산
+        instance.comment_count = instance.community_posts.count()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['post'])
+    def toggle_community(self, request, pk=None):
+        book = self.get_object()
+        if not book.has_community:
+            book.has_community = True
+            book.community_created_at = timezone.now()
+            book.save()
+            return Response({'status': 'community activated'})
+        else:
+            book.has_community = False
+            book.community_created_at = None
+            book.save()
+            return Response({'status': 'community deactivated'})
+
+    @action(detail=True, methods=['post'])
+    def update_stats(self, request, pk=None):
+        book = self.get_object()
+        # 댓글 수 업데이트
+        comment_count = book.community_posts.count()
+        book.comment_count = comment_count
+        book.save()
+        return Response({
+            'comment_count': comment_count,
+            'like_count': book.likes_count
+        })
+
+
+class AIReportViewSet(viewsets.ModelViewSet):
+    serializer_class = AIReportSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return AIReport.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        try:
+            # 이미 존재하는 레포트가 있다면 삭제
+            book_id = self.request.data.get('book')
+            if not book_id:
+                raise ValidationError('책 ID가 필요합니다.')
+
+            book = get_object_or_404(Book, id=book_id)
+            
+            # 기존 레포트 삭제
+            AIReport.objects.filter(
+                user=self.request.user,
+                book=book
+            ).delete()
+            
+            # 새 레포트 저장
+            serializer.save(user=self.request.user, book=book)
+        except Book.DoesNotExist:
+            raise NotFound('해당 책을 찾을 수 없습니다.')
+        except ValidationError as e:
+            raise ValidationError(str(e))
+        except Exception as e:
+            print(f"Error in perform_create: {str(e)}")
+            raise APIException('AI 레포트 저장 중 오류가 발생했습니다.')
+
+    @action(detail=True, methods=['get'])
+    def by_book(self, request, pk=None):
+        """특정 책의 AI 레포트 조회"""
+        try:
+            report = AIReport.objects.get(book_id=pk, user=request.user)
+            serializer = self.get_serializer(report)
+            return Response(serializer.data)
+        except AIReport.DoesNotExist:
+            return Response(
+                {'error': 'Report not found'}, 
+                status=status.HTTP_404_NOT_FOUND
             )
