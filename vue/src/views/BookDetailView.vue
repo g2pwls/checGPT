@@ -27,7 +27,7 @@
         </button>
         <button @click="isThreadModalOpen = true" class="action-btn thread-write-btn">스레드 작성하기</button>
         <button @click="goToAIAnalysis" class="action-btn ai-analysis-btn">
-          <i class="fas fa-robot"></i> AI 분석 시작하기
+          <i class="fas fa-robot"></i>AI 분석 시작하기
         </button>
       </div>
     </header>
