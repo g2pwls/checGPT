@@ -57,7 +57,6 @@ export default {
         }
       }
     )
-    alert('작성 완료!')
     this.$emit('submit-thread', response.data)
     this.$emit('close')
   } catch (error) {

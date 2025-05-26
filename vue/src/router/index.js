@@ -1,19 +1,22 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import MainView from '@/views/MainView.vue'
 import LoginView from '../views/LoginView.vue'
 import BookListView from '../views/BookListView.vue'
 import BookDetailView from '../views/BookDetailView.vue'
 import ProfileView from '@/views/ProfileView.vue'
 import SignUpView from '@/views/SignUpView.vue'
 import ThreadDetail from '@/views/ThreadDetail.vue'
+import ReportView from '@/views/ReportView.vue'
+import CommunityView from '../views/CommunityView.vue'
+import CommunityDetailView from '@/views/CommunityDetailView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
-      name: 'home',
-      component: HomeView,
+      name: 'main',
+      component: MainView
     },
     {
       path: '/login',
@@ -47,6 +50,23 @@ const router = createRouter({
       component: ThreadDetail,
       props: true,
     },
+    {
+      path: '/report',
+      name: 'Report',
+      component: ReportView,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/books/:bookId/community',
+      name: 'community',
+      component: CommunityView
+    },
+    {
+      path: '/community/:postId',
+      name: 'communityDetail',
+      component: CommunityDetailView,
+      props: true
+    }
   ],
   scrollBehavior(to, from, savedPosition) {
     // 항상 페이지 상단으로 이동

@@ -49,7 +49,7 @@
               </div>
             </div>
 
-            <div v-for="comment in thread.comments" :key="comment.id" class="comment">
+            <div v-for="comment in sortedComments" :key="comment.id" class="comment">
               <div class="comment-content">
                 <div v-if="editingComment?.id === comment.id" class="edit-form">
                   <textarea 
@@ -60,19 +60,31 @@
                 </div>
                 <p v-else>{{ comment.content }}</p>
                 <div class="comment-meta">
-                  <span class="comment-author">@{{ comment.author.username }}</span>
-                  <span class="comment-date">{{ formatDate(comment.created_at) }}</span>
+                  <div class="comment-info">
+                    <span class="comment-author">@{{ comment.author.username }}</span>
+                    <span class="comment-date">{{ formatDate(comment.created_at) }}</span>
+                  </div>
+                  <div class="comment-actions-wrapper">
+                    <button 
+                      v-if="!isCommentAuthor(comment)"
+                      @click.stop="toggleCommentLike(comment)"
+                      class="like-btn-small"
+                      :class="{ 'liked': comment.is_liked }"
+                    >
+                      ❤️ {{ comment.likes_count || 0 }}
+                    </button>
+                    <div class="comment-actions" v-if="isCommentAuthor(comment)">
+                      <template v-if="editingComment?.id === comment.id">
+                        <button @click.stop="saveCommentEdit" class="save-btn">저장</button>
+                        <button @click.stop="cancelCommentEdit" class="cancel-btn">취소</button>
+                      </template>
+                      <template v-else>
+                        <button @click.stop="startCommentEdit(comment)" class="edit-btn">수정</button>
+                        <button @click.stop="deleteComment(comment.id)" class="delete-btn">삭제</button>
+                      </template>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div class="comment-actions" v-if="isCommentAuthor(comment)">
-                <template v-if="editingComment?.id === comment.id">
-                  <button @click="saveEdit" class="save-btn">저장</button>
-                  <button @click="cancelEdit" class="cancel-btn">취소</button>
-                </template>
-                <template v-else>
-                  <button @click="startEdit(comment)" class="edit-btn">수정</button>
-                  <button @click="deleteComment(comment.id)" class="delete-btn">삭제</button>
-                </template>
               </div>
             </div>
           </div>
@@ -153,6 +165,10 @@ export default {
     isOwnThread() {
       const currentUserId = localStorage.getItem('userId')
       return this.thread?.writer?.id.toString() === currentUserId
+    },
+    sortedComments() {
+      if (!this.thread?.comments) return [];
+      return [...this.thread.comments].sort((a, b) => (b.likes_count || 0) - (a.likes_count || 0));
     }
   },
   async mounted() {
@@ -295,13 +311,13 @@ export default {
         }
       }
     },
-    startEdit(comment) {
+    startCommentEdit(comment) {
       this.editingComment = { ...comment };
     },
-    cancelEdit() {
+    cancelCommentEdit() {
       this.editingComment = null;
     },
-    async saveEdit() {
+    async saveCommentEdit() {
       if (!this.editingComment.content.trim()) {
         alert('댓글 내용을 입력해주세요.');
         return;
@@ -322,7 +338,7 @@ export default {
           }
         );
 
-        // Update the comment in the list
+        // 수정된 댓글로 업데이트
         const index = this.thread.comments.findIndex(c => c.id === this.editingComment.id);
         if (index !== -1) {
           this.thread.comments[index] = response.data;
@@ -334,28 +350,6 @@ export default {
           console.error('Error details:', error.response.data);
         }
         alert('댓글 수정에 실패했습니다.');
-      }
-    },
-    async deleteComment(commentId) {
-      if (!confirm('댓글을 삭제하시겠습니까?')) return;
-
-      try {
-        const token = localStorage.getItem('token');
-        await axios.delete(
-          `http://127.0.0.1:8000/api/comments/${commentId}/delete/`,
-          {
-            headers: {
-              Authorization: `Token ${token}`
-            }
-          }
-        );
-
-        // Remove the comment from the list
-        this.thread.comments = this.thread.comments.filter(c => c.id !== commentId);
-        this.thread.comments_count -= 1;
-      } catch (error) {
-        console.error('댓글 삭제 실패:', error);
-        alert('댓글 삭제에 실패했습니다.');
       }
     },
     startEditing() {
@@ -481,6 +475,70 @@ export default {
     handleImageError(e) {
       console.log('Image load error, using default image')
       e.target.src = '/default-profile.png'
+    },
+    async deleteComment(commentId) {
+      if (!confirm('댓글을 삭제하시겠습니까?')) return;
+
+      try {
+        const token = localStorage.getItem('token');
+        await axios.delete(
+          `http://127.0.0.1:8000/api/comments/${commentId}/delete/`,
+          {
+            headers: {
+              Authorization: `Token ${token}`
+            }
+          }
+        );
+
+        // Remove the comment from the list
+        this.thread.comments = this.thread.comments.filter(c => c.id !== commentId);
+        this.thread.comments_count -= 1;
+      } catch (error) {
+        console.error('댓글 삭제 실패:', error);
+        alert('댓글 삭제에 실패했습니다.');
+      }
+    },
+    async toggleCommentLike(comment) {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          alert('로그인이 필요합니다.');
+          return;
+        }
+
+        // Optimistic update
+        comment.is_liked = !comment.is_liked;
+        comment.likes_count = (comment.likes_count || 0) + (comment.is_liked ? 1 : -1);
+
+        const response = await axios.post(
+          `http://127.0.0.1:8000/api/comments/${comment.id}/like/`,
+          {},
+          {
+            headers: {
+              Authorization: `Token ${token}`
+            }
+          }
+        );
+
+        // Update with server response
+        comment.is_liked = response.data.is_liked;
+        comment.likes_count = response.data.likes_count;
+
+        // Force Vue to recognize the changes
+        this.thread = { ...this.thread };
+
+      } catch (error) {
+        // Revert optimistic update on error
+        comment.is_liked = !comment.is_liked;
+        comment.likes_count = (comment.likes_count || 0) + (comment.is_liked ? 1 : -1);
+
+        console.error('댓글 좋아요 실패:', error);
+        if (error.response?.status === 401) {
+          alert('로그인이 필요합니다.');
+        } else {
+          alert('좋아요 처리에 실패했습니다.');
+        }
+      }
     },
   }
 }
@@ -792,6 +850,38 @@ export default {
   color: #666;
 }
 
+.comment-info {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.comment-actions-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.like-btn-small {
+  background: none;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 15px;
+  cursor: pointer;
+  font-size: 12px;
+  color: #666;
+  transition: all 0.3s ease;
+}
+
+.like-btn-small:hover {
+  background: #f0f0f0;
+  transform: scale(1.05);
+}
+
+.like-btn-small.liked {
+  color: #e74c3c;
+}
+
 .comment-author {
   font-weight: bold;
 }
@@ -809,7 +899,7 @@ export default {
 .edit-btn, .delete-btn, .save-btn, .cancel-btn {
   padding: 4px 8px;
   border: none;
-  border-radius: 4px;
+  border-radius: 15px;
   cursor: pointer;
   font-size: 12px;
   transition: background-color 0.3s;
@@ -866,7 +956,7 @@ export default {
 
 .edit-textarea {
   width: 96%;
-  min-height: 150px;
+  min-height: 100px;
   padding: 10px;
   margin-bottom: 10px;
   border: 1px solid #ddd;
