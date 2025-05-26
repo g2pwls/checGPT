@@ -56,18 +56,6 @@ class BookDetailView(APIView):
         return Response(serializer.data)
 
 
-@api_view(["GET"])
-def recommended_books(request, book_id):
-    book = get_object_or_404(Book, id=book_id)
-    recommended = (
-        Book.objects.filter(Q(author=book.author) | Q(category=book.category))
-        .exclude(id=book.id)
-        .order_by("?")[:3]
-    )
-    serializer = BookSerializer(recommended, many=True)
-    return Response(serializer.data)
-
-
 class BookAudioGenerateView(APIView):
     def post(self, request, book_id):
         book = get_object_or_404(Book, pk=book_id)

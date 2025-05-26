@@ -1,7 +1,7 @@
 <template>
   <div class="book-detail-wrapper">
     <header class="header">
-      <div class="title-section">
+      <div class="left-header">
         <h1 class="book-title">{{ book.title }}</h1>
         <div class="action-buttons">
           <button 
@@ -21,22 +21,108 @@
           </button>
         </div>
       </div>
-      <div class="actions">
+      <div class="right-header">
         <button @click="addToLibrary" class="action-btn" :class="{ 'in-library': isInLibrary }">
           {{ isInLibrary ? '서재에서 제거' : '내 서재에 추가하기' }}
         </button>
-        <button @click="isThreadModalOpen = true" class="action-btn">스레드 작성하기</button>
+        <button @click="isThreadModalOpen = true" class="action-btn thread-write-btn">스레드 작성하기</button>
+        <button @click="goToAIAnalysis" class="action-btn ai-analysis-btn">
+          <i class="fas fa-robot"></i> AI 분석
+        </button>
       </div>
     </header>
 
-    <div class="backback">
-      <!-- 책 정보 섹션 -->
-      <section class="book-info-section">
-        <img :src="book.cover" alt="book cover" class="book-cover" />
-        <div class="book-details">
-          <p class="subtitle">{{ book.subTitle }}</p>
-          <p class="description">{{ book.description }}</p>
-          <button @click="generateAudio" :disabled="isGenerating">
+    <div class="content-wrapper">
+      <!-- 왼쪽 컨텐츠 영역 -->
+      <div class="left-content">
+        <!-- 책 정보 섹션 -->
+        <section class="book-info-section">
+          <img :src="book.cover" alt="book cover" class="book-cover" />
+          <div class="book-details">
+            <p class="subtitle">{{ book.subTitle }}</p>
+            <p class="description">{{ book.description }}</p>
+            <div class="sangsae"><strong>출판사:</strong> {{ book.publisher }}</div>
+            <div class="sangsae"><strong>출간일:</strong> {{ book.pub_date }}</div>
+            <div class="sangsae"><strong>ISBN:</strong> {{ book.isbn }}</div>
+            <div class="sangsae"><strong>고객 리뷰 평점:</strong> {{ book.customer_review_rank }}</div>
+          </div>
+        </section>
+
+        <!-- 관련 스레드 -->
+        <section class="thread-info-section">
+          <h2>관련 스레드</h2>
+          <div v-if="threads.length === 0">등록된 스레드가 없습니다.</div>
+          <div v-else>
+            <div class="thread-sort-tabs">
+              <button 
+                @click="sortType = 'latest'" 
+                :class="{ active: sortType === 'latest' }"
+                class="sort-tab"
+              >
+                최신순
+              </button>
+              <button 
+                @click="sortType = 'likes'" 
+                :class="{ active: sortType === 'likes' }"
+                class="sort-tab"
+              >
+                좋아요순
+              </button>
+              <button 
+                @click="sortType = 'comments'" 
+                :class="{ active: sortType === 'comments' }"
+                class="sort-tab"
+              >
+                댓글순
+              </button>
+            </div>
+            <div
+              v-for="thread in displayedThreads"
+              :key="thread.id"
+              class="thread-box"
+              @click="goToThreadDetail(thread.id)"
+              style="cursor: pointer;"
+            >
+              <div class="thread-content">
+                <div class="thread-title">{{ thread.title }}</div>
+                <div class="thread-info">
+                  <span class="thread-writer">{{ thread.writer.username }}</span>
+                  <span class="thread-stats">
+                    <span class="likes">❤️ {{ thread.likes_count }}</span>
+                    <span class="comments">💬 {{ thread.comments_count }}</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <button 
+              v-if="threads.length > 5"
+              @click="toggleThreads" 
+              class="toggle-btn"
+            >
+              {{ showAllThreads ? '접기' : '더보기' }}
+              <span class="toggle-icon">{{ showAllThreads ? '▲' : '▼' }}</span>
+            </button>
+          </div>
+        </section>
+      </div>
+
+      <!-- 오른쪽 컨텐츠 영역 -->
+      <div class="right-content">
+        <!-- 작가 정보 -->
+        <section class="author-info-section">
+          <h2 style="margin-top: 0px;">작가 정보</h2>
+          <div class="author-profile">
+            <img v-if="book.author_photo" :src="book.author_photo" alt="author" class="author-photo" />
+            <div>
+              <p class="author-name"><strong>{{ book.author }}</strong></p>
+              <p class="author-desc">{{ book.author_info }}</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- AI 설명 읽어주기 섹션 -->
+        <section class="ai-audio-section">
+          <button @click="generateAudio" :disabled="isGenerating" class="ai-audio-btn">
             {{ isGenerating ? '오디오 생성 중...' : 'AI 설명 읽어주기 생성' }}
           </button>
           <div class="audiofile" v-if="book.audio_file">
@@ -44,108 +130,13 @@
               <span class="audio-title">AI가 들려주는</span>
               <span class="audio-booktitle">{{ book.title }}</span>
             </div>
-            <audio controls :src="`http://127.0.0.1:8000${book.audio_file}`" />
+            <audio controls :src="`http://127.0.0.1:8000${book.audio_file}`" class="audio-player" />
           </div>
-          <div class="sangsae"><strong>출판사:</strong> {{ book.publisher }}</div>
-          <div class="sangsae"><strong>출간일:</strong> {{ book.pub_date }}</div>
-          <div class="sangsae"><strong>ISBN:</strong> {{ book.isbn }}</div>
-          <div class="sangsae"><strong>고객 리뷰 평점:</strong> {{ book.customer_review_rank }}</div>
-        </div>
-      </section>
-
-      <!-- 관련 스레드 -->
-      <section class="thread-info-section">
-        <h2>관련 스레드</h2>
-        <div v-if="threads.length === 0">등록된 스레드가 없습니다.</div>
-        <div v-else>
-          <div class="thread-sort-tabs">
-            <button 
-              @click="sortType = 'latest'" 
-              :class="{ active: sortType === 'latest' }"
-              class="sort-tab"
-            >
-              최신순
-            </button>
-            <button 
-              @click="sortType = 'likes'" 
-              :class="{ active: sortType === 'likes' }"
-              class="sort-tab"
-            >
-              좋아요순
-            </button>
-            <button 
-              @click="sortType = 'comments'" 
-              :class="{ active: sortType === 'comments' }"
-              class="sort-tab"
-            >
-              댓글순
-            </button>
-          </div>
-          <div
-            v-for="thread in displayedThreads"
-            :key="thread.id"
-            class="thread-box"
-            @click="goToThreadDetail(thread.id)"
-            style="cursor: pointer;"
-          >
-            <div class="thread-text">
-              <p class="title"><strong>{{ thread.title }}</strong></p>
-              <p class="subtitle">- by {{ thread.writer.username }}</p>
-            </div>
-            <div class="meta">
-              ❤️ {{ thread.likes_count }} ・ 💬 {{ thread.comments_count }}
-            </div>
-          </div>
-          <button 
-            v-if="threads.length > 5"
-            @click="toggleThreads" 
-            class="toggle-btn"
-          >
-            {{ showAllThreads ? '접기' : '더보기' }}
-            <span class="toggle-icon">{{ showAllThreads ? '▲' : '▼' }}</span>
-          </button>
-        </div>
-      </section>
-
-      <!-- 추천 도서 + 지도 -->
-      <section class="recommend-map-wrapper" v-if="recommendations.length || mapUrl">
-        <div class="recommendation-section">
-          <h3>이런 책은 어때요?</h3>
-          <p class="recommend-desc">AI 분석 기반 도서 추천</p>
-          <div class="recommend-list">
-            <div
-              v-for="rec in recommendations"
-              :key="rec.id"
-              class="recommend-card"
-              @click="goToBookDetail(rec.id)"
-            >
-              <img :src="rec.cover" alt="추천 도서" class="recommend-cover" />
-              <p class="recommend-title">{{ rec.title }}</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="map-section" v-if="mapUrl">
-          <h3>이 책을 읽으면 좋은 장소</h3>
-          <p class="recommend-place" v-if="recommendedPlace">{{ recommendedPlace }}</p>
-          <iframe :src="mapUrl" width="100%" height="300" style="border:0;" loading="lazy"></iframe>
-        </div>
-      </section>
-
-      <!-- 작가 정보 -->
-      <section class="author-info-section">
-        <h2>작가 정보</h2>
-        <div class="author-profile">
-          <img v-if="book.author_photo" :src="book.author_photo" alt="author" class="author-photo" />
-          <div>
-            <p class="author-name"><strong>{{ book.author }}</strong></p>
-            <p class="author-desc">{{ book.author_info }}</p>
-          </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </div>
 
-    <!-- 🟡 ThreadWriteModal 컴포넌트 -->
+    <!-- ThreadWriteModal 컴포넌트 -->
     <ThreadWriteModal
       v-if="isThreadModalOpen"
       :book="book"
@@ -169,9 +160,6 @@ export default {
       showAllThreads: false,
       sortType: 'latest',
       isGenerating: false,
-      recommendations: [],
-      recommendedPlace: '',
-      mapUrl: '',
       isThreadModalOpen: false,
       isInLibrary: false,
     }
@@ -189,34 +177,35 @@ export default {
     }
   },
   async created() {
+    this.setAuthToken();
     await this.loadBookData();
     await this.loadThreads();
     await this.checkLibraryStatus();
-    await this.getRecommendedPlace();
-  },
-  mounted() {
-    this.getUserLocation();
   },
   methods: {
+    setAuthToken() {
+      const token = localStorage.getItem('token');
+      if (token) {
+        axios.defaults.headers.common['Authorization'] = `Token ${token}`;
+      }
+    },
     async loadBookData() {
       const bookId = this.$route.params.bookId;
       try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get(`http://127.0.0.1:8000/api/books/${bookId}/`, {
-          headers: {
-            Authorization: `Token ${token}`
-          }
-        });
+        const response = await axios.get(`http://127.0.0.1:8000/api/books/${bookId}/`);
         this.book = response.data;
-
-        const recRes = await axios.get(`http://127.0.0.1:8000/api/books/${bookId}/recommendations/`, {
-          headers: {
-            Authorization: `Token ${token}`
-          }
-        });
-        this.recommendations = recRes.data;
       } catch (error) {
-        console.error('책 정보를 불러오는 데 실패했습니다:', error);
+        if (error.response?.status === 401) {
+          this.setAuthToken();
+          try {
+            const retryResponse = await axios.get(`http://127.0.0.1:8000/api/books/${bookId}/`);
+            this.book = retryResponse.data;
+          } catch (retryError) {
+            console.error('책 정보를 불러오는 데 실패했습니다:', retryError);
+          }
+        } else {
+          console.error('책 정보를 불러오는 데 실패했습니다:', error);
+        }
       }
     },
     async generateAudio() {
@@ -234,16 +223,31 @@ export default {
     },
     async loadThreads() {
       try {
-        const bookId = this.$route.params.bookId
+        const bookId = this.$route.params.bookId;
         const res = await axios.get(`http://127.0.0.1:8000/api/books/${bookId}/threads/`, {
           params: {
             sort_by: this.sortType
           }
-        })
-        this.threads = res.data
-        this.updateDisplayedThreads()
+        });
+        this.threads = res.data;
+        this.updateDisplayedThreads();
       } catch (error) {
-        console.error('스레드 불러오기 실패:', error)
+        if (error.response?.status === 401) {
+          this.setAuthToken();
+          try {
+            const retryResponse = await axios.get(`http://127.0.0.1:8000/api/books/${this.$route.params.bookId}/threads/`, {
+              params: {
+                sort_by: this.sortType
+              }
+            });
+            this.threads = retryResponse.data;
+            this.updateDisplayedThreads();
+          } catch (retryError) {
+            console.error('스레드 불러오기 실패:', retryError);
+          }
+        } else {
+          console.error('스레드 불러오기 실패:', error);
+        }
       }
     },
     updateDisplayedThreads() {
@@ -265,243 +269,176 @@ export default {
     goToThreadDetail(threadId) {
       this.$router.push(`/threads/${threadId}`)
     },
-    getUserLocation() {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition((pos) => {
-          const lat = pos.coords.latitude
-          const lng = pos.coords.longitude
-          this.mapUrl = `https://www.google.com/maps?q=도서관&ll=${lat},${lng}&z=15&output=embed`
-        })
-      }
-    },
     async checkLibraryStatus() {
       try {
-        const token = localStorage.getItem('token')
-        const libraryRes = await axios.get(
-          'http://127.0.0.1:8000/api/users/library/',
-          {
-            headers: {
-              Authorization: `Token ${token}`
-            }
-          }
-        )
-        this.isInLibrary = libraryRes.data.some(item => item.book.id === this.book.id)
+        const response = await axios.get(`http://127.0.0.1:8000/api/users/library/`);
+        this.isInLibrary = response.data.some(item => item.book.id === this.book.id);
       } catch (error) {
-        console.error('서재 상태 확인 실패:', error)
+        if (error.response?.status === 401) {
+          this.setAuthToken();
+          try {
+            const retryResponse = await axios.get(`http://127.0.0.1:8000/api/users/library/`);
+            this.isInLibrary = retryResponse.data.some(item => item.book.id === this.book.id);
+          } catch (retryError) {
+            console.error('서재 상태 확인 실패:', retryError);
+          }
+        } else {
+          console.error('서재 상태 확인 실패:', error);
+        }
       }
     },
     async addToLibrary() {
       try {
-        const token = localStorage.getItem('token')
-        if (!token) {
-          alert('로그인이 필요합니다.')
-          return
-        }
-
         if (this.isInLibrary) {
           await axios.delete(
-            `http://127.0.0.1:8000/api/books/${this.book.id}/remove-from-library/`,
-            {
-              headers: {
-                Authorization: `Token ${token}`
-              }
-            }
-          )
+            `http://127.0.0.1:8000/api/books/${this.book.id}/remove-from-library/`
+          );
         } else {
           await axios.post(
-            `http://127.0.0.1:8000/api/books/${this.book.id}/add-to-library/`,
-            {},
-            {
-              headers: {
-                Authorization: `Token ${token}`
-              }
+            `http://127.0.0.1:8000/api/books/${this.book.id}/add-to-library/`
+          );
+        }
+        this.isInLibrary = !this.isInLibrary;
+      } catch (error) {
+        if (error.response?.status === 401) {
+          this.setAuthToken();
+          try {
+            if (this.isInLibrary) {
+              await axios.delete(
+                `http://127.0.0.1:8000/api/books/${this.book.id}/remove-from-library/`
+              );
+            } else {
+              await axios.post(
+                `http://127.0.0.1:8000/api/books/${this.book.id}/add-to-library/`
+              );
             }
-          )
-        }
-        this.isInLibrary = !this.isInLibrary
-      } catch (error) {
-        console.error('서재 업데이트 실패:', error)
-        if (error.response?.status === 400) {
-          alert('이미 서재에 추가된 책입니다.')
-        } else {
-          alert('서재 업데이트에 실패했습니다.')
-        }
-      }
-    },
-    async getRecommendedPlace() {
-      try {
-        const prompt = `다음 책의 실제 내용에서 가장 중요한 장면이 일어나는 구체적인 장소 하나만 알려주세요:
-제목: ${this.book.title}
-작가: ${this.book.author}
-줄거리: ${this.book.description}
-
-다음 조건을 반드시 지켜주세요:
-1. 책의 내용에서 실제로 언급된 구체적인 장소만 알려주세요
-2. 작가의 이름이나 책 제목과 관련된 일반적인 장소는 피해주세요 (예: 작가가 '한강'이라고 무조건 '한강'을 추천하지 말 것)
-3. 장소는 최대한 구체적으로 알려주세요 (예: '서울'보다는 '서울 광화문 광장' 처럼)
-4. 장소 이름만 알려주세요. 설명은 필요 없습니다.`;
-        
-        const response = await axios.post('https://api.openai.com/v1/chat/completions', {
-          model: "gpt-3.5-turbo",
-          messages: [{
-            role: "user",
-            content: prompt
-          }],
-          temperature: 0.7,
-          max_tokens: 100
-        }, {
-          headers: {
-            'Authorization': `Bearer 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`,
-            'Content-Type': 'application/json'
+            this.isInLibrary = !this.isInLibrary;
+          } catch (retryError) {
+            console.error('서재 업데이트 실패:', retryError);
+            if (retryError.response?.status === 400) {
+              alert('이미 서재에 추가된 책입니다.');
+            } else {
+              alert('서재 업데이트에 실패했습니다.');
+            }
           }
-        });
-
-        // GPT 응답에서 장소 추출
-        const content = response.data.choices[0].message.content;
-        const place = this.extractPlace(content);
-        if (place) {
-          this.recommendedPlace = place;
-          this.updateMapUrl(place);
+        } else {
+          console.error('서재 업데이트 실패:', error);
+          if (error.response?.status === 400) {
+            alert('이미 서재에 추가된 책입니다.');
+          } else {
+            alert('서재 업데이트에 실패했습니다.');
+          }
         }
-      } catch (error) {
-        console.error('장소 추천 실패:', error);
       }
-    },
-    extractPlace(content) {
-      // 불필요한 설명이나 부가 정보를 제거하고 장소명만 추출
-      const cleanedContent = content
-        .replace(/^[^가-힣a-zA-Z\d]*/, '') // 시작 부분의 특수문자 제거
-        .replace(/[.!?][^가-힣a-zA-Z\d]*$/, '') // 끝 부분의 특수문자와 마침표 제거
-        .replace(/^장소[:：]\s*/, '') // "장소:" 같은 텍스트 제거
-        .trim();
-      
-      return cleanedContent;
-    },
-    updateMapUrl(place) {
-      this.mapUrl = `https://www.google.com/maps?q=${encodeURIComponent(place)}&output=embed`;
     },
     async toggleLike() {
       try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-          alert('로그인이 필요한 기능입니다.');
-          return;
-        }
-        
         const response = await axios.post(
-          `http://127.0.0.1:8000/api/books/${this.book.id}/like/`,
-          {},
-          {
-            headers: {
-              Authorization: `Token ${token}`
-            }
-          }
+          `http://127.0.0.1:8000/api/books/${this.book.id}/like/`
         );
         this.book.is_liked = response.data.liked;
         this.book.likes_count = response.data.likes_count;
       } catch (error) {
-        console.error('좋아요 토글 실패:', error);
         if (error.response?.status === 401) {
-          alert('로그인이 필요한 기능입니다.');
+          this.setAuthToken();
+          try {
+            const retryResponse = await axios.post(
+              `http://127.0.0.1:8000/api/books/${this.book.id}/like/`
+            );
+            this.book.is_liked = retryResponse.data.liked;
+            this.book.likes_count = retryResponse.data.likes_count;
+          } catch (retryError) {
+            console.error('좋아요 토글 실패:', retryError);
+            alert('로그인이 필요한 기능입니다.');
+          }
+        } else {
+          console.error('좋아요 토글 실패:', error);
+          if (error.response?.status === 401) {
+            alert('로그인이 필요한 기능입니다.');
+          }
         }
       }
     },
     goToCommunity() {
       this.$router.push(`/books/${this.book.id}/community`);
     },
+    goToAIAnalysis() {
+      this.$router.push(`/books/${this.book.id}/ai`);
+    }
   }
 }
 </script>
 
 <style scoped>
 .book-detail-wrapper {
-  max-width: 900px;
-  margin: 40px auto;
-  font-family: "Noto Sans KR", sans-serif;
-  color: #111;
-}
-
-.backback {
-  padding: 30px;
-  background-color: rgb(241, 241, 241);
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 93.9vh;
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-  height: 50px;
+  margin-bottom: 10px;
+  padding: 12px 30px 12px 30px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.left-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
 }
 
 .book-title {
-  font-size: 2rem;
-  font-weight: bold;
-}
-
-.thread-btn {
-  background-color: #f44;
-  border: none;
-  color: white;
-  font-size: 14px;
-  width: 120px;
-  height: 30px;
-  border-radius: 5px;
-  cursor: pointer;
-  line-height: 1;
-  transition: background-color 0.3s ease;
-}
-.thread-btn:hover {
-  background-color: #d33;
-}
-
-.thread-box {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #fff;
-  border: 1px solid #cecece;
-  border-radius: 5px;
-  padding: 12px 16px;
-  margin-bottom: 10px;
-  height: 30px;
-}
-
-.thread-text {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-
-.thread-text .title {
-  font-size: 15px;
+  font-size: 1.8rem;
   margin: 0;
-  color: #222;
 }
 
-.thread-text .subtitle {
-  font-size: 13px;
-  color: #888;
+.right-header {
+  display: flex;
+  gap: 10px;
 }
 
-.meta {
-  font-size: 13px;
-  color: #999;
-  white-space: nowrap;
+.content-wrapper {
+  display: flex;
+  gap: 30px;
+  background-color: #f5f5f5;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.left-content {
+  flex: 1.2;
+  background-color: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.right-content {
+  flex: 0.8;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .book-info-section {
   display: flex;
-  gap: 20px;
-  margin-bottom: 40px;
+  gap: 30px;
+  margin-bottom: 30px;
 }
 
 .book-cover {
-  width: 160px;
-  height: 240px;
+  height: 300px;
+  width: 200px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   object-fit: cover;
-  border-radius: 6px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
 .book-details {
@@ -509,124 +446,42 @@ export default {
 }
 
 .subtitle {
-  font-weight: 600;
-  font-size: 1.1rem;
-  margin-bottom: 12px;
+  font-size: 1.2rem;
+  color: #666;
+  margin-bottom: 15px;
+  margin-top: 0px;
 }
 
 .description {
-  margin-bottom: 15px;
-  white-space: pre-wrap;
   line-height: 1.5;
-  font-size: 15px;
+  margin-bottom: 20px;
+  color: #333;
 }
 
 .sangsae {
-  font-size: 15px;
+  margin-bottom: 0px;
+  color: #666;
 }
 
-.audiio-sang {
-  display: flex;
-  flex-direction: column;
-  text-align: center;
-}
-.audio-title {
-  font-weight: bold;
-  color: crimson;
-}
-.audio-booktitle {
-  font-weight: bold;
-  color: rgb(0, 0, 0);
-}
-.audiofile {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 10px;
-}
-
-/* 추천 도서 + 지도 섹션 */
-.recommend-map-wrapper {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 30px;
-  margin-top: 40px;
-  border-top: 1px solid #ccc;
-  padding-top: 20px;
-}
-
-.recommendation-section {
-  flex: 1;
-  min-width: 300px;
-}
-
-.recommend-desc {
-  color: crimson;
-  margin-bottom: 15px;
-}
-
-.recommend-list {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-
-.recommend-card {
-  flex: 1 0 30%;
-  max-width: 30%;
-  text-align: center;
-  cursor: pointer;
-  box-sizing: border-box;
-}
-
-.recommend-cover {
-  width: 100%;
-  aspect-ratio: 2/3; /* ⭐ 2:3 비율 유지 (예: 160x240) */
-  object-fit: cover;
-  border-radius: 8px;
-  box-shadow: 0 0 5px rgba(0,0,0,0.1);
-}
-
-.recommend-title {
-  margin-top: 8px;
-  font-size: 14px;
-  font-weight: bold;
-}
-
-.map-section {
-  flex: 1;
-  min-width: 300px;
-}
-
-.map-section h3 {
-  font-size: 1.1rem;
-  margin-bottom: 10px;
-}
-
-/* 작가 정보 */
-.author-info-section {
-  border-top: 1px solid #ddd;
-  padding-top: 30px;
-}
-
-.author-info-section h2 {
-  margin-bottom: 20px;
-  font-weight: 700;
-  font-size: 1.4rem;
+.author-info-section,
+.ai-audio-section {
+  background-color: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .author-profile {
   display: flex;
   gap: 20px;
-  align-items: flex-start;
+  margin-top: 15px;
 }
 
 .author-photo {
-  width: 100px;
-  height: 100px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
   object-fit: cover;
-  box-shadow: 0 0 5px rgba(0,0,0,0.1);
 }
 
 .author-name {
@@ -635,15 +490,175 @@ export default {
 }
 
 .author-desc {
-  font-size: 0.9rem;
-  line-height: 1.4;
-  white-space: pre-wrap;
+  color: #666;
+  line-height: 1.5;
 }
 
-.actions {
+.ai-audio-btn {
+  width: 100%;
+  padding: 15px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-bottom: 15px;
+}
+
+.ai-audio-btn:hover {
+  background-color: #45a049;
+}
+
+.ai-audio-btn:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.audio-player {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.audiio-sang {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.audio-title {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.audio-booktitle {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #333;
+  margin-top: 5px;
+}
+
+.thread-info-section {
+  margin-top: 30px;
+}
+
+.thread-sort-tabs {
   display: flex;
   gap: 10px;
-  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.sort-tab {
+  padding: 8px 16px;
+  border: none;
+  background-color: #f0f0f0;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.sort-tab.active {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.thread-box {
+  padding: 12px 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  transition: all 0.3s ease;
+  border: 1px solid #dedede;
+}
+
+.thread-box:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: #f0f0f0;
+}
+
+.thread-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.thread-title {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #333;
+  flex: 1;
+}
+
+.thread-info {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  color: #666;
+  white-space: nowrap;
+}
+
+.thread-writer {
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+.thread-stats {
+  display: flex;
+  gap: 15px;
+}
+
+.likes, .comments {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.like-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  background: #f8f9fa;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.like-btn:hover {
+  transform: scale(1.05);
+}
+
+.like-btn.liked {
+  background: #ffebee;
+}
+
+.like-btn.liked .likes-count {
+  color: #e53935;
+}
+
+.community-btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  background: #4CAF50;
+  color: white;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.community-btn:hover {
+  background: #45a049;
+  transform: scale(1.05);
 }
 
 .action-btn {
@@ -654,6 +669,7 @@ export default {
   color: white;
   cursor: pointer;
   transition: all 0.3s ease;
+  font-size: 0.9rem;
 }
 
 .action-btn:hover {
@@ -668,45 +684,12 @@ export default {
   background-color: #7f8c8d;
 }
 
-.show-more-btn {
-  background-color: #3498db;
-  border: none;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  margin-top: 10px;
+.thread-write-btn {
+  background-color: #e74c3c;
 }
 
-.show-more-btn:hover {
-  background-color: #2980b9;
-}
-
-.thread-sort-tabs {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.sort-tab {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 20px;
-  background-color: #f5f5f5;
-  color: #666;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 14px;
-}
-
-.sort-tab:hover {
-  background-color: #e0e0e0;
-}
-
-.sort-tab.active {
-  background-color: #3498db;
-  color: white;
+.thread-write-btn:hover {
+  background-color: #c0392b;
 }
 
 .toggle-btn {
@@ -735,76 +718,76 @@ export default {
   transition: transform 0.3s ease;
 }
 
-.recommend-place {
-  margin: 10px 0;
-  padding: 10px;
-  background-color: #f8f9fa;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  color: #2c3e50;
-}
-
-.title-section {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.action-buttons {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-}
-
-.like-btn {
+.ai-button {
+  background-color: #ff4081;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 5px;
+  cursor: pointer;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  border: none;
-  background: white;
-  border-radius: 20px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  transition: background-color 0.3s;
 }
 
-.like-btn:hover {
-  transform: scale(1.05);
+.ai-button:hover {
+  background-color: #f50057;
 }
 
-.heart-icon {
-  font-size: 1.2rem;
+.ai-button i {
+  font-size: 1.1rem;
 }
 
-.likes-count {
-  font-size: 0.9rem;
-  font-weight: bold;
-  color: #666;
-}
-
-.like-btn.liked {
-  background: #ffebee;
-}
-
-.like-btn.liked .likes-count {
-  color: #e53935;
-}
-
-.community-btn {
-  padding: 0.5rem 1rem;
-  border: none;
-  background: #4CAF50;
+.ai-analysis-btn {
+  background-color: #ff4081;
   color: white;
-  border-radius: 20px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-weight: bold;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.community-btn:hover {
-  background: #45a049;
-  transform: scale(1.05);
+.ai-analysis-btn:hover {
+  background-color: #f50057;
+}
+
+.ai-analysis-btn i {
+  font-size: 1.1rem;
+}
+
+@media (max-width: 1024px) {
+  .header {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .left-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .right-header {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .content-wrapper {
+    flex-direction: column;
+  }
+
+  .left-content,
+  .right-content {
+    flex: 1;
+  }
+
+  .book-info-section {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .book-cover {
+    width: 150px;
+  }
 }
 </style>

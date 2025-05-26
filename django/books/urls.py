@@ -30,7 +30,6 @@ urlpatterns = [
     path("categories/", CategoryListView.as_view()),
     path("books/<int:book_id>/", BookDetailView.as_view(), name="book_detail"),
     path("books/<int:book_id>/generate-audio/", BookAudioGenerateView.as_view()),
-    path("books/<int:book_id>/recommendations/", views.recommended_books),
     path("books/<int:book_id>/like/", toggle_book_like, name="book-like"),
     path(
         "books/<int:book_id>/threads/",

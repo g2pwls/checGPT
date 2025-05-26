@@ -9,6 +9,7 @@ import ThreadDetail from '@/views/ThreadDetail.vue'
 import ReportView from '@/views/ReportView.vue'
 import CommunityView from '../views/CommunityView.vue'
 import CommunityDetailView from '@/views/CommunityDetailView.vue'
+import AIView from '../views/AIView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -37,6 +38,12 @@ const router = createRouter({
       path: '/books/:bookId',
       name: 'BookDetail',
       component: BookDetailView,
+    },
+    {
+      path: '/books/:bookId/ai',
+      name: 'book-ai',
+      component: AIView,
+      props: true
     },
     {
       path: '/users/:userId/profile',
