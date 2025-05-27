@@ -229,13 +229,14 @@ export default {
 
 <style scoped>
 .music-recommendation-wrapper {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-  background-color: #ffffff; /* 흰색 배경 */
-  border-radius: 8px; /* 둥근 모서리 */
-  border: 1px solid #ddd; /* 테두리 */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); /* 가벼운 그림자 */
+  box-sizing: border-box;
+  margin-top: 30px;
+  background-color: #ffffff;
+  border-radius: 15px;
+  padding: 25px;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  width: 100%;
 }
 
 .section-loading {
@@ -272,6 +273,7 @@ export default {
   text-align: center;
   padding-bottom: 10px;
   border-bottom: 1px solid #eee; /* 하단 테두리 */
+  font-weight: 400;
 }
 
 .music-section {
