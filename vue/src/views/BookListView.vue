@@ -60,6 +60,8 @@
   const selectedCategory = ref(0);
   const router = useRouter();
   const route = useRoute();
+  let searchTimeout = null;
+  let isInitialLoad = true;
   
   // URL에서 카테고리 파라미터 가져오기
   const categoryParam = route.query.category;
@@ -68,36 +70,53 @@
   }
 
   const fetchBooks = async () => {
-    const params = {};
-    if (selectedCategory.value) {
-      params.category = selectedCategory.value;
+    try {
+      const params = {};
+      if (selectedCategory.value) {
+        params.category = selectedCategory.value;
+      }
+      if (searchQuery.value) {
+        params.search = searchQuery.value;
+      }
+      const response = await axios.get("http://127.0.0.1:8000/api/books/", { params });
+      books.value = response.data;
+    } catch (error) {
+      console.error('Error fetching books:', error);
     }
-    if (searchQuery.value) {
-      params.search = searchQuery.value;
-    }
-    const response = await axios.get("http://127.0.0.1:8000/api/books/", { params });
-    books.value = response.data;
   };
   
   const fetchCategories = async () => {
-    const response = await axios.get("http://127.0.0.1:8000/api/categories/");
-    categories.value = response.data;
+    try {
+      const response = await axios.get("http://127.0.0.1:8000/api/categories/");
+      categories.value = response.data;
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
   };
   
   // 카테고리 변경 감시
   watch(selectedCategory, (newCategory) => {
-    fetchBooks();
-    // URL 쿼리 파라미터 업데이트
-    router.push({
-      query: { 
-        ...route.query,
-        category: newCategory || undefined
-      }
-    });
+    if (!isInitialLoad) {
+      fetchBooks();
+      // URL 쿼리 파라미터 업데이트
+      router.push({
+        query: { 
+          ...route.query,
+          category: newCategory || undefined
+        }
+      });
+    }
   });
   
   // 검색어 변경 감시
-  watch(searchQuery, fetchBooks);
+  watch(searchQuery, (newQuery) => {
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+    }
+    searchTimeout = setTimeout(() => {
+      fetchBooks();
+    }, 300);
+  });
   
   // URL 쿼리 파라미터 변경 감시
   watch(() => route.query.category, (newCategory) => {
@@ -107,8 +126,8 @@
   });
   
   onMounted(async () => {
-    await fetchCategories();
-    await fetchBooks();
+    await Promise.all([fetchCategories(), fetchBooks()]);
+    isInitialLoad = false;
   });
   
   const goToDetail = (bookId) => {
