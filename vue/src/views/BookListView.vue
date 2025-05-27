@@ -27,7 +27,10 @@
   
       <!-- 본문 -->
       <main class="main-content">
-        <div class="book-grid">
+        <div v-if="isLoading" class="booklist-loading-wrapper">
+          <div class="booklist-loading-spinner"></div>
+        </div>
+        <div v-else class="book-grid">
           <div
             v-for="book in books"
             :key="book.id"
@@ -61,6 +64,8 @@
   const router = useRouter();
   const route = useRoute();
   
+  const isLoading = ref(false);
+
   // URL에서 카테고리 파라미터 가져오기
   const categoryParam = route.query.category;
   if (categoryParam) {
@@ -68,6 +73,7 @@
   }
 
   const fetchBooks = async () => {
+    isLoading.value = true;
     const params = {};
     if (selectedCategory.value !== null) {  // null이 아닐 때만 category 파라미터 추가
       params.category = selectedCategory.value;
@@ -77,6 +83,7 @@
     }
     const response = await axios.get("http://127.0.0.1:8000/api/books/", { params });
     books.value = response.data;
+    isLoading.value = false;
   };
   
   const fetchCategories = async () => {
@@ -343,6 +350,28 @@
   .book-title, .book-meta, .book-subtitle {
     text-align: center; /* 텍스트 중앙 정렬 */
   }
+}
+
+.booklist-loading-wrapper {
+  width: 100%;
+  height: 100%;
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.booklist-loading-spinner {
+  width: 48px;
+  height: 48px;
+  border: 6px solid #e0e0e0;
+  border-top: 6px solid #222;
+  border-radius: 50%;
+  animation: booklist-spin 1s linear infinite;
+  background: transparent;
+}
+@keyframes booklist-spin {
+  0% { transform: rotate(0deg);}
+  100% { transform: rotate(360deg);}
 }
 
 </style>
