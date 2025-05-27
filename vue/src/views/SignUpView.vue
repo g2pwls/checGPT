@@ -8,7 +8,7 @@
       </div>
       <div class="form-group">
         <label for="email">이메일</label>
-        <input id="email" v-model="form.email" placeholder="pro@ssafy.com" type="email" />
+        <input id="email" v-model="form.email" placeholder="ChecGPT@ssafy.com" type="email" />
       </div>
       <div class="form-group">
         <label for="password1">비밀번호</label>
@@ -197,7 +197,7 @@ body {
   align-items: center;
   min-width: 110px;
   margin-right: 0.5rem;
-  margin-bottom: 0.2rem;
+  margin-bottom: 0.4rem;
   cursor: pointer;
   user-select: none;
 }
@@ -218,7 +218,7 @@ body {
   transition: background-color 0.3s;
 }
 .signupcard button:hover {
-  background-color: #555;
+  background-color: #000000;
 }
 
 /* 에러 메시지 스타일 개선 */

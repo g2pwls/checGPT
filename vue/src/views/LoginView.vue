@@ -139,7 +139,7 @@ input[type="submit"] {
 }
 
 input[type="submit"]:hover {
-  background-color: #555;
+  background-color: #111111;
 }
 
 .signup-button {
@@ -155,7 +155,7 @@ input[type="submit"]:hover {
   transition: background-color 0.3s, color 0.3s;
 }
 .signup-button:hover {
-  background-color: #868686;
+  background-color: #d1d1d1;
   color: #fff;
 }
 </style>
