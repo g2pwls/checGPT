@@ -134,42 +134,144 @@ export default {
 
     async getBookRecommendations() {
       try {
-        const response = await axios.get(
-          `http://127.0.0.1:8000/api/books/${this.book.id}/recommend_similar/`,
-          {
-            headers: {
-              Authorization: `Token ${localStorage.getItem('token')}`
-            }
+        const prompt = `다음 책과 비슷한 분위기나 주제를 가진 책을 추천해주세요:
+
+제목: ${this.book.title}
+작가: ${this.book.author}
+줄거리: ${this.book.description}
+
+이 책의 독자가 좋아할 만한 다른 책 3권을 추천해주세요.
+반드시 3권의 책을 추천해주세요. 각 책에 대해 추천 이유도 자세히 설명해주세요.
+책은 실제로 존재하는 책이어야 합니다.
+
+응답 형식:
+추천도서1: [책 제목] - [작가]
+추천이유1: [추천 이유]
+추천도서2: [책 제목] - [작가]
+추천이유2: [추천 이유]
+추천도서3: [책 제목] - [작가]
+추천이유3: [추천 이유]`;
+
+        const response = await axios.post('https://api.openai.com/v1/chat/completions', {
+          model: "gpt-3.5-turbo",
+          messages: [{
+            role: "user",
+            content: prompt
+          }],
+          temperature: 0.7,
+          max_tokens: 1000
+        }, {
+          headers: {
+            'Authorization': `Bearer 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`,
+            'Content-Type': 'application/json'
           }
-        );
-        
-        this.recommendedBooks = response.data.map(rec => ({
-          id: rec.book.id,
-          cover: rec.book.cover,
-          title: rec.book.title,
-          author: rec.book.author,
-          recommendation_reason: rec.reason
-        }));
+        });
+
+        const content = response.data.choices[0].message.content;
+        await this.fetchRecommendedBooks(content);
       } catch (error) {
         console.error('책 추천 실패:', error);
       }
     },
 
-    goToBook(bookId) {
-      if (bookId === this.book.id) return;
-      this.$router.push(`/books/${bookId}`);
+    async fetchRecommendedBooks(gptResponse) {
+      try {
+        const recommendations = [];
+        const lines = gptResponse.split('\n');
+        
+        for (let i = 0; i < lines.length; i++) {
+          if (lines[i].startsWith('추천도서')) {
+            const bookInfo = lines[i].split(/:\s*|\s*-\s*/g).slice(1);
+            const reasonLine = lines[i + 1];
+            if (reasonLine && reasonLine.startsWith('추천이유')) {
+              const reason = reasonLine.split(/:\s*/)[1];
+              recommendations.push({
+                title: bookInfo[0].trim(),
+                author: bookInfo[1].trim(),
+                reason: reason.trim()
+              });
+            }
+          }
+        }
+
+        const bookPromises = recommendations.map(async (rec) => {
+          try {
+            const response = await axios.get('http://127.0.0.1:8000/api/books/');
+            const allBooks = response.data;
+            
+            // 1. 정확한 제목 매칭 시도
+            let matchedBook = allBooks.find(book => 
+              this.normalizeText(book.title) === this.normalizeText(rec.title)
+            );
+
+            // 2. 정확한 제목 매칭이 실패하면, 제목이 포함된 경우 검색
+            if (!matchedBook) {
+              const possibleMatches = allBooks.filter(book => 
+                this.normalizeText(book.title).includes(this.normalizeText(rec.title)) ||
+                this.normalizeText(rec.title).includes(this.normalizeText(book.title))
+              );
+
+              // 작가 이름으로 필터링
+              if (possibleMatches.length > 0) {
+                matchedBook = possibleMatches.find(book =>
+                  this.normalizeText(book.author).includes(this.normalizeText(rec.author)) ||
+                  this.normalizeText(rec.author).includes(this.normalizeText(book.author))
+                );
+              }
+
+              // 여전히 매칭이 없으면 첫 번째 가능한 매치 사용
+              if (!matchedBook && possibleMatches.length > 0) {
+                matchedBook = possibleMatches[0];
+              }
+            }
+
+            if (matchedBook) {
+              return {
+                ...matchedBook,
+                recommendation_reason: rec.reason,
+                original_recommendation: {
+                  title: rec.title,
+                  author: rec.author
+                }
+              };
+            }
+            return null;
+          } catch (error) {
+            console.error(`책 검색 실패 (${rec.title}):`, error);
+            return null;
+          }
+        });
+
+        const books = await Promise.all(bookPromises);
+        this.recommendedBooks = books.filter(book => book);
+      } catch (error) {
+        console.error('추천 도서 검색 실패:', error);
+      }
+    },
+
+    // 텍스트 정규화 함수
+    normalizeText(text) {
+      return text
+        .toLowerCase()
+        .replace(/\s+/g, '') // 모든 공백 제거
+        .replace(/[^\w\s가-힣]/g, ''); // 특수문자 제거, 한글 유지
     },
 
     processGPTResponse(content) {
-      const placeMatch = content.match(/장소:\s*([^\n]+)/);
-      const analysisMatch = content.match(/분석:\s*([^\n]+)/);
+      const placeMatch = content.match(/장소:\s*(.+?)(?=\n|$)/);
+      const analysisMatch = content.match(/분석:\s*(.+?)(?=\n|$)/);
 
-      if (placeMatch) {
+      if (placeMatch && placeMatch[1]) {
         this.recommendedPlace = placeMatch[1].trim();
         this.updateMapUrl(this.recommendedPlace);
       }
-      if (analysisMatch) {
+
+      if (analysisMatch && analysisMatch[1]) {
         this.analysis = analysisMatch[1].trim();
+      }
+
+      if (!placeMatch || !analysisMatch) {
+        this.error = 'AI의 응답을 처리하는 중에 문제가 발생했습니다.';
       }
     },
 
@@ -179,10 +281,21 @@ export default {
 
     retryAnalysis() {
       this.analyzeBookLocation();
+    },
+
+    goToBook(bookId) {
+      this.$router.push(`/books/${bookId}`);
     }
   },
-  async created() {
-    await this.analyzeBookLocation();
+  watch: {
+    book: {
+      handler(newBook) {
+        if (newBook) {
+          this.analyzeBookLocation();
+        }
+      },
+      immediate: true
+    }
   }
 }
 </script>
@@ -312,74 +425,90 @@ iframe {
 }
 
 .recommendation-section {
-  margin-top: 2rem;
-  padding: 2rem;
-  background: white;
-  border-radius: 1rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-top: 30px;
+  background-color: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .recommendation-section h3 {
-  font-size: 1.5rem;
-  color: #333;
-  margin-bottom: 1.5rem;
+  margin: 0 0 20px 0;
+  color: #2c3e50;
+  font-size: 1.5em;
+  text-align: center;
 }
 
 .recommended-books {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
+  gap: 20px;
+  margin-top: 20px;
 }
 
 .book-card {
-  background: #f8f9fa;
-  border-radius: 0.5rem;
-  padding: 1rem;
+  background-color: white;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
-  transition: transform 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  height: 100%;
   display: flex;
-  gap: 1rem;
+  flex-direction: column;
 }
 
 .book-card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-5px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
 .book-card .book-cover {
-  width: 100px;
-  height: 150px;
+  width: 100%;
+  height: 280px;
   object-fit: cover;
-  border-radius: 0.25rem;
 }
 
 .book-info {
-  flex: 1;
+  padding: 20px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
 }
 
-.book-info h4 {
-  font-size: 1.1rem;
-  color: #333;
-  margin-bottom: 0.5rem;
+.book-title {
+  margin: 0;
+  font-size: 1.2em;
+  color: #2c3e50;
+  font-weight: 600;
+  margin-bottom: 8px;
 }
 
-.book-info .book-author {
+.book-author {
+  margin: 0;
   color: #666;
-  font-size: 0.9rem;
-  margin-bottom: 0.5rem;
+  font-size: 1em;
+}
+
+.divider {
+  height: 1px;
+  background-color: #eee;
+  margin: 15px 0;
 }
 
 .recommendation-reason {
-  color: #555;
-  font-size: 0.9rem;
-  line-height: 1.4;
-  margin-top: 0.5rem;
+  margin: 0;
+  font-size: 0.95em;
+  color: #666;
+  line-height: 1.5;
 }
 
 .reason-label {
   display: block;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 0.3rem;
+  color: #2c3e50;
+  font-weight: 600;
+  margin-bottom: 5px;
+  font-size: 0.9em;
 }
 
 .original-recommendation {
@@ -424,7 +553,7 @@ iframe {
   margin-top: 10px;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1200px) {
   .recommended-books {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -433,6 +562,14 @@ iframe {
 @media (max-width: 768px) {
   .recommended-books {
     grid-template-columns: 1fr;
+  }
+
+  .book-card .book-cover {
+    height: 200px;
+  }
+
+  .book-info {
+    padding: 15px;
   }
 }
 </style> 
