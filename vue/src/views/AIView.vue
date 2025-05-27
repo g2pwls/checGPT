@@ -6,8 +6,8 @@
 </template>
 
 <script>
-import AIMovie from '@/components/AIMovie.vue'
 import AIMusic from '@/components/AIMusic.vue'
+import AIMovie from '@/components/AIMovie.vue'
 
 export default {
   components: {
