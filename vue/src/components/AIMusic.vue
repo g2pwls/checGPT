@@ -254,11 +254,11 @@ export default {
 .loading-spinner {
   width: 40px;
   height: 40px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #3498db;
+  border: 4px solid #e0e0e0;
+  border-top: 4px solid #222;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin-bottom: 15px;
+  background: transparent;
 }
 
 @keyframes spin {

@@ -1,5 +1,8 @@
 <template>
   <div class="ai-view">
+    <div v-if="loading" class="ai-loading-overlay">
+      <div class="ai-spinner"></div>
+    </div>
     <div class="ai-content" ref="aiContent">
       <div class="container">
         <div v-if="book">
@@ -218,5 +221,28 @@ export default {
     width: 100%;
     justify-content: center;
   }
+}
+
+.ai-loading-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(255,255,255,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+.ai-spinner {
+  width: 48px;
+  height: 48px;
+  border: 6px solid #e0e0e0;
+  border-top: 6px solid #222;
+  border-radius: 50%;
+  animation: ai-spin 1s linear infinite;
+  background: transparent;
+}
+@keyframes ai-spin {
+  0% { transform: rotate(0deg);}
+  100% { transform: rotate(360deg);}
 }
 </style>

@@ -259,16 +259,21 @@ export default {
 .loading {
   text-align: center;
   padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 220px;
 }
 
 .loading-spinner {
   width: 40px;
   height: 40px;
-  margin: 0 auto 20px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #3498db;
+  border: 4px solid #e0e0e0;
+  border-top: 4px solid #222;
   border-radius: 50%;
   animation: spin 1s linear infinite;
+  background: transparent;
 }
 
 @keyframes spin {
