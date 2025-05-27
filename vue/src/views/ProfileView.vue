@@ -15,11 +15,11 @@
           <div class="follow-stats">
             <div class="stat">
               <span class="stat-value">{{ user.followers_count || 0 }}</span>
-              <span class="stat-label">팔로워</span>
+              <span class="stat-label"> 팔로워</span>
             </div>
             <div class="stat">
               <span class="stat-value">{{ user.following_count || 0 }}</span>
-              <span class="stat-label">팔로잉</span>
+              <span class="stat-label"> 팔로잉</span>
             </div>
           </div>
           <button 
@@ -550,7 +550,7 @@ watch(
   border-radius: 50%;
   object-fit: cover;
   margin-bottom: 15px;
-  border: 3px solid #ddd; /* 테두리 추가 */
+  border: 1px solid #ddd; /* 테두리 추가 */
 }
 
 .profile-name {
@@ -620,7 +620,7 @@ watch(
   flex: 1;
   background-color: #ffffff; /* 흰색 배경 */
   padding: 20px;
-  border-radius: 8px;
+  border-radius: 0px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
   border: 1px solid #ddd;
 }

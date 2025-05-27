@@ -38,7 +38,7 @@ function logout() {
           <span @click="logout" class="logout">Log out</span>
         </template>
         <template v-else>
-          <RouterLink :to="{ name: 'Login' }">Signin</RouterLink>
+          <RouterLink :to="{ name: 'Login' }">Sign in</RouterLink>
           <RouterLink :to="{ name: 'BookList' }">Books</RouterLink>
         </template>
       </div>
