@@ -27,15 +27,19 @@
         <label for="profile_image">프로필 이미지</label>
         <input id="profile_image" @change="onFileChange" type="file" />
       </div>
-      <div class="form-group interests-group">
-        <span style="font-weight:500; color:#333; margin-bottom:0.2rem;">관심 카테고리</span>
-        <div class="checkbox-row">
-          <label v-for="(label, value) in genreChoices" :key="value">
-            <input type="checkbox" :value="value" v-model="form.interests" />
-            {{ label }}
-          </label>
+      <div class="form-group">
+        <label for="password2">관심 카테고리</label>
+          <div class="form-group interests-group">
+            <div class="checkbox-row">
+              <label v-for="(label, value) in genreChoices" :key="value">
+              <input type="checkbox" :value="value" v-model="form.interests" />
+              {{ label }}
+            </label>
+          </div>
         </div>
       </div>
+      
+      
       <button type="submit">회원가입</button>
     </form>
   </div>
@@ -129,7 +133,7 @@ body {
   padding: 2.5rem 2rem;
   border-radius: 0px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  width: 350px;
+  width: 420px;
   display: flex;
   flex-direction: column;
   gap: 1.2rem;
@@ -183,13 +187,24 @@ body {
   border-color: #333;
 }
 
+/* 카테고리 체크박스 전체를 네모 박스(card)로 감싸기 */
+.interests-group {
+  background: #fafbfc;
+  border: 1px solid #dadada;
+  border-radius: 10px;
+  padding: 18px 12px 10px 12px;
+  margin-bottom: 0.5rem;
+}
+
 .interests-group > .checkbox-row {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 0.5rem 1rem;
   margin-bottom: 0.5rem;
   margin-top: 0.4rem;
+  width: 100%;
 }
+
 .signupcard label {
   color: #333;
   font-weight: 500;
