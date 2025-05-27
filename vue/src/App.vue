@@ -26,14 +26,14 @@ function logout() {
   <header class="custom-navbar">
     <nav class="nav-container">
       <div class="nav-left">
-        <RouterLink to="/">Starbooks</RouterLink>
+        <RouterLink to="/">ChecGPT</RouterLink>
       </div>
       <div class="nav-right">
         <template v-if="userStore.isLoggedIn">
           <span class="namename">{{ userStore.username }}님, 환영합니다!</span>
-          <RouterLink :to="{ name: 'BookList' }">책마루</RouterLink>
-          <router-link :to="{ name: 'story' }" class="nav-link">이야기마당</router-link> 
-          <RouterLink :to="{ name: 'Report' }">감상문</RouterLink>
+          <RouterLink :to="{ name: 'BookList' }">Books</RouterLink>
+          <router-link :to="{ name: 'story' }" class="nav-link">Community</router-link> 
+          <RouterLink :to="{ name: 'Report' }">Thread</RouterLink>
           <RouterLink :to="{ name: 'UserProfile', params: { userId: userStore.userId } }">나의 책갈피</RouterLink>
           <span @click="logout" class="logout">떠나기</span>
         </template>
@@ -81,7 +81,7 @@ function logout() {
 .logout:hover,
 .nav-left a:hover,
 .nav-right a:hover {
-  color: lightgreen;
+  color: rgb(143, 142, 142);
 }
 
 .nav-right {

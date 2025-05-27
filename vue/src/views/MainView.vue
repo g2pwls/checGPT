@@ -351,7 +351,7 @@ export default {
   justify-content: center;
   align-items: flex-start;
   background-color: #ffffff; /* Keep monochromatic */
-  padding: 20px;
+  padding: 0px;
 }
 
 .search-container {
@@ -360,9 +360,10 @@ export default {
   padding: 2rem;
   text-align: center;
   padding-top: 250px;
+  padding-bottom: 80px;
   opacity: 0;
   transform: translateY(20px);
-  transition: opacity 0.6s, transform 0.6s, padding-top 0.7s cubic-bezier(.4,1.4,.6,1), margin-top 0.7s cubic-bezier(.4,1.4,.6,1);
+  transition: opacity 0.6s, transform 0.6s, padding-top 0.7s cubic-bezier(.4,1.4,.6,1), margin-top 0.7s cubic-bezier(.4,1.4,.6,1), padding-bottom 0.7s cubic-bezier(.4,1.4,.6,1);
 }
 
 .search-container.loaded {
@@ -371,7 +372,8 @@ export default {
 }
 
 .search-container.results-loaded {
-  padding-top: 80px;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
 .title {
@@ -425,7 +427,7 @@ export default {
 }
 
 .search-button:hover {
-  background: #777777;
+  background: #ffffff;
 }
 
 .search-button i {
@@ -479,13 +481,13 @@ export default {
 }
 
 .recommendations {
-  margin-top: 0.6rem;
+  margin-top: 0.3rem;
 }
 
 .recommendations h2 {
   font-size: 1.8rem;
   color: #333; /* Keep monochromatic */
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
   text-align: center;
 }
 
@@ -520,24 +522,36 @@ export default {
 
 .book-card.first {
   z-index: 3;
-  transform: scale(1.5);
+  transform: scale(1.3);
   box-shadow: 0 8px 24px rgba(0,0,0,0.15);
   transition: transform 0.3s, box-shadow 0.3s, z-index 0.3s;
 }
 
 .book-card.first:hover {
-  transform: scale(1.55);
+  transform: scale(1.35);
   box-shadow: 0 12px 32px rgba(0,0,0,0.18);
 }
 
 .book-card.second {
   z-index: 2;
   transform: scale(1.1);
+  transition: transform 0.3s, box-shadow 0.3s, z-index 0.3s;
+}
+
+.book-card.second:hover {
+  transform: scale(1.15);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
 }
 
 .book-card.third {
   z-index: 1;
   transform: scale(1.0);
+  transition: transform 0.3s, box-shadow 0.3s, z-index 0.3s;
+}
+
+.book-card.third:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
 }
 
 .rank {
@@ -652,7 +666,7 @@ export default {
 
 .h2-title{
   font-weight: 300;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 </style> 
