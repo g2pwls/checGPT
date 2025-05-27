@@ -606,21 +606,21 @@ watch(
 }
 
 .follow-button:not(.following) {
-  background-color: #007bff; /* 파란색 계열 (예시) */
+  background-color: #000000; /* 파란색 계열 (예시) */
   color: white;
 }
 
 .follow-button:not(.following):hover {
-  background-color: #0056b3;
+  background-color: #5f5f5f;
 }
 
 .follow-button.following {
-  background-color: #dc3545; /* 빨간색 계열 (예시) */
+  background-color: #5f5f5f; /* 빨간색 계열 (예시) */
   color: white;
 }
 
 .follow-button.following:hover {
-  background-color: #c82333;
+  background-color: #858484;
 }
 
 .right-box {
@@ -1035,12 +1035,12 @@ watch(
 }
 
 .delete-btn {
-  background-color: #dc3545; /* 빨간색 삭제 버튼 */
+  background-color: #000000; /* 빨간색 삭제 버튼 */
   color: white;
 }
 
 .delete-btn:hover {
-  background-color: #c82333;
+  background-color: #797979;
 }
 
 /* AI 레포트 관련 버튼 (ProfileView에 AI 분석 시작하기 버튼이 없으므로 AI 레포트 모달 내 버튼에 적용) */
