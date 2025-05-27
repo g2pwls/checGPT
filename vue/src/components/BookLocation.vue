@@ -205,7 +205,7 @@ export default {
 .analysis-section {
   background-color: white;
   padding: 25px;
-  border-radius: 12px;
+  border-radius: 15px;
   margin-bottom: 20px;
   box-shadow: 0 2px 5px rgba(0,0,0,0.05);
   border: 1px solid #ddd;
@@ -228,7 +228,7 @@ export default {
 .analysis-content {
   background-color: #f8f9fa;
   padding: 20px;
-  border-radius: 8px;
+  border-radius: 15px;
 }
 
 .analysis-text p {
@@ -311,7 +311,7 @@ export default {
 
 .map-section {
   margin-top: 20px;
-  border-radius: 12px;
+  border-radius: 15px;
   overflow: hidden;
   box-shadow: 0 2px 5px rgba(0,0,0,0.05);
   background-color: white;
@@ -391,6 +391,7 @@ iframe {
   margin: 0;
   color: #666;
   font-size: 1em;
+  margin-bottom: 12px;
 }
 
 .recommendation-reason {

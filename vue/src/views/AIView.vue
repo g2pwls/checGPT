@@ -147,7 +147,7 @@ export default {
 .ai-view {
   padding: 20px;
   min-height: 100vh;
-  background-color: #f5f5f5;
+  background-color: #ffffff;
 }
 
 .container {
@@ -158,7 +158,7 @@ export default {
 .ai-card {
   background: white;
   border-radius: 0px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
   overflow: hidden;
   border: 1px solid #eee;
   padding: 20px;

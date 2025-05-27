@@ -233,7 +233,7 @@ export default {
   box-sizing: border-box;
   margin-top: 30px;
   background-color: #ffffff;
-  border-radius: 8px;
+  border-radius: 15px;
   padding: 25px;
   border: 1px solid #ddd;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
