@@ -109,7 +109,7 @@ export default {
     },
     async getMusicRecommendations() {
       try {
-        const prompt = `다음 책의 내용을 바탕으로 관련된 음악을 3곡 추천해주세요:
+        const prompt = `다음 책의 내용을 바탕으로 관련된 음악을 6곡 추천해주세요:
 제목: ${this.book.title}
 작가: ${this.book.author}
 줄거리: ${this.book.description}
