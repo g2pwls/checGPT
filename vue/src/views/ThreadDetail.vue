@@ -662,8 +662,8 @@ export default {
 
 .actions button {
   margin-right: 10px;
-  background: #333;
-  color: white;
+  background: #1c1c1c;
+  color: #ffffff;
   border: none;
   padding: 10px 20px;
   border-radius: 15px;
@@ -825,8 +825,8 @@ export default {
 
 .like-btn {
   margin-right: 10px;
-  background: #f0f0f0;
-  color: #333;
+  background: #f8f9fa;
+  color: #111111;
   border: none;
   padding: 6px 12px;
   border-radius: 15px;
@@ -840,7 +840,7 @@ export default {
 }
 
 .like-btn:hover {
-  transform: scale(1.05);
+  background: #f8f9fa;
 }
 
 .comment-content {
@@ -912,21 +912,21 @@ export default {
 }
 
 .edit-btn {
-  background: #3498db;
+  background: #000000;
   color: white;
 }
 
 .edit-btn:hover {
-  background: #2980b9;
+  background: #2e2e2e;
 }
 
 .delete-btn {
-  background: #e74c3c;
+  background: #858484;
   color: white;
 }
 
 .delete-btn:hover {
-  background: #c0392b;
+  background: #b4b4b4;
 }
 
 .save-btn {

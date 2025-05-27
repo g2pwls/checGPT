@@ -693,6 +693,7 @@ export default {
   border-radius: 20px;
   cursor: pointer;
   transition: all 0.3s ease;
+  color: #111111;
 }
 
 .like-btn:hover {
@@ -727,7 +728,7 @@ export default {
   border: none;
   border-radius: 20px;
   background-color: #1c1c1c;
-  color: white;
+  color: #ffffff;
   cursor: pointer;
   transition: all 0.3s ease;
   font-size: 0.9rem;
