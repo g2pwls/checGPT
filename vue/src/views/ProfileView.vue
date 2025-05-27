@@ -86,24 +86,28 @@
             <div v-if="topGenres.length > 0" class="top-genres-section">
               <h3 class="section-title section-title-normal">선호 장르</h3>
               <div class="top-genres-grid">
-                <div v-for="(genre, index) in topGenres" :key="genre.id" class="genre-item">
+                <div v-for="(genre, index) in topGenres" :key="genre.id" class="genre-card">
                   <div class="rank-badge">{{ index + 1 }}순위</div>
-                  <h4 class="genre-name">{{ genre.name }}</h4>
-                  <p class="genre-count">{{ genre.count }}권</p>
+                  <div class="genre-name">{{ genre.name }}</div>
+                  <div class="genre-count">{{ genre.count }}권</div>
                 </div>
               </div>
             </div>
 
+            <!-- Library Section -->
             <div v-if="library.length === 0" class="empty-state">
               <p>서재에 추가된 책이 없습니다.</p>
             </div>
-            <div v-else class="library-grid">
-              <div v-for="item in library" :key="item.id" class="library-item" @click="goToBook(item.book.id)">
-                <div class="book-cover-container">
-                  <img :src="item.book.cover" :alt="item.book.title" class="book-cover">
+            <div v-else>
+              <h3 class="section-title section-title-normal">전체 도서</h3>
+              <div class="library-grid">
+                <div v-for="item in library" :key="item.id" class="library-item" @click="goToBook(item.book.id)">
+                  <div class="book-cover-container">
+                    <img :src="item.book.cover" :alt="item.book.title" class="book-cover">
+                  </div>
+                  <h3 class="book-title">{{ item.book.title }}</h3>
+                  <p class="book-author">{{ item.book.author }}</p>
                 </div>
-                <h3 class="book-title">{{ item.book.title }}</h3>
-                <p class="book-author">{{ item.book.author }}</p>
               </div>
             </div>
           </div>
@@ -621,11 +625,17 @@ watch(
 
 .right-box {
   flex: 1;
-  background-color: #ffffff; /* 흰색 배경 */
+  background-color: #ffffff;
   padding: 20px;
   border-radius: 0px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
   border: 1px solid #ddd;
+  font-weight: 400;
+}
+
+.right-box .tab-button,
+.right-box .section-title {
+  font-weight: bold !important;
 }
 
 .tabs {
@@ -686,12 +696,79 @@ watch(
   font-weight: 400;
 }
 
-.top-books-grid,
-.library-grid,
+.top-books-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  width: 100%;
+}
+
+.library-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  width: 100%;
+}
+
+.top-genres-section {
+  margin-bottom: 48px;
+}
+
 .top-genres-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
+  width: 100%;
+}
+
+.genre-card {
+  background-color: #f9f9f9;
+  padding: 15px;
+  border-radius: 8px;
+  text-align: center;
+  border: 1px solid #eee;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.genre-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.06);
+}
+
+.rank-badge {
+  display: inline-block;
+  background-color: #333;
+  color: white;
+  font-size: 0.8rem;
+  padding: 3px 8px;
+  border-radius: 12px;
+  margin-bottom: 10px;
+}
+
+.genre-name {
+  font-size: 1rem;
+  font-weight: bold;
+  margin-bottom: 4px;
+  color: #333;
+}
+
+.genre-count {
+  font-size: 0.9rem;
+  color: #777;
+}
+
+.top-books-section {
+  margin-bottom: 48px;
+}
+
+.library-content {
+  margin-bottom: 32px;
 }
 
 .top-book-item,
@@ -710,16 +787,6 @@ watch(
 .library-item:hover {
   transform: translateY(-2px);
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.06);
-}
-
-.rank-badge {
-  display: inline-block;
-  background-color: #333; /* 무채색 배지 */
-  color: white;
-  font-size: 0.8rem;
-  padding: 3px 8px;
-  border-radius: 12px;
-  margin-bottom: 10px;
 }
 
 .book-cover-container {
@@ -746,33 +813,6 @@ watch(
 .book-author {
   font-size: 0.9rem;
   color: #777;
-}
-
-.genre-item {
-  background-color: #f9f9f9; /* 밝은 배경 */
-  padding: 15px;
-  border-radius: 8px;
-  text-align: center;
-  border: 1px solid #eee;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
-}
-
-.genre-name {
-  font-size: 1.1rem;
-  font-weight: bold;
-  margin-bottom: 5px;
-  color: #333;
-}
-
-.genre-count {
-  font-size: 0.9rem;
-  color: #777;
-}
-
-.empty-state {
-  text-align: center;
-  color: #777;
-  padding: 50px 0;
 }
 
 .threads-list {
@@ -1011,6 +1051,14 @@ watch(
     background-color: #ff7676; /* 기존 빨간색보다 밝게 */
 }
 
+@media (max-width: 1200px) {
+  .top-books-grid,
+  .library-grid,
+  .top-genres-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 768px) {
   .content-wrapper {
     flex-direction: column;
@@ -1051,16 +1099,13 @@ watch(
 
   .top-books-grid,
   .library-grid,
-  .top-genres-grid,
-  .reports-grid {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 15px;
+  .top-genres-grid {
+    grid-template-columns: 1fr;
   }
 
   .top-book-item,
   .library-item,
-  .genre-item,
-  .report-card {
+  .genre-card {
     padding: 10px;
   }
 
