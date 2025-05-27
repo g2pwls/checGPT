@@ -428,7 +428,7 @@ export default {
 
 <style scoped>
 .main-container {
-  background-color: #e7e7e7;
+  background-color: #ffffff;
 }
 .book-detail-wrapper {
   max-width: 1500px;
@@ -444,8 +444,9 @@ export default {
   margin-bottom: 10px;
   padding: 12px 30px 12px 30px;
   background-color: white;
-  border-radius: 10px;
+  border-radius: 0px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid #dadada;
 }
 
 .left-header {
@@ -466,16 +467,16 @@ export default {
 
 .content-wrapper {
   display: flex;
-  gap: 30px;
+  gap: 10px;
   background-color: #f5f5f5;
   padding: 10px;
-  border-radius: 10px;
+  border-radius: 0px;
 }
 
 .left-content {
   flex: 1.2;
   background-color: white;
-  border-radius: 10px;
+  border-radius: 0px;
   padding: 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -526,7 +527,7 @@ export default {
 .author-info-section,
 .ai-audio-section {
   background-color: white;
-  border-radius: 10px;
+  border-radius: 0px;
   padding: 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -557,7 +558,7 @@ export default {
 .ai-audio-btn {
   width: 100%;
   padding: 15px;
-  background-color: #F24162;
+  background-color: #e74c3c;
   color: white;
   border: none;
   border-radius: 8px;
@@ -568,7 +569,7 @@ export default {
 }
 
 .ai-audio-btn:hover {
-  background-color: #45a049;
+  background-color: #ff6c6c;
 }
 
 .ai-audio-btn:disabled {
@@ -800,14 +801,14 @@ export default {
 }
 
 .ai-analysis-btn {
-  background-color: #F24162;
+  background-color: #e74c3c;
   color: white;
   display: flex;
   align-items: center;
 }
 
 .ai-analysis-btn:hover {
-  background-color: #f50057;
+  background-color: #ff7676;
 }
 
 .ai-analysis-btn i {

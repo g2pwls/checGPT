@@ -304,7 +304,7 @@ export default {
   min-height: 93.9vh;
   display: flex;
   justify-content: center;
-  background-color: #f5f5f5;
+  background-color: #ffffff;
 }
 
 .search-container {
@@ -319,7 +319,7 @@ export default {
   font-size: 2.5rem;
   color: #333;
   margin-bottom: 2rem;
-  font-weight: bold;
+  font-weight: 300;
   margin-top: 10px;
 }
 
@@ -330,6 +330,8 @@ export default {
   background: white;
   border-radius: 50px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid #dadada;
+
 }
 
 .search-input {
@@ -344,7 +346,7 @@ export default {
 .search-button {
   padding: 1.5rem 2rem;
   border: none;
-  background: #4CAF50;
+  background: #000000;
   color: white;
   border-radius: 0 50px 50px 0;
   cursor: pointer;
@@ -352,7 +354,7 @@ export default {
 }
 
 .search-button:hover {
-  background: #45a049;
+  background: #ff4545;
 }
 
 .loading {

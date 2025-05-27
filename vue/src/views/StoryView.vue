@@ -106,7 +106,7 @@ export default {
 
 <style scoped>
 .container {
-  background-color: #e7e7e7;
+  background-color: #ffffff;
   height: 93.5vh;
 }
 .story-view {

@@ -131,7 +131,7 @@
     .sidebar {
         width: 20%;
         padding: 20px 10px 20px 20px;
-        background-color: #e7e7e7;
+        background-color: #ffffff;
 
         display: flex;            /* flex 컨테이너 */
         flex-direction: column;   /* 세로 정렬 */
@@ -175,7 +175,7 @@
         flex: 1;
         padding: 100px 24px 24px 10px;
         overflow-y: auto;
-        background-color: #e7e7e7;
+        background-color: #ffffff;
         display: flex;
         /* justify-content: center */
         /* overflow: hidden; */
@@ -215,15 +215,15 @@
     /* 개별 책 카드 */
     .book-card {
     display: flex;
-    background-color: #ffffff;
+    background-color: #f0f0f0;
     padding: 16px;
-    border-radius: 8px;
+    border-radius: 0px;
     gap: 16px; /* 이미지와 텍스트 사이 간격 */
     align-items: flex-start; /* 이미지와 텍스트 상단 정렬 */
     height: 200px;
     overflow: hidden;
     color: #515151;
-
+    border: 1px solid #dadada;
     }
 
     .book-cover {
