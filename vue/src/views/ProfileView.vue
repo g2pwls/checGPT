@@ -148,7 +148,7 @@
 
           <!-- AI Reports Tab -->
           <div v-if="activeTab === 'ai-reports'" class="ai-reports-section">
-            <h3>📊 AI 분석 레포트</h3>
+            <h3>AI 분석 레포트</h3>
             <div class="reports-grid">
               <div v-for="report in aiReports" :key="report.id" class="report-card">
                 <div class="report-content" @click="showReport(report)">

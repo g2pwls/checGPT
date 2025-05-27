@@ -780,7 +780,7 @@ export default {
 }
 
 .ai-button {
-  background-color: #ff4081;
+  background-color: #e53935;
   color: white;
   border: none;
   padding: 0.8rem 1.5rem;

@@ -3,16 +3,10 @@
     <div class="ai-content" ref="aiContent">
       <div class="container">
         <div v-if="book">
-          <div class="ai-cards">
-            <div class="ai-card">
-              <book-location :book="book"></book-location>
-            </div>
-            <div class="ai-card">
-              <AIMusic :book="book" />
-            </div>
-            <div class="ai-card">
-              <AIMovie :book="book" />
-            </div>
+          <div class="ai-card">
+            <book-location :book="book"></book-location>
+            <AIMusic :book="book" />
+            <AIMovie :book="book" />
           </div>
         </div>
         <div v-else class="no-book">
@@ -161,18 +155,20 @@ export default {
   margin: 0 auto;
 }
 
-.ai-cards {
+.ai-card {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  border: 1px solid #eee;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 20px;
-  margin-bottom: 20px;
 }
 
-.ai-card {
-  background: white;
-  border-radius: 0px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
+.ai-card > * {
+  width: 100%;
 }
 
 .no-book {
@@ -191,7 +187,7 @@ export default {
 }
 
 .save-button {
-  background-color: #4CAF50;
+  background-color: #e53935;
   color: white;
   border: none;
   padding: 12px 24px;
@@ -205,7 +201,7 @@ export default {
 }
 
 .save-button:hover {
-  background-color: #45a049;
+  background-color: #e74c3c;
 }
 
 .save-button:disabled {

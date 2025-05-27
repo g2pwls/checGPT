@@ -1,6 +1,7 @@
 <template>
   <div class="music-recommendation-wrapper">
     <h1 class="title">{{ book.title }} 관련 음악 추천</h1>
+    <div class="divider"></div>
     
     <!-- 음악 추천 섹션 -->
     <section class="music-section">
@@ -109,7 +110,7 @@ export default {
     },
     async getMusicRecommendations() {
       try {
-        const prompt = `다음 책의 내용을 바탕으로 관련된 음악을 6곡 추천해주세요:
+        const prompt = `다음 책의 내용을 바탕으로 관련된 음악을 5곡 추천해주세요:
 제목: ${this.book.title}
 작가: ${this.book.author}
 줄거리: ${this.book.description}
@@ -229,75 +230,40 @@ export default {
 
 <style scoped>
 .music-recommendation-wrapper {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-  background-color: #ffffff; /* 흰색 배경 */
-  border-radius: 8px; /* 둥근 모서리 */
-  border: 1px solid #ddd; /* 테두리 */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); /* 가벼운 그림자 */
-}
-
-.section-loading {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 40px;
-  background-color: #f8f8f8; /* 밝은 회색 배경 */
-  border-radius: 8px; /* 둥근 모서리 */
-  margin: 20px 0;
-  border: 1px solid #eee;
-}
-
-.loading-spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #3498db;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: 15px;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.title {
-  font-size: 1.5rem; /* 폰트 크기 조정 */
-  color: #333; /* 어두운 글자색 */
-  margin-bottom: 20px; /* 마진 조정 */
-  text-align: center;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #eee; /* 하단 테두리 */
+  box-sizing: border-box;
+  margin-top: 30px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 25px;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  width: 100%;
 }
 
 .music-section {
-  margin-bottom: 0; /* 마진 제거 */
+  width: 100%;
 }
 
 .music-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* 그리드 조정 */
+  grid-template-columns: repeat(5, 1fr);
   gap: 20px;
-  margin-top: 20px;
+  width: 100%;
 }
 
 .music-card {
-  background-color: #f9f9f9; /* 밝은 배경 */
-  border-radius: 8px; /* 둥근 모서리 */
-  overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03); /* 가벼운 그림자 */
-  transition: all 0.2s ease; /* 트랜지션 조정 */
+  background: white;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   cursor: pointer;
-  border: 1px solid #eee;
+  transition: transform 0.2s;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  text-align: center;
-  padding: 15px;
+  gap: 15px;
+  box-sizing: border-box;
 }
 
 .music-card:hover {
@@ -322,6 +288,7 @@ export default {
 
 .music-info {
   flex-grow: 1;
+  text-align: center;
 }
 
 .track-title {
@@ -506,5 +473,22 @@ export default {
   .album-details p {
     font-size: 0.9rem;
   }
+}
+
+.title {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 10px;
+  text-align: center;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.divider {
+  width: 100%;
+  height: 1px;
+  background: #e0e0e0;
+  margin: 20px 0;
+  border-radius: 1px;
 }
 </style>

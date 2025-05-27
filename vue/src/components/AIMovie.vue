@@ -1,6 +1,7 @@
 <template>
   <div class="movie-recommendation-wrapper">
     <h1 class="title">{{ book.title }} 관련 영화 추천</h1>
+    <div class="divider"></div>
     
     <!-- 영화 추천 섹션 -->
     <section class="movie-section">
@@ -192,13 +193,14 @@ export default {
 
 <style scoped>
 .movie-recommendation-wrapper {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-  background-color: #ffffff; /* 흰색 배경 */
-  border-radius: 8px; /* 둥근 모서리 */
-  border: 1px solid #ddd; /* 테두리 */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); /* 가벼운 그림자 */
+  box-sizing: border-box;
+  margin-top: 30px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 25px;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  width: 100%;
 }
 
 .section-loading {
@@ -229,35 +231,42 @@ export default {
 }
 
 .title {
-  font-size: 1.5rem; /* 폰트 크기 조정 */
-  color: #333; /* 어두운 글자색 */
-  margin-bottom: 20px; /* 마진 조정 */
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 10px;
   text-align: center;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #eee; /* 하단 테두리 */
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.divider {
+  width: 100%;
+  height: 1px;
+  background: #e0e0e0;
+  margin: 20px 0;
+  border-radius: 1px;
 }
 
 .movie-section {
-  margin-bottom: 0; /* 마진 제거 */
+  width: 100%;
 }
 
 .movie-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* 그리드 조정 */
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
-  margin-top: 20px;
+  width: 100%;
 }
 
 .movie-card {
-  background-color: #f9f9f9; /* 밝은 배경 */
-  border-radius: 8px; /* 둥근 모서리 */
-  overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03); /* 가벼운 그림자 */
-  transition: all 0.2s ease; /* 트랜지션 조정 */
+  background: white;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   cursor: pointer;
-  border: 1px solid #eee;
-  display: flex; /* flexbox 사용 */
-  flex-direction: column; /* 세로 정렬 */
+  transition: transform 0.2s;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .movie-card:hover {

@@ -35,6 +35,7 @@
 
     <div class="recommendation-section" v-if="recommendedBooks.length > 0">
       <h3>이런 책은 어떠세요?</h3>
+      <div class="divider"></div>
       <div class="recommended-books">
         <div v-for="book in recommendedBooks" :key="book.id" class="book-card" @click="goToBook(book.id)">
           <img :src="book.cover" :alt="book.title" class="book-cover">
@@ -247,9 +248,11 @@ export default {
 }
 
 .divider {
+  width: 100%;
   height: 1px;
-  background-color: #e0e0e0;
+  background: #e0e0e0;
   margin: 20px 0;
+  border-radius: 1px;
 }
 
 .loading {
@@ -324,15 +327,24 @@ iframe {
   margin-top: 30px;
   background-color: white;
   padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 .recommendation-section h3 {
-  margin: 0 0 20px 0;
+  margin: 0 0 10px 0;
   color: #2c3e50;
   font-size: 1.5em;
   text-align: center;
+}
+
+.recommendation-section .divider {
+  width: 60px;
+  height: 2px;
+  background: #eee;
+  margin: 0 auto 20px auto;
+  border-radius: 1px;
 }
 
 .recommended-books {
