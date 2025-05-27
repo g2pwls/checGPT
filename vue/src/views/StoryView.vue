@@ -2,7 +2,7 @@
   <div class="container">
   <div class="story-view">
     <div class="story-header">
-      <h2 class="page-title">📚 이야기마당</h2>
+      <h2 class="page-title">이야기마당</h2>
       <p class="description">독자들과 함께 나누는 책 이야기 공간입니다.</p>
     </div>
 

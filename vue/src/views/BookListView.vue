@@ -120,7 +120,7 @@
     /* 전체 컨테이너 */
     .container {
         display: flex;
-        height: 92vh;
+        height: 93.5vh;
         background-color: #111;
         color: white;
         font-family: 'Noto Sans KR', sans-serif;

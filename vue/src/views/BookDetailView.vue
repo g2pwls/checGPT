@@ -1,4 +1,5 @@
 <template>
+  <div class="main-container">
   <div class="book-detail-wrapper">
     <header class="header">
       <div class="left-header">
@@ -144,6 +145,7 @@
       @submit-thread="addThread"
     />
   </div>
+</div>
 </template>
 
 <script>
@@ -412,6 +414,9 @@ export default {
 </script>
 
 <style scoped>
+.main-container {
+  background-color: #e7e7e7;
+}
 .book-detail-wrapper {
   max-width: 1500px;
   margin: 0 auto;
@@ -539,7 +544,7 @@ export default {
 .ai-audio-btn {
   width: 100%;
   padding: 15px;
-  background-color: #4CAF50;
+  background-color: #F24162;
   color: white;
   border: none;
   border-radius: 8px;
@@ -601,7 +606,7 @@ export default {
 }
 
 .sort-tab.active {
-  background-color: #4CAF50;
+  background-color: #1c1c1c;
   color: white;
 }
 
@@ -661,7 +666,7 @@ export default {
 .action-buttons {
   display: flex;
   gap: 1rem;
-  margin-top: 1rem;
+  margin-top: 0px;
 }
 
 .like-btn {
@@ -691,7 +696,7 @@ export default {
 .community-btn {
   padding: 0.5rem 1rem;
   border: none;
-  background: #4CAF50;
+  background: #1c1c1c;
   color: white;
   border-radius: 20px;
   cursor: pointer;
@@ -707,7 +712,7 @@ export default {
   padding: 10px 20px;
   border: none;
   border-radius: 20px;
-  background-color: #e74c3c;
+  background-color: #1c1c1c;
   color: white;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -715,7 +720,7 @@ export default {
 }
 
 .action-btn:hover {
-  background-color: #c0392b;
+  background-color: #505050;
 }
 
 .action-btn.in-library {
@@ -727,11 +732,11 @@ export default {
 }
 
 .thread-write-btn {
-  background-color: #e74c3c;
+  background-color: #1c1c1c;
 }
 
 .thread-write-btn:hover {
-  background-color: #c0392b;
+  background-color: #505050;
 }
 
 .toggle-btn {
@@ -782,7 +787,7 @@ export default {
 }
 
 .ai-analysis-btn {
-  background-color: #ff4081;
+  background-color: #F24162;
   color: white;
   display: flex;
   align-items: center;
