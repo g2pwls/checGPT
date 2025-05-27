@@ -2,13 +2,13 @@
   <div class="container">
   <div class="story-view">
     <div class="story-header">
-      <h2 class="page-title">이야기마당</h2>
+      <h2 class="page-title">Community</h2>
       <p class="description">독자들과 함께 나누는 책 이야기 공간입니다.</p>
     </div>
 
     <!-- 최근 오픈된 이야기마당 공지 섹션 -->
     <div class="notice-section">
-      <h3>🎉 새로 열린 이야기마당</h3>
+      <h3> 새로 열린 Community</h3>
       <div class="notice-items">
         <div v-for="book in recentStoryBooks" :key="'story-'+book.id" 
              class="notice-item" @click="goToCommunity(book.id)">
@@ -16,7 +16,7 @@
             <img :src="book.cover" :alt="book.title" class="notice-book-cover">
             <div class="notice-text">
               <span class="book-title">{{ book.title }}</span>
-              <span class="open-label">이야기마당이 열렸습니다!</span>
+              <span class="open-label">Community가 열렸습니다!</span>
             </div>
           </div>
         </div>
@@ -25,10 +25,10 @@
 
     <!-- 전체 이야기마당 목록 -->
     <div class="books-section">
-      <h3>📖 전체 이야기마당</h3>
+      <h3>전체 Community</h3>
       <div v-if="booksWithStory.length === 0" class="no-books">
-        <p>현재 이야기마당이 열린 책이 없습니다.</p>
-        <p class="sub-text">책에 좋아요를 2개 이상 받으면 이야기마당이 열립니다!</p>
+        <p>현재 Community이 열린 책이 없습니다.</p>
+        <p class="sub-text">책에 좋아요를 2개 이상 받으면 Community이 열립니다!</p>
       </div>
       <div v-else class="books-grid">
         <div v-for="book in booksWithStory" :key="book.id" 

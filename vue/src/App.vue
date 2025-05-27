@@ -34,12 +34,12 @@ function logout() {
           <RouterLink :to="{ name: 'BookList' }">Books</RouterLink>
           <router-link :to="{ name: 'story' }" class="nav-link">Community</router-link> 
           <RouterLink :to="{ name: 'Report' }">Thread</RouterLink>
-          <RouterLink :to="{ name: 'UserProfile', params: { userId: userStore.userId } }">나의 책갈피</RouterLink>
-          <span @click="logout" class="logout">떠나기</span>
+          <RouterLink :to="{ name: 'UserProfile', params: { userId: userStore.userId } }">My page</RouterLink>
+          <span @click="logout" class="logout">Log out</span>
         </template>
         <template v-else>
-          <RouterLink :to="{ name: 'Login' }">들르기</RouterLink>
-          <RouterLink :to="{ name: 'BookList' }">책마루</RouterLink>
+          <RouterLink :to="{ name: 'Login' }">Signin</RouterLink>
+          <RouterLink :to="{ name: 'BookList' }">Books</RouterLink>
         </template>
       </div>
     </nav>

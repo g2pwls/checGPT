@@ -1,7 +1,7 @@
 <template>
   <div class="book-location">
     <div class="analysis-section">
-      <h3>📚 이 책과 관련된 AI분석</h3>
+      <h3>이 책과 관련된 AI분석</h3>
       <div v-if="loading" class="loading">
         <div class="loading-spinner"></div>
         <p>AI가 책의 내용을 분석하고 있습니다...</p>
@@ -12,10 +12,10 @@
       </div>
       <div v-else-if="analysis" class="analysis-content">
         <div class="analysis-text">
-          <h4>📍 추천 장소</h4>
+          <h4>추천 장소</h4>
           <p class="place">{{ recommendedPlace }}</p>
           <div class="divider"></div>
-          <h4>📖 장소 선정 이유</h4>
+          <h4>장소 선정 이유</h4>
           <p class="reason">{{ analysis }}</p>
         </div>
       </div>
@@ -34,7 +34,7 @@
     </div>
 
     <div class="recommendation-section" v-if="recommendedBooks.length > 0">
-      <h3>📚 이런 책은 어떠세요?</h3>
+      <h3>이런 책은 어떠세요?</h3>
       <div class="recommended-books">
         <div v-for="book in recommendedBooks" :key="book.id" class="book-card" @click="goToBook(book.id)">
           <img :src="book.cover" :alt="book.title" class="book-cover">

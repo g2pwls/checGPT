@@ -1,7 +1,7 @@
 <template>
   <div class="report-view">
     <div class="report-container">
-      <h1 class="report-title">감상문</h1>
+      <h1 class="report-title">Thread</h1>
       
       <!-- 정렬 탭 추가 -->
       <div class="sort-tabs">
@@ -110,7 +110,7 @@ export default {
 
 <style scoped>
 .report-view {
-  background-color: #f8f8f8; /* 밝은 회색 배경 */
+  background: #fff;
   min-height: 100vh;
   width: 100%;
   padding-top: 1px; /* margin collapse 방지 */

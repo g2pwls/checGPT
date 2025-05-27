@@ -546,7 +546,7 @@ export default {
 
 <style scoped>
 .thread-detail {
-  background: #f1f1f1;
+  background: #fff;
   color: black;
   padding-bottom: 40px;
   min-height: 95vh;
