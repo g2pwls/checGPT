@@ -10,7 +10,9 @@
       </div>
       
       <div v-else-if="recommendedTracks.length > 0" class="music-grid">
-        <div v-for="track in recommendedTracks" :key="track.id" class="music-card">
+        <div v-for="track in recommendedTracks" :key="track.id" 
+             class="music-card"
+             @click="openMusicModal(track, $event)">
           <div class="album-cover">
             <img :src="track.albumCover" :alt="track.albumName" />
           </div>
@@ -25,6 +27,27 @@
         <p>관련 음악을 찾을 수 없습니다.</p>
       </div>
     </section>
+
+    <!-- 음악 상세 모달 -->
+    <div v-if="selectedTrack" class="music-modal" @click.self="closeMusicModal">
+      <div class="modal-content" :style="modalStyle">
+        <button class="close-button" @click="closeMusicModal">&times;</button>
+        <div class="modal-body">
+          <div class="modal-album">
+            <img :src="selectedTrack.albumCover" :alt="selectedTrack.albumName" class="modal-album-cover">
+            <div class="modal-info">
+              <h2 class="modal-title">{{ selectedTrack.name }}</h2>
+              <p class="modal-artist">{{ selectedTrack.artist }}</p>
+              <div class="album-details">
+                <h3>앨범</h3>
+                <p>{{ selectedTrack.albumName }}</p>
+                
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -38,7 +61,21 @@ export default {
       book: {},
       recommendedTracks: [],
       isLoading: true,
-      accessToken: null
+      accessToken: null,
+      selectedTrack: null,
+      modalPosition: null
+    }
+  },
+  computed: {
+    modalStyle() {
+      if (!this.modalPosition) return {}
+      
+      return {
+        '--initial-top': `${this.modalPosition.top}px`,
+        '--initial-left': `${this.modalPosition.left}px`,
+        '--initial-width': `${this.modalPosition.width}px`,
+        '--initial-height': `${this.modalPosition.height}px`
+      }
     }
   },
   async created() {
@@ -112,7 +149,7 @@ export default {
         const content = response.data.choices[0].message.content
         const parsedContent = JSON.parse(content)
         
-        // Spotify에서 각 트랙 검색
+        // Spotify에서 각 트랙 검색 및 정보 가져오기
         for (const track of parsedContent.tracks) {
           await this.searchSpotifyTrack(track)
         }
@@ -138,13 +175,55 @@ export default {
 
         if (response.data.tracks.items.length > 0) {
           const spotifyTrack = response.data.tracks.items[0]
+          // Spotify에서 가져온 정보로 업데이트
           track.id = spotifyTrack.id
+          track.name = spotifyTrack.name
+          track.artist = spotifyTrack.artists[0].name
           track.albumName = spotifyTrack.album.name
           track.albumCover = spotifyTrack.album.images[0].url
+          
+          // 앨범 ID를 저장
+          track.albumId = spotifyTrack.album.id
+          
+          // 앨범 상세 정보 가져오기
+          await this.getAlbumDetails(track)
         }
       } catch (error) {
         console.error('Spotify 트랙 검색에 실패했습니다:', error)
       }
+    },
+    async getAlbumDetails(track) {
+      try {
+        const response = await axios.get(`https://api.spotify.com/v1/albums/${track.albumId}`, {
+          headers: {
+            'Authorization': `Bearer ${this.accessToken}`
+          }
+        })
+        
+        if (response.data) {
+          track.albumDescription = response.data.description || '앨범 설명이 없습니다.'
+        }
+      } catch (error) {
+        console.error('앨범 상세 정보를 가져오는 데 실패했습니다:', error)
+        track.albumDescription = '앨범 설명을 가져올 수 없습니다.'
+      }
+    },
+    openMusicModal(track, event) {
+      this.selectedTrack = track
+      document.body.style.overflow = 'hidden'
+      
+      const card = event.currentTarget
+      const rect = card.getBoundingClientRect()
+      this.modalPosition = {
+        top: rect.top,
+        left: rect.left,
+        width: rect.width,
+        height: rect.height
+      }
+    },
+    closeMusicModal() {
+      this.selectedTrack = null
+      document.body.style.overflow = 'auto'
     }
   }
 }
@@ -261,6 +340,183 @@ export default {
 @media (max-width: 768px) {
   .music-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+.music-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+  animation: fadeIn 0.3s ease;
+  will-change: opacity;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 15px;
+  width: 90%;
+  max-width: 500px;
+  position: relative;
+  transform-origin: center;
+  will-change: transform, opacity;
+}
+
+@keyframes popup {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.modal-content {
+  animation: popup 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.close-button {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: #666;
+  cursor: pointer;
+  z-index: 1;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.3s;
+}
+
+.close-button:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.modal-body {
+  padding: 30px;
+}
+
+.modal-album {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.modal-album-cover {
+  width: 250px;
+  height: 250px;
+  border-radius: 10px;
+  object-fit: cover;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.modal-info {
+  text-align: center;
+  width: 100%;
+}
+
+.modal-title {
+  font-size: 1.8rem;
+  color: #333;
+  margin-bottom: 10px;
+  word-break: keep-all;
+}
+
+.modal-artist {
+  color: #666;
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+}
+
+.album-details {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+
+.album-details h3 {
+  font-size: 1.2rem;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.album-details p {
+  color: #666;
+  font-size: 1.1rem;
+}
+
+.album-description {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #eee;
+}
+
+.album-description h4 {
+  font-size: 1.1rem;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.album-description p {
+  color: #666;
+  font-size: 1rem;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+@media (max-width: 768px) {
+  .modal-content {
+    width: 95%;
+    margin: 10px;
+  }
+
+  .modal-body {
+    padding: 20px;
+  }
+
+  .modal-album-cover {
+    width: 200px;
+    height: 200px;
+  }
+
+  .modal-title {
+    font-size: 1.5rem;
+  }
+
+  .modal-artist {
+    font-size: 1.1rem;
+  }
+
+  .album-details h3 {
+    font-size: 1.1rem;
+  }
+
+  .album-details p {
+    font-size: 1rem;
+  }
+
+  .album-description h4 {
+    font-size: 1rem;
+  }
+  
+  .album-description p {
+    font-size: 0.9rem;
   }
 }
 </style>

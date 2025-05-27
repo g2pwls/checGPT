@@ -320,6 +320,7 @@ export default {
   z-index: 1000;
   padding: 20px;
   animation: fadeIn 0.3s ease;
+  will-change: opacity;
 }
 
 @keyframes fadeIn {
@@ -335,32 +336,25 @@ export default {
   background: white;
   border-radius: 15px;
   width: 90%;
-  max-width: 1000px;
-  max-height: 90vh;
-  overflow-y: auto;
+  max-width: 800px;
   position: relative;
-  animation: popup 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   transform-origin: center;
+  will-change: transform, opacity;
 }
 
 @keyframes popup {
   0% {
-    position: absolute;
-    top: var(--initial-top);
-    left: var(--initial-left);
-    width: var(--initial-width);
-    height: var(--initial-height);
+    transform: scale(0.8);
     opacity: 0;
   }
   100% {
-    position: relative;
-    top: 0;
-    left: 0;
-    width: 90%;
-    max-width: 1000px;
-    height: auto;
+    transform: scale(1);
     opacity: 1;
   }
+}
+
+.modal-content {
+  animation: popup 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .close-button {
@@ -391,9 +385,10 @@ export default {
 }
 
 .modal-title {
-  font-size: 2rem;
+  font-size: 1.8rem;
   color: #333;
   margin-bottom: 10px;
+  word-break: keep-all;
 }
 
 .modal-year {
@@ -422,7 +417,7 @@ export default {
 }
 
 .modal-description h3 {
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   color: #333;
   margin-bottom: 15px;
 }
