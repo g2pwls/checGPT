@@ -160,7 +160,7 @@ onMounted(async () => {
 
 .top-books-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
   margin-bottom: 20px;
 }
@@ -231,7 +231,7 @@ onMounted(async () => {
   position: absolute;
   top: 10px;
   right: 10px;
-  background-color: #dc3545;
+  background-color: #727272;
   color: white;
   border: none;
   border-radius: 50%;
@@ -246,12 +246,12 @@ onMounted(async () => {
 }
 
 .remove-btn:hover {
-  background-color: #c82333;
+  background-color: #474747;
 }
 
 .library-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 15px;
   margin-bottom: 20px;
 }

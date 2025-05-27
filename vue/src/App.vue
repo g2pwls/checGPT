@@ -91,7 +91,7 @@ function logout() {
 }
 
 .divider {
-  color: green;
+  color: rgb(82, 82, 82);
   margin: 0 0.5rem;
 }
 </style>
