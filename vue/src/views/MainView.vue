@@ -571,7 +571,7 @@ export default {
   position: absolute;
   top: -10px;
   right: -10px;
-  background: #f3f3f3; /* Monochromatic */
+  background: #d6d6d6; /* Monochromatic */
   color: #333; /* Monochromatic */
   padding: 0.5rem 1rem;
   border-radius: 20px;

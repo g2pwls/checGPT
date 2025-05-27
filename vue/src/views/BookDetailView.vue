@@ -558,7 +558,7 @@ export default {
 .ai-audio-btn {
   width: 100%;
   padding: 15px;
-  background-color: #e74c3c;
+  background-color: #1c1c1c;
   color: white;
   border: none;
   border-radius: 8px;
