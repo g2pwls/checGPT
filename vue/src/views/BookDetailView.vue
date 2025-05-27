@@ -804,7 +804,6 @@ export default {
   color: white;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
 }
 
 .ai-analysis-btn:hover {

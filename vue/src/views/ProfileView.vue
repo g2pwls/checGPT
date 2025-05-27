@@ -666,7 +666,7 @@ watch(
 .library-grid {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 1.5rem;
+  gap: 10px;
   padding: 1rem;
   max-width: 1200px;
   margin: 0 auto;
@@ -699,7 +699,7 @@ watch(
 .library-item {
   background: white;
   border-radius: 0.5rem;
-  padding: 1rem;
+  padding: 10px;
   transition: transform 0.2s;
   cursor: pointer;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
