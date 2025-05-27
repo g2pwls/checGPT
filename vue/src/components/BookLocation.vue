@@ -39,16 +39,8 @@
         <div v-for="book in recommendedBooks" :key="book.id" class="book-card" @click="goToBook(book.id)">
           <img :src="book.cover" :alt="book.title" class="book-cover">
           <div class="book-info">
-            <div class="original-recommendation" v-if="book.original_recommendation.title !== book.title">
-              <span class="ai-recommendation-label">AI 추천 도서</span>
-              <p class="original-title">{{ book.original_recommendation.title }}</p>
-              <p class="original-author">{{ book.original_recommendation.author }}</p>
-            </div>
-            <div class="matched-book">
-              <span class="matched-label">매칭된 도서</span>
-              <h4 class="book-title">{{ book.title }}</h4>
-              <p class="book-author">{{ book.author }}</p>
-            </div>
+            <h4>{{ book.title }}</h4>
+            <p class="book-author">{{ book.author }}</p>
             <div class="divider"></div>
             <p class="recommendation-reason">
               <span class="reason-label">AI의 추천 이유</span>
@@ -134,127 +126,31 @@ export default {
 
     async getBookRecommendations() {
       try {
-        const prompt = `다음 책과 비슷한 분위기나 주제를 가진 책을 추천해주세요:
-
-제목: ${this.book.title}
-작가: ${this.book.author}
-줄거리: ${this.book.description}
-
-이 책의 독자가 좋아할 만한 다른 책 3권을 추천해주세요.
-반드시 3권의 책을 추천해주세요. 각 책에 대해 추천 이유도 자세히 설명해주세요.
-책은 실제로 존재하는 책이어야 합니다.
-
-응답 형식:
-추천도서1: [책 제목] - [작가]
-추천이유1: [추천 이유]
-추천도서2: [책 제목] - [작가]
-추천이유2: [추천 이유]
-추천도서3: [책 제목] - [작가]
-추천이유3: [추천 이유]`;
-
-        const response = await axios.post('https://api.openai.com/v1/chat/completions', {
-          model: "gpt-3.5-turbo",
-          messages: [{
-            role: "user",
-            content: prompt
-          }],
-          temperature: 0.7,
-          max_tokens: 1000
-        }, {
-          headers: {
-            'Authorization': `Bearer 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`,
-            'Content-Type': 'application/json'
+        const response = await axios.get(
+          `http://127.0.0.1:8000/api/books/${this.book.id}/recommend_similar/`,
+          {
+            headers: {
+              Authorization: `Token ${localStorage.getItem('token')}`
+            }
           }
-        });
+        );
+        
+        this.recommendedBooks = response.data.map(rec => ({
+          id: rec.book.id,
+          cover: rec.book.cover,
+          title: rec.book.title,
+          author: rec.book.author,
+          recommendation_reason: rec.reason
+        }));
 
-        const content = response.data.choices[0].message.content;
-        await this.fetchRecommendedBooks(content);
       } catch (error) {
         console.error('책 추천 실패:', error);
-      }
-    },
-
-    async fetchRecommendedBooks(gptResponse) {
-      try {
-        const recommendations = [];
-        const lines = gptResponse.split('\n');
-        
-        for (let i = 0; i < lines.length; i++) {
-          if (lines[i].startsWith('추천도서')) {
-            const bookInfo = lines[i].split(/:\s*|\s*-\s*/g).slice(1);
-            const reasonLine = lines[i + 1];
-            if (reasonLine && reasonLine.startsWith('추천이유')) {
-              const reason = reasonLine.split(/:\s*/)[1];
-              recommendations.push({
-                title: bookInfo[0].trim(),
-                author: bookInfo[1].trim(),
-                reason: reason.trim()
-              });
-            }
-          }
+        if (error.response?.data?.error) {
+          this.error = error.response.data.error;
+        } else {
+          this.error = '책 추천을 가져오는데 실패했습니다.';
         }
-
-        const bookPromises = recommendations.map(async (rec) => {
-          try {
-            const response = await axios.get('http://127.0.0.1:8000/api/books/');
-            const allBooks = response.data;
-            
-            // 1. 정확한 제목 매칭 시도
-            let matchedBook = allBooks.find(book => 
-              this.normalizeText(book.title) === this.normalizeText(rec.title)
-            );
-
-            // 2. 정확한 제목 매칭이 실패하면, 제목이 포함된 경우 검색
-            if (!matchedBook) {
-              const possibleMatches = allBooks.filter(book => 
-                this.normalizeText(book.title).includes(this.normalizeText(rec.title)) ||
-                this.normalizeText(rec.title).includes(this.normalizeText(book.title))
-              );
-
-              // 작가 이름으로 필터링
-              if (possibleMatches.length > 0) {
-                matchedBook = possibleMatches.find(book =>
-                  this.normalizeText(book.author).includes(this.normalizeText(rec.author)) ||
-                  this.normalizeText(rec.author).includes(this.normalizeText(book.author))
-                );
-              }
-
-              // 여전히 매칭이 없으면 첫 번째 가능한 매치 사용
-              if (!matchedBook && possibleMatches.length > 0) {
-                matchedBook = possibleMatches[0];
-              }
-            }
-
-            if (matchedBook) {
-              return {
-                ...matchedBook,
-                recommendation_reason: rec.reason,
-                original_recommendation: {
-                  title: rec.title,
-                  author: rec.author
-                }
-              };
-            }
-            return null;
-          } catch (error) {
-            console.error(`책 검색 실패 (${rec.title}):`, error);
-            return null;
-          }
-        });
-
-        const books = await Promise.all(bookPromises);
-        this.recommendedBooks = books.filter(book => book);
-      } catch (error) {
-        console.error('추천 도서 검색 실패:', error);
       }
-    },
-
-    // 텍스트 정규화 함수
-    normalizeText(text) {
-      return text
-        .toLowerCase()
-        .replace(/\s+/g, '') // 모든 공백 제거
-        .replace(/[^\w\s가-힣]/g, ''); // 특수문자 제거, 한글 유지
     },
 
     processGPTResponse(content) {

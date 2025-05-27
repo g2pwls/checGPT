@@ -38,6 +38,10 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 from django.utils import timezone
 from rest_framework import viewsets
+import json
+import os
+import openai
+from django.conf import settings
 
 # ----------------------
 # 📚 Book 관련 API
@@ -579,6 +583,162 @@ class BookViewSet(viewsets.ModelViewSet):
         return Response(
             {"comment_count": comment_count, "like_count": book.likes_count}
         )
+
+    @action(detail=True, methods=["get"])
+    def recommend_similar(self, request, pk=None):
+        """책 3권을 추천하는 API"""
+        try:
+            book = self.get_object()
+
+            # fixtures 파일들 로드
+            books_fixture_path = os.path.join(
+                settings.BASE_DIR, "books", "fixtures", "books.json"
+            )
+            categories_fixture_path = os.path.join(
+                settings.BASE_DIR, "books", "fixtures", "categories.json"
+            )
+
+            with open(books_fixture_path, "r", encoding="utf-8") as f:
+                all_books = json.load(f)
+            with open(categories_fixture_path, "r", encoding="utf-8") as f:
+                categories = json.load(f)
+
+            # 카테고리 정보를 딕셔너리로 변환
+            category_dict = {cat["pk"]: cat["fields"]["name"] for cat in categories}
+
+            # 현재 책을 제외한 다른 책들 준비
+            other_books = []
+            for b in all_books:
+                if b["pk"] != book.id and b["fields"]["author"] != book.author:
+                    book_info = {
+                        "id": b["pk"],
+                        "title": b["fields"]["title"],
+                        "author": b["fields"]["author"],
+                        "description": b["fields"]["description"],
+                        "category": category_dict.get(b["fields"]["category"], "기타"),
+                    }
+                    other_books.append(book_info)
+
+            # GPT API를 사용하여 유사한 책 찾기
+            client = openai.OpenAI(api_key=settings.OPENAI_API_KEY)
+
+            prompt = f"""
+다음 책과 비슷한 책을 추천해주세요:
+
+입력 도서:
+제목: {book.title}
+작가: {book.author}
+카테고리: {category_dict.get(book.category.id, '기타')}
+줄거리: {book.description}
+
+주어진 도서 목록에서 이 책과 비슷한 주제, 스타일, 또는 분위기를 가진 책 3권을 선택해주세요.
+반드시 3권을 추천해야 합니다.
+
+선택 시 다음 사항을 고려해주세요:
+1. 같은 작가의 다른 작품은 제외
+2. 비슷한 주제나 테마를 가진 책
+3. 비슷한 문체나 스토리텔링 방식
+4. 독자의 관심사나 취향
+5. 가능한 경우 같은 카테고리의 책 우선 추천
+
+주어진 도서 목록:
+{[{
+    'id': b['id'],
+    'title': b['title'],
+    'author': b['author'],
+    'category': b['category'],
+    'description': b['description'][:200]
+} for b in other_books[:30]]}
+
+응답 형식:
+[
+    {{"id": "책ID", "reason": "추천 이유 (구체적으로 입력 도서와의 연관성 설명)"}},
+    {{"id": "책ID", "reason": "추천 이유 (구체적으로 입력 도서와의 연관성 설명)"}},
+    {{"id": "책ID", "reason": "추천 이유 (구체적으로 입력 도서와의 연관성 설명)"}}
+]
+
+반드시 3권의 책을 추천해야 하며, 각각 다른 책이어야 합니다."""
+
+            max_retries = 3
+            for attempt in range(max_retries):
+                try:
+                    response = client.chat.completions.create(
+                        model="gpt-3.5-turbo",
+                        messages=[
+                            {
+                                "role": "system",
+                                "content": "당신은 도서 추천 전문가입니다. 주어진 도서 목록에서 정확히 3권의 책을 추천해야 합니다.",
+                            },
+                            {"role": "user", "content": prompt},
+                        ],
+                        temperature=0.7,
+                    )
+
+                    # GPT 응답 파싱
+                    recommendations = json.loads(response.choices[0].message.content)
+
+                    # 정확히 3권이 추천되었는지 확인
+                    if len(recommendations) != 3:
+                        if attempt < max_retries - 1:
+                            continue
+                        else:
+                            return Response(
+                                {"error": "정확히 3권의 책을 추천받지 못했습니다."},
+                                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            )
+
+                    # 추천된 책들의 전체 정보 가져오기
+                    recommended_books = []
+                    for rec in recommendations:
+                        try:
+                            recommended_book = Book.objects.get(id=rec["id"])
+                            recommended_books.append(
+                                {
+                                    "book": BookSerializer(
+                                        recommended_book, context={"request": request}
+                                    ).data,
+                                    "reason": rec["reason"],
+                                }
+                            )
+                        except Book.DoesNotExist:
+                            continue
+
+                    # 3권이 모두 유효한 책인지 확인
+                    if len(recommended_books) == 3:
+                        return Response(recommended_books)
+                    elif attempt < max_retries - 1:
+                        continue
+                    else:
+                        return Response(
+                            {"error": "유효한 책 3권을 찾지 못했습니다."},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        )
+
+                except json.JSONDecodeError:
+                    if attempt < max_retries - 1:
+                        continue
+                    else:
+                        return Response(
+                            {"error": "AI 응답을 처리하는 데 실패했습니다."},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        )
+                except Exception as e:
+                    print(
+                        f"Error in recommend_similar (attempt {attempt + 1}): {str(e)}"
+                    )
+                    if attempt < max_retries - 1:
+                        continue
+                    else:
+                        return Response(
+                            {"error": str(e)},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        )
+
+        except Exception as e:
+            print(f"Error in recommend_similar: {str(e)}")
+            return Response(
+                {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 class AIReportViewSet(viewsets.ModelViewSet):
