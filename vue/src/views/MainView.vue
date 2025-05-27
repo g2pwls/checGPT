@@ -1,7 +1,7 @@
 <template>
   <div class="main-container">
     <div class="search-container" :class="{ 'loaded': isLoaded, 'results-loaded': recommendedBooks.length > 0 }">
-      <h1 class="title">도서 AI 에이전트</h1>
+      <h1 class="title">AI 도서 에이전트</h1>
       <div class="search-box">
         <input 
           v-model="searchQuery" 
@@ -24,7 +24,7 @@
       </div>
 
       <div v-if="recommendedBooks.length > 0" class="recommendations">
-        <h2 class="h2-title">검색 결과</h2>
+        <h2 class="h2-title">추천 결과</h2>
         <transition-group name="stagger-cards" tag="div" class="books-grid">
           <!-- 2순위 책 (왼쪽) -->
           <div v-if="recommendedBooks[1]" 
@@ -522,35 +522,35 @@ export default {
 
 .book-card.first {
   z-index: 3;
-  transform: scale(1.3);
+  transform: scale(1.35);
   box-shadow: 0 8px 24px rgba(0,0,0,0.15);
   transition: transform 0.3s, box-shadow 0.3s, z-index 0.3s;
 }
 
 .book-card.first:hover {
-  transform: scale(1.35);
+  transform: scale(1.4);
   box-shadow: 0 12px 32px rgba(0,0,0,0.18);
 }
 
 .book-card.second {
   z-index: 2;
-  transform: scale(1.1);
+  transform: scale(0.95);
   transition: transform 0.3s, box-shadow 0.3s, z-index 0.3s;
 }
 
 .book-card.second:hover {
-  transform: scale(1.15);
+  transform: scale(1);
   box-shadow: 0 8px 24px rgba(0,0,0,0.18);
 }
 
 .book-card.third {
   z-index: 1;
-  transform: scale(1.0);
+  transform: scale(0.95);
   transition: transform 0.3s, box-shadow 0.3s, z-index 0.3s;
 }
 
 .book-card.third:hover {
-  transform: scale(1.05);
+  transform: scale(1);
   box-shadow: 0 8px 24px rgba(0,0,0,0.18);
 }
 
@@ -562,7 +562,7 @@ export default {
   color: white; /* Keep monochromatic */
   padding: 0.5rem 1rem;
   border-radius: 20px;
-  font-weight: bold;
+  font-weight: 500;
   font-size: 0.9rem;
   z-index: 1;
 }
@@ -575,7 +575,7 @@ export default {
   color: #333; /* Monochromatic */
   padding: 0.5rem 1rem;
   border-radius: 20px;
-  font-weight: bold;
+  font-weight: 400;
   font-size: 0.9rem;
   z-index: 1;
   border: 1px solid #ddd; /* Monochromatic */
@@ -593,7 +593,7 @@ export default {
 
 .book-title {
   font-size: 1.1rem;
-  font-weight: bold;
+  font-weight: 400;
   color: #333; /* Monochromatic */
   margin: 0.5rem 0;
   text-align: center;
@@ -632,7 +632,7 @@ export default {
   .books-grid {
     flex-direction: column;
     height: auto;
-    gap: 1rem;
+    gap: 0;
   }
 
   .book-card {
