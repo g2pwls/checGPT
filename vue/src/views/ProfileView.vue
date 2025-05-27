@@ -155,9 +155,6 @@
                     <p class="report-date">{{ formatDate(report.created_at) }}</p>
                   </div>
                 </div>
-                <button v-if="isOwnProfile" @click.stop="deleteReport(report)" class="delete-button">
-                  삭제
-                </button>
               </div>
             </div>
           </div>
@@ -182,19 +179,28 @@
         <button class="close-button" @click="closeReportModal">×</button>
         <h3>{{ selectedReport?.book.title }} AI 레포트</h3>
         <div class="report-viewer">
-          <object
-            :data="getReportUrl(selectedReport?.report_file)"
-            type="application/pdf"
-            width="100%"
-            height="600px"
-          >
-            <div class="pdf-fallback">
-              <p>PDF를 표시할 수 없습니다.</p>
-              <a :href="getReportUrl(selectedReport?.report_file)" target="_blank" class="download-btn">
-                PDF 다운로드
-              </a>
-            </div>
-          </object>
+          <img 
+            v-if="selectedReport?.report_image" 
+            :src="getReportImageUrl(selectedReport.report_image)" 
+            alt="AI Report" 
+            class="report-image"
+          />
+          <div class="report-actions">
+            <a 
+              :href="getReportUrl(selectedReport?.report_file)" 
+              target="_blank" 
+              class="action-button download-btn"
+            >
+              <i class="fas fa-file-pdf"></i> PDF 다운로드
+            </a>
+            <button 
+              v-if="isOwnProfile" 
+              @click="deleteReport(selectedReport)" 
+              class="action-button delete-btn"
+            >
+              <i class="fas fa-trash"></i> 레포트 삭제
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -478,10 +484,18 @@ const deleteReport = async (report) => {
     
     // 삭제 후 목록 새로고침
     aiReports.value = aiReports.value.filter(r => r.id !== report.id)
+    // 모달창 닫기
+    closeReportModal()
   } catch (error) {
     console.error('AI 레포트 삭제 실패:', error)
     alert('레포트 삭제에 실패했습니다. 다시 시도해주세요.')
   }
+}
+
+const getReportImageUrl = (imagePath) => {
+  if (!imagePath) return ''
+  if (imagePath.startsWith('http')) return imagePath
+  return `http://127.0.0.1:8000${imagePath}`
 }
 
 onMounted(() => {
@@ -1047,6 +1061,8 @@ watch(
   transition: transform 0.2s;
   display: flex;
   flex-direction: column;
+  width: 215px;
+  height: 310px;
 }
 
 .report-content {
@@ -1111,42 +1127,55 @@ watch(
   margin-top: 20px;
   background: #f5f5f5;
   border-radius: 8px;
-  padding: 10px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-.pdf-fallback {
-  text-align: center;
-  padding: 20px;
-  background: #f5f5f5;
+.report-image {
+  width: 100%;
+  max-height: 70vh;
+  object-fit: contain;
   border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.report-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.action-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  border: none;
 }
 
 .download-btn {
-  display: inline-block;
-  margin-top: 10px;
-  padding: 8px 16px;
-  background-color: #1976d2;
+  background-color: #4CAF50;
   color: white;
-  text-decoration: none;
-  border-radius: 4px;
-  transition: background-color 0.3s;
 }
 
 .download-btn:hover {
-  background-color: #1565c0;
+  background-color: #45a049;
 }
 
-.delete-button {
-  padding: 0.5rem;
-  background-color: #dc3545;
+.delete-btn {
+  background-color: #f44336;
   color: white;
-  border: none;
-  width: 100%;
-  cursor: pointer;
-  transition: background-color 0.2s;
 }
 
-.delete-button:hover {
-  background-color: #c82333;
+.delete-btn:hover {
+  background-color: #d32f2f;
 }
 </style>

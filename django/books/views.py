@@ -27,7 +27,12 @@ from .serializers import (
     AIReportSerializer,
 )
 from django.contrib.auth import get_user_model
-from rest_framework.exceptions import PermissionDenied, NotFound, ValidationError, APIException
+from rest_framework.exceptions import (
+    PermissionDenied,
+    NotFound,
+    ValidationError,
+    APIException,
+)
 from .utils import generate_audio_for_book
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
@@ -253,29 +258,32 @@ class UserLibraryView(APIView):
                 )
 
             # Get library items
-            library_items = UserLibrary.objects.filter(user_id=target_user_id).select_related('book', 'book__category').order_by('-added_date')
+            library_items = (
+                UserLibrary.objects.filter(user_id=target_user_id)
+                .select_related("book", "book__category")
+                .order_by("-added_date")
+            )
             print(f"Found {library_items.count()} library items")
-            
+
             # Calculate top 3 genres
             genre_counts = {}
             for item in library_items:
                 category = item.book.category
                 if category:
                     genre_counts[category.id] = {
-                        'id': category.id,
-                        'name': category.name,
-                        'count': genre_counts.get(category.id, {}).get('count', 0) + 1
+                        "id": category.id,
+                        "name": category.name,
+                        "count": genre_counts.get(category.id, {}).get("count", 0) + 1,
                     }
-            
+
             # Sort genres by count and get top 3
-            top_genres = sorted(genre_counts.values(), key=lambda x: x['count'], reverse=True)[:3]
-            
+            top_genres = sorted(
+                genre_counts.values(), key=lambda x: x["count"], reverse=True
+            )[:3]
+
             serializer = UserLibrarySerializer(library_items, many=True)
-            return Response({
-                'library': serializer.data,
-                'top_genres': top_genres
-            })
-            
+            return Response({"library": serializer.data, "top_genres": top_genres})
+
         except Exception as e:
             print(f"Error in UserLibraryView: {str(e)}")
             return Response(
@@ -454,6 +462,7 @@ def delete_community_comment(request, comment_id):
     comment.delete()
     return Response(status=204)
 
+
 class TopBooksView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -462,66 +471,68 @@ class TopBooksView(APIView):
         try:
             # Determine which user's top books to fetch
             target_user_id = user_id if user_id else request.user.id
-            
+
             # Check if the user exists
             User = get_user_model()
             if not User.objects.filter(id=target_user_id).exists():
                 return Response(
-                    {'error': f'User with id {target_user_id} does not exist'}, 
-                    status=status.HTTP_404_NOT_FOUND
+                    {"error": f"User with id {target_user_id} does not exist"},
+                    status=status.HTTP_404_NOT_FOUND,
                 )
-            
+
             # Get top books
-            top_books = TopBook.objects.filter(user_id=target_user_id).select_related('book').order_by('rank')
+            top_books = (
+                TopBook.objects.filter(user_id=target_user_id)
+                .select_related("book")
+                .order_by("rank")
+            )
             serializer = TopBookSerializer(top_books, many=True)
             return Response(serializer.data)
         except Exception as e:
             return Response(
-                {'error': str(e)}, 
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
     def post(self, request):
         """Update user's top books"""
         try:
             # Get the user's library books
-            user_library = UserLibrary.objects.filter(user=request.user).values_list('book_id', flat=True)
-            
+            user_library = UserLibrary.objects.filter(user=request.user).values_list(
+                "book_id", flat=True
+            )
+
             # Delete existing top books
             TopBook.objects.filter(user=request.user).delete()
-            
+
             # Create new top books
-            top_books_data = request.data.get('top_books', [])
+            top_books_data = request.data.get("top_books", [])
             created_books = []
-            
+
             for rank, book_id in enumerate(top_books_data, 1):
                 # Check if the book is in the user's library
                 if book_id not in user_library:
                     return Response(
-                        {'error': f'Book with id {book_id} is not in your library'}, 
-                        status=status.HTTP_400_BAD_REQUEST
+                        {"error": f"Book with id {book_id} is not in your library"},
+                        status=status.HTTP_400_BAD_REQUEST,
                     )
-                
+
                 try:
                     book = Book.objects.get(id=book_id)
                     top_book = TopBook.objects.create(
-                        user=request.user,
-                        book=book,
-                        rank=rank
+                        user=request.user, book=book, rank=rank
                     )
                     created_books.append(top_book)
                 except Book.DoesNotExist:
                     return Response(
-                        {'error': f'Book with id {book_id} does not exist'}, 
-                        status=status.HTTP_404_NOT_FOUND
+                        {"error": f"Book with id {book_id} does not exist"},
+                        status=status.HTTP_404_NOT_FOUND,
                     )
-            
+
             serializer = TopBookSerializer(created_books, many=True)
             return Response(serializer.data, status=201)
         except Exception as e:
             return Response(
-                {'error': str(e)}, 
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
 
@@ -544,31 +555,30 @@ class BookViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=["post"])
     def toggle_community(self, request, pk=None):
         book = self.get_object()
         if not book.has_community:
             book.has_community = True
             book.community_created_at = timezone.now()
             book.save()
-            return Response({'status': 'community activated'})
+            return Response({"status": "community activated"})
         else:
             book.has_community = False
             book.community_created_at = None
             book.save()
-            return Response({'status': 'community deactivated'})
+            return Response({"status": "community deactivated"})
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=["post"])
     def update_stats(self, request, pk=None):
         book = self.get_object()
         # 댓글 수 업데이트
         comment_count = book.community_posts.count()
         book.comment_count = comment_count
         book.save()
-        return Response({
-            'comment_count': comment_count,
-            'like_count': book.likes_count
-        })
+        return Response(
+            {"comment_count": comment_count, "like_count": book.likes_count}
+        )
 
 
 class AIReportViewSet(viewsets.ModelViewSet):
@@ -581,29 +591,26 @@ class AIReportViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         try:
             # 이미 존재하는 레포트가 있다면 삭제
-            book_id = self.request.data.get('book')
+            book_id = self.request.data.get("book")
             if not book_id:
-                raise ValidationError('책 ID가 필요합니다.')
+                raise ValidationError("책 ID가 필요합니다.")
 
             book = get_object_or_404(Book, id=book_id)
-            
+
             # 기존 레포트 삭제
-            AIReport.objects.filter(
-                user=self.request.user,
-                book=book
-            ).delete()
-            
+            AIReport.objects.filter(user=self.request.user, book=book).delete()
+
             # 새 레포트 저장
             serializer.save(user=self.request.user, book=book)
         except Book.DoesNotExist:
-            raise NotFound('해당 책을 찾을 수 없습니다.')
+            raise NotFound("해당 책을 찾을 수 없습니다.")
         except ValidationError as e:
             raise ValidationError(str(e))
         except Exception as e:
             print(f"Error in perform_create: {str(e)}")
-            raise APIException('AI 레포트 저장 중 오류가 발생했습니다.')
+            raise APIException("AI 레포트 저장 중 오류가 발생했습니다.")
 
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=["get"])
     def by_book(self, request, pk=None):
         """특정 책의 AI 레포트 조회"""
         try:
@@ -612,6 +619,5 @@ class AIReportViewSet(viewsets.ModelViewSet):
             return Response(serializer.data)
         except AIReport.DoesNotExist:
             return Response(
-                {'error': 'Report not found'}, 
-                status=status.HTTP_404_NOT_FOUND
+                {"error": "Report not found"}, status=status.HTTP_404_NOT_FOUND
             )

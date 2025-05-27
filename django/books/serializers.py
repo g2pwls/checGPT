@@ -33,25 +33,25 @@ class BookSerializer(serializers.ModelSerializer):
     class Meta:
         model = Book
         fields = (
-            'id',
-            'title',
-            'subTitle',
-            'description',
-            'isbn',
-            'cover',
-            'publisher',
-            'pub_date',
-            'author',
-            'author_info',
-            'author_photo',
-            'customer_review_rank',
-            'category',
-            'likes_count',
-            'like_count',
-            'has_community',
-            'community_created_at',
-            'comment_count',
-            'is_liked',
+            "id",
+            "title",
+            "subTitle",
+            "description",
+            "isbn",
+            "cover",
+            "publisher",
+            "pub_date",
+            "author",
+            "author_info",
+            "author_photo",
+            "customer_review_rank",
+            "category",
+            "likes_count",
+            "like_count",
+            "has_community",
+            "community_created_at",
+            "comment_count",
+            "is_liked",
         )
 
     def get_is_liked(self, obj):
@@ -199,18 +199,20 @@ class CommunitySerializer(serializers.ModelSerializer):
     def get_is_popular(self, obj):
         return obj.is_popular
 
+
 class TopBookSerializer(serializers.ModelSerializer):
     book = BookSerializer(read_only=True)
-    
+
     class Meta:
         model = TopBook
-        fields = ['id', 'book', 'rank']
-        read_only_fields = ['id']
+        fields = ["id", "book", "rank"]
+        read_only_fields = ["id"]
+
 
 class AIReportSerializer(serializers.ModelSerializer):
     book = BookSerializer(read_only=True)
-    
+
     class Meta:
         model = AIReport
-        fields = ['id', 'book', 'report_file', 'created_at']
-        read_only_fields = ['created_at']
+        fields = ["id", "book", "report_file", "report_image", "created_at"]
+        read_only_fields = ["created_at"]

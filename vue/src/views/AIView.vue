@@ -65,16 +65,20 @@ export default {
           backgroundColor: '#ffffff'
         })
         
-        // PDF 생성
+        // 이미지 데이터 생성
         const imgData = canvas.toDataURL('image/png')
+        
+        // 이미지 Blob 생성
+        const imgBlob = await (await fetch(imgData)).blob()
+        
+        // PDF 생성
         const pdf = new jsPDF({
           orientation: 'portrait',
           unit: 'mm'
         })
         
-        const imgProps = pdf.getImageProperties(imgData)
         const pdfWidth = pdf.internal.pageSize.getWidth()
-        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width
         pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight)
         
         // PDF를 Blob으로 변환
@@ -83,7 +87,8 @@ export default {
         // FormData 생성
         const formData = new FormData()
         formData.append('report_file', pdfBlob, 'ai_report.pdf')
-        formData.append('book', this.book.id.toString())  // book id를 문자열로 변환
+        formData.append('report_image', imgBlob, 'ai_report.png')
+        formData.append('book', this.book.id.toString())
         
         // 서버에 저장
         const response = await axios.post('http://127.0.0.1:8000/api/ai-reports/', formData, {
