@@ -2,20 +2,28 @@
   <div class="movie-recommendation-wrapper">
     <div class="loading-overlay" v-if="isLoading">
       <div class="loading-spinner"></div>
-      <p>AI 영화 추천을 생성하는 중입니다...</p>
+      <p>영화 추천을 생성하는 중입니다...</p>
     </div>
 
     <div v-else class="content">
-      <h1 class="title">{{ book.title }}과(와) 관련된 영화 추천</h1>
+      <h1 class="title">{{ book.title }} 관련 영화 추천</h1>
       
       <!-- 영화 추천 섹션 -->
       <section class="movie-section">
         <div v-if="recommendedMovies.length > 0" class="movie-grid">
-          <div v-for="movie in recommendedMovies" :key="movie.title" class="movie-card" @click="openVideoModal(movie)">
-            <img :src="movie.poster" :alt="movie.title" class="movie-poster" />
+          <div v-for="movie in recommendedMovies" :key="movie.title" class="movie-card">
             <div class="movie-info">
               <h3 class="movie-title">{{ movie.title }}</h3>
               <p class="movie-year">{{ movie.year }}</p>
+              <div class="movie-trailer" v-if="movie.trailerId">
+                <iframe
+                  :src="`https://www.youtube.com/embed/${movie.trailerId}?rel=0`"
+                  frameborder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowfullscreen
+                  loading="lazy"
+                ></iframe>
+              </div>
               <p class="movie-description">{{ movie.description }}</p>
             </div>
           </div>
@@ -24,32 +32,6 @@
           <p>관련 영화를 찾을 수 없습니다.</p>
         </div>
       </section>
-
-      <!-- 비디오 모달 -->
-      <div v-if="isVideoModalOpen" class="video-modal-overlay" @click="closeVideoModal">
-        <div class="video-modal" @click.stop>
-          <button class="close-button" @click="closeVideoModal">&times;</button>
-          <h2 class="modal-title">{{ selectedMovie?.title }} 관련 영상</h2>
-          <div v-if="selectedMovieVideos.length > 0" class="video-list">
-            <div v-for="video in selectedMovieVideos" :key="video.id" class="video-item">
-              <div class="video-thumbnail">
-                <img :src="video.thumbnail" :alt="video.title" />
-                <div class="video-duration">{{ video.duration }}</div>
-              </div>
-              <div class="video-info">
-                <h3 class="video-title">{{ video.title }}</h3>
-                <p class="video-channel">{{ video.channelTitle }}</p>
-              </div>
-              <a :href="`https://www.youtube.com/watch?v=${video.id}`" target="_blank" class="watch-button">
-                유튜브에서 보기
-              </a>
-            </div>
-          </div>
-          <div v-else class="no-videos">
-            <p>관련 영상을 찾을 수 없습니다.</p>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </template>
@@ -63,10 +45,7 @@ export default {
     return {
       book: {},
       recommendedMovies: [],
-      isLoading: true,
-      isVideoModalOpen: false,
-      selectedMovie: null,
-      selectedMovieVideos: []
+      isLoading: true
     }
   },
   async created() {
@@ -86,7 +65,7 @@ export default {
     },
     async getMovieRecommendations() {
       try {
-        const prompt = `다음 책의 내용을 바탕으로 관련된 영화를 추천해주세요:
+        const prompt = `다음 책의 내용을 바탕으로 관련된 영화를 3가지 추천해주세요:
 제목: ${this.book.title}
 작가: ${this.book.author}
 줄거리: ${this.book.description}
@@ -104,14 +83,14 @@ export default {
     {
       "title": "영화 제목",
       "year": "개봉년도",
-      "description": "영화 설명",
-      "poster": "포스터 이미지 URL"
+      "description": "영화 설명"
     }
   ]
-}`
+}
+`
 
         const response = await axios.post('https://api.openai.com/v1/chat/completions', {
-          model: "gpt-3.5-turbo",
+          model: "gpt-4o-mini",
           messages: [{
             role: "user",
             content: prompt
@@ -128,63 +107,37 @@ export default {
         const content = response.data.choices[0].message.content
         const parsedContent = JSON.parse(content)
         this.recommendedMovies = parsedContent.movies
+
+        // 각 영화의 예고편 검색
+        for (let movie of this.recommendedMovies) {
+          await this.searchMovieTrailer(movie)
+        }
       } catch (error) {
         console.error('영화 추천을 가져오는 데 실패했습니다:', error)
       }
     },
-    async getYoutubeVideos(movie) {
+    async searchMovieTrailer(movie) {
       try {
-        // 먼저 공식 예고편 검색
-        const officialTrailerQuery = `${movie.title} 영화 예고편`
-        const officialResponse = await axios.get('https://www.googleapis.com/youtube/v3/search', {
+        const searchQuery = `${movie.title} 공식 예고편`
+        const response = await axios.get('https://www.googleapis.com/youtube/v3/search', {
           params: {
             part: 'snippet',
             maxResults: 1,
-            q: officialTrailerQuery,
+            q: searchQuery,
             type: 'video',
-            key: 'AIzaSyBYSS0TB0NZYLQSSA1yY_HNm8IK7-pSztE'
+            key: 'AIzaSyAVq5PqVceFYHi_vNGDWTWJPc_JH-3aJ94'
           }
         })
 
-        // 공식 예고편이 없으면 일반 영상 검색
-        const generalQuery = `${movie.title} movie scene`
-        const generalResponse = await axios.get('https://www.googleapis.com/youtube/v3/search', {
-          params: {
-            part: 'snippet',
-            maxResults: 2,
-            q: generalQuery,
-            type: 'video',
-            key: 'AIzaSyBYSS0TB0NZYLQSSA1yY_HNm8IK7-pSztE'
-          }
-        })
-
-        // 결과 합치기
-        const allVideos = [
-          ...officialResponse.data.items,
-          ...generalResponse.data.items
-        ].slice(0, 3) // 최대 3개까지만 표시
-
-        this.selectedMovieVideos = allVideos.map(item => ({
-          id: item.id.videoId,
-          title: item.snippet.title,
-          thumbnail: item.snippet.thumbnails.high.url,
-          channelTitle: item.snippet.channelTitle,
-          duration: '00:00' // Duration would require an additional API call
-        }))
+        if (response.data.items && response.data.items.length > 0) {
+          movie.trailerId = response.data.items[0].id.videoId
+          console.log(`Found trailer for ${movie.title}: ${movie.trailerId}`)
+        } else {
+          console.log(`No trailer found for ${movie.title}`)
+        }
       } catch (error) {
-        console.error('유튜브 영상을 가져오는 데 실패했습니다:', error)
-        this.selectedMovieVideos = []
+        console.error('영화 예고편을 가져오는 데 실패했습니다:', error)
       }
-    },
-    async openVideoModal(movie) {
-      this.selectedMovie = movie
-      this.isVideoModalOpen = true
-      await this.getYoutubeVideos(movie)
-    },
-    closeVideoModal() {
-      this.isVideoModalOpen = false
-      this.selectedMovie = null
-      this.selectedMovieVideos = []
     }
   }
 }
@@ -251,17 +204,10 @@ export default {
   overflow: hidden;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease;
-  cursor: pointer;
 }
 
 .movie-card:hover {
   transform: translateY(-5px);
-}
-
-.movie-poster {
-  width: 100%;
-  height: 400px;
-  object-fit: cover;
 }
 
 .movie-info {
@@ -284,120 +230,25 @@ export default {
   color: #666;
   font-size: 0.9rem;
   line-height: 1.4;
+  margin-top: 15px;
 }
 
-.video-modal-overlay {
-  position: fixed;
+.movie-trailer {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%; /* 16:9 Aspect Ratio */
+  margin: 15px 0;
+}
+
+.movie-trailer iframe {
+  position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.video-modal {
-  background: white;
-  border-radius: 10px;
-  padding: 20px;
-  width: 90%;
-  max-width: 800px;
-  max-height: 90vh;
-  overflow-y: auto;
-  position: relative;
-}
-
-.close-button {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  color: #666;
-}
-
-.modal-title {
-  margin: 0 0 20px 0;
-  color: #333;
-  font-size: 1.5rem;
-}
-
-.video-list {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.video-item {
-  display: flex;
-  gap: 15px;
-  padding: 15px;
-  background: #f5f5f5;
-  border-radius: 8px;
-}
-
-.video-thumbnail {
-  position: relative;
-  width: 200px;
-  height: 112px;
-  flex-shrink: 0;
-}
-
-.video-thumbnail img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  border-radius: 4px;
 }
 
-.video-duration {
-  position: absolute;
-  bottom: 5px;
-  right: 5px;
-  background: rgba(0, 0, 0, 0.7);
-  color: white;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 0.8rem;
-}
-
-.video-info {
-  flex: 1;
-}
-
-.video-title {
-  font-size: 1.1rem;
-  margin: 0 0 10px 0;
-  color: #333;
-}
-
-.video-channel {
-  color: #666;
-  font-size: 0.9rem;
-  margin: 0;
-}
-
-.watch-button {
-  display: inline-block;
-  padding: 8px 16px;
-  background: #ff0000;
-  color: white;
-  text-decoration: none;
-  border-radius: 4px;
-  margin-top: 10px;
-  transition: background-color 0.3s;
-}
-
-.watch-button:hover {
-  background: #cc0000;
-}
-
-.no-movies, .no-videos {
+.no-movies {
   text-align: center;
   padding: 40px;
   color: #666;
@@ -408,19 +259,6 @@ export default {
 @media (max-width: 768px) {
   .movie-grid {
     grid-template-columns: 1fr;
-  }
-
-  .movie-poster {
-    height: 300px;
-  }
-
-  .video-item {
-    flex-direction: column;
-  }
-
-  .video-thumbnail {
-    width: 100%;
-    height: 200px;
   }
 }
 </style> 

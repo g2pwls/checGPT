@@ -1,7 +1,7 @@
 <template>
   <div class="main-container">
     <div class="search-container">
-      <h1 class="title">도서 AI 검색</h1>
+      <h1 class="title">AI 도서 검색</h1>
       <div class="search-box">
         <input 
           v-model="searchQuery" 

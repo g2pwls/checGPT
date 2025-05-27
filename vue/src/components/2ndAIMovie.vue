@@ -2,16 +2,16 @@
   <div class="movie-recommendation-wrapper">
     <div class="loading-overlay" v-if="isLoading">
       <div class="loading-spinner"></div>
-      <p>영화 추천을 생성하는 중입니다...</p>
+      <p>AI 영화 추천을 생성하는 중입니다...</p>
     </div>
 
     <div v-else class="content">
-      <h1 class="title">{{ book.title }} 관련 영화 추천</h1>
+      <h1 class="title">{{ book.title }}과(와) 관련된 영화 추천</h1>
       
       <!-- 영화 추천 섹션 -->
       <section class="movie-section">
         <div v-if="recommendedMovies.length > 0" class="movie-grid">
-          <div v-for="movie in recommendedMovies" :key="movie.title" class="movie-card">
+          <div v-for="movie in recommendedMovies" :key="movie.title" class="movie-card" @click="openVideoModal(movie)">
             <img :src="movie.poster" :alt="movie.title" class="movie-poster" />
             <div class="movie-info">
               <h3 class="movie-title">{{ movie.title }}</h3>
@@ -25,25 +25,31 @@
         </div>
       </section>
 
-      <!-- 유튜브 영상 섹션 -->
-      <section class="youtube-section">
-        <h2>관련 영상</h2>
-        <div v-if="youtubeVideos.length > 0" class="video-grid">
-          <div v-for="video in youtubeVideos" :key="video.id" class="video-card">
-            <div class="video-thumbnail">
-              <img :src="video.thumbnail" :alt="video.title" />
-              <div class="video-duration">{{ video.duration }}</div>
-            </div>
-            <div class="video-info">
-              <h3 class="video-title">{{ video.title }}</h3>
-              <p class="video-channel">{{ video.channelTitle }}</p>
+      <!-- 비디오 모달 -->
+      <div v-if="isVideoModalOpen" class="video-modal-overlay" @click="closeVideoModal">
+        <div class="video-modal" @click.stop>
+          <button class="close-button" @click="closeVideoModal">&times;</button>
+          <h2 class="modal-title">{{ selectedMovie?.title }} 관련 영상</h2>
+          <div v-if="selectedMovieVideos.length > 0" class="video-list">
+            <div v-for="video in selectedMovieVideos" :key="video.id" class="video-item">
+              <div class="video-thumbnail">
+                <img :src="video.thumbnail" :alt="video.title" />
+                <div class="video-duration">{{ video.duration }}</div>
+              </div>
+              <div class="video-info">
+                <h3 class="video-title">{{ video.title }}</h3>
+                <p class="video-channel">{{ video.channelTitle }}</p>
+              </div>
+              <a :href="`https://www.youtube.com/watch?v=${video.id}`" target="_blank" class="watch-button">
+                유튜브에서 보기
+              </a>
             </div>
           </div>
+          <div v-else class="no-videos">
+            <p>관련 영상을 찾을 수 없습니다.</p>
+          </div>
         </div>
-        <div v-else class="no-videos">
-          <p>관련 영상을 찾을 수 없습니다.</p>
-        </div>
-      </section>
+      </div>
     </div>
   </div>
 </template>
@@ -57,14 +63,15 @@ export default {
     return {
       book: {},
       recommendedMovies: [],
-      youtubeVideos: [],
-      isLoading: true
+      isLoading: true,
+      isVideoModalOpen: false,
+      selectedMovie: null,
+      selectedMovieVideos: []
     }
   },
   async created() {
     await this.loadBookData()
     await this.getMovieRecommendations()
-    await this.getYoutubeVideos()
     this.isLoading = false
   },
   methods: {
@@ -79,7 +86,7 @@ export default {
     },
     async getMovieRecommendations() {
       try {
-        const prompt = `다음 책의 내용을 바탕으로 관련된 영화를 3가지 추천해주세요:
+        const prompt = `다음 책의 내용을 바탕으로 관련된 영화를 추천해주세요:
 제목: ${this.book.title}
 작가: ${this.book.author}
 줄거리: ${this.book.description}
@@ -101,8 +108,7 @@ export default {
       "poster": "포스터 이미지 URL"
     }
   ]
-}
-`
+}`
 
         const response = await axios.post('https://api.openai.com/v1/chat/completions', {
           model: "gpt-3.5-turbo",
@@ -126,20 +132,39 @@ export default {
         console.error('영화 추천을 가져오는 데 실패했습니다:', error)
       }
     },
-    async getYoutubeVideos() {
+    async getYoutubeVideos(movie) {
       try {
-        const searchQuery = `${this.book.title} 영화 예고편`
-        const response = await axios.get('https://www.googleapis.com/youtube/v3/search', {
+        // 먼저 공식 예고편 검색
+        const officialTrailerQuery = `${movie.title} 영화 예고편`
+        const officialResponse = await axios.get('https://www.googleapis.com/youtube/v3/search', {
           params: {
             part: 'snippet',
-            maxResults: 3,
-            q: searchQuery,
+            maxResults: 1,
+            q: officialTrailerQuery,
             type: 'video',
             key: 'AIzaSyBYSS0TB0NZYLQSSA1yY_HNm8IK7-pSztE'
           }
         })
 
-        this.youtubeVideos = response.data.items.map(item => ({
+        // 공식 예고편이 없으면 일반 영상 검색
+        const generalQuery = `${movie.title} movie scene`
+        const generalResponse = await axios.get('https://www.googleapis.com/youtube/v3/search', {
+          params: {
+            part: 'snippet',
+            maxResults: 2,
+            q: generalQuery,
+            type: 'video',
+            key: 'AIzaSyBYSS0TB0NZYLQSSA1yY_HNm8IK7-pSztE'
+          }
+        })
+
+        // 결과 합치기
+        const allVideos = [
+          ...officialResponse.data.items,
+          ...generalResponse.data.items
+        ].slice(0, 3) // 최대 3개까지만 표시
+
+        this.selectedMovieVideos = allVideos.map(item => ({
           id: item.id.videoId,
           title: item.snippet.title,
           thumbnail: item.snippet.thumbnails.high.url,
@@ -148,7 +173,18 @@ export default {
         }))
       } catch (error) {
         console.error('유튜브 영상을 가져오는 데 실패했습니다:', error)
+        this.selectedMovieVideos = []
       }
+    },
+    async openVideoModal(movie) {
+      this.selectedMovie = movie
+      this.isVideoModalOpen = true
+      await this.getYoutubeVideos(movie)
+    },
+    closeVideoModal() {
+      this.isVideoModalOpen = false
+      this.selectedMovie = null
+      this.selectedMovieVideos = []
     }
   }
 }
@@ -198,26 +234,27 @@ export default {
   text-align: center;
 }
 
-.movie-section, .youtube-section {
+.movie-section {
   margin-bottom: 40px;
 }
 
-.movie-grid, .video-grid {
+.movie-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 20px;
   margin-top: 20px;
 }
 
-.movie-card, .video-card {
+.movie-card {
   background: white;
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease;
+  cursor: pointer;
 }
 
-.movie-card:hover, .video-card:hover {
+.movie-card:hover {
   transform: translateY(-5px);
 }
 
@@ -227,11 +264,11 @@ export default {
   object-fit: cover;
 }
 
-.movie-info, .video-info {
+.movie-info {
   padding: 15px;
 }
 
-.movie-title, .video-title {
+.movie-title {
   font-size: 1.2rem;
   margin: 0 0 10px 0;
   color: #333;
@@ -249,25 +286,79 @@ export default {
   line-height: 1.4;
 }
 
+.video-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.video-modal {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  width: 90%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+}
+
+.modal-title {
+  margin: 0 0 20px 0;
+  color: #333;
+  font-size: 1.5rem;
+}
+
+.video-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.video-item {
+  display: flex;
+  gap: 15px;
+  padding: 15px;
+  background: #f5f5f5;
+  border-radius: 8px;
+}
+
 .video-thumbnail {
   position: relative;
-  width: 100%;
-  padding-top: 56.25%; /* 16:9 Aspect Ratio */
+  width: 200px;
+  height: 112px;
+  flex-shrink: 0;
 }
 
 .video-thumbnail img {
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: 4px;
 }
 
 .video-duration {
   position: absolute;
-  bottom: 10px;
-  right: 10px;
+  bottom: 5px;
+  right: 5px;
   background: rgba(0, 0, 0, 0.7);
   color: white;
   padding: 2px 6px;
@@ -275,10 +366,35 @@ export default {
   font-size: 0.8rem;
 }
 
+.video-info {
+  flex: 1;
+}
+
+.video-title {
+  font-size: 1.1rem;
+  margin: 0 0 10px 0;
+  color: #333;
+}
+
 .video-channel {
   color: #666;
   font-size: 0.9rem;
-  margin-top: 5px;
+  margin: 0;
+}
+
+.watch-button {
+  display: inline-block;
+  padding: 8px 16px;
+  background: #ff0000;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  margin-top: 10px;
+  transition: background-color 0.3s;
+}
+
+.watch-button:hover {
+  background: #cc0000;
 }
 
 .no-movies, .no-videos {
@@ -290,12 +406,21 @@ export default {
 }
 
 @media (max-width: 768px) {
-  .movie-grid, .video-grid {
+  .movie-grid {
     grid-template-columns: 1fr;
   }
 
   .movie-poster {
     height: 300px;
+  }
+
+  .video-item {
+    flex-direction: column;
+  }
+
+  .video-thumbnail {
+    width: 100%;
+    height: 200px;
   }
 }
 </style> 
