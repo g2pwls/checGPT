@@ -3,9 +3,17 @@
     <div class="ai-content" ref="aiContent">
       <div class="container">
         <div v-if="book">
-          <book-location :book="book"></book-location>
-    <AIMusic />
-    <AIMovie />
+          <div class="ai-cards">
+            <div class="ai-card">
+              <book-location :book="book"></book-location>
+            </div>
+            <div class="ai-card">
+              <AIMusic :book="book" />
+            </div>
+            <div class="ai-card">
+              <AIMovie :book="book" />
+            </div>
+          </div>
         </div>
         <div v-else class="no-book">
           <p>선택된 책이 없습니다.</p>
@@ -18,7 +26,6 @@
         {{ buttonText }}
       </button>
     </div>
-  </div>  <div class="ai-view">
   </div>
 </template>
 
@@ -144,17 +151,9 @@ export default {
 
 <style scoped>
 .ai-view {
-  padding: 30px 20px;
-  background-color: #f5f7fa;
+  padding: 20px;
   min-height: 100vh;
-}
-
-.ai-content {
-  background: white;
-  border-radius: 16px;
-  padding: 30px;
-  margin-bottom: 20px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  background-color: #f5f5f5;
 }
 
 .container {
@@ -162,43 +161,66 @@ export default {
   margin: 0 auto;
 }
 
-.no-book {
-  text-align: center;
-  padding: 50px;
-  background-color: white;
-  border-radius: 16px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+.ai-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 20px;
 }
 
-.no-book p {
-  color: #666;
-  font-size: 1.1em;
+.ai-card {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.no-book {
+  text-align: center;
+  padding: 40px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .action-buttons {
-  margin-top: 20px;
-  text-align: center;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
 }
 
 .save-button {
   background-color: #4CAF50;
   color: white;
   border: none;
-  padding: 10px 20px;
+  padding: 12px 24px;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 1rem;
   display: flex;
   align-items: center;
   gap: 8px;
-  margin: 0 auto;
+  transition: background-color 0.3s;
 }
 
 .save-button:hover {
   background-color: #45a049;
 }
 
+.save-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
 .save-button i {
-  font-size: 18px;
+  font-size: 1.2rem;
+}
+
+@media (max-width: 768px) {
+  .save-button {
+    width: 100%;
+    justify-content: center;
+  }
 }
 </style>

@@ -56,9 +56,14 @@ import axios from 'axios'
 
 export default {
   name: 'AIMusic',
+  props: {
+    book: {
+      type: Object,
+      required: true
+    }
+  },
   data() {
     return {
-      book: {},
       recommendedTracks: [],
       isLoading: true,
       accessToken: null,
@@ -79,21 +84,11 @@ export default {
     }
   },
   async created() {
-    await this.loadBookData()
     await this.getSpotifyToken()
     await this.getMusicRecommendations()
     this.isLoading = false
   },
   methods: {
-    async loadBookData() {
-      try {
-        const bookId = this.$route.params.bookId
-        const response = await axios.get(`http://127.0.0.1:8000/api/books/${bookId}/`)
-        this.book = response.data
-      } catch (error) {
-        console.error('책 정보를 불러오는 데 실패했습니다:', error)
-      }
-    },
     async getSpotifyToken() {
       try {
         const clientId = '21b8d2d1a90940faab04e31992183f98'
@@ -141,7 +136,7 @@ export default {
             content: prompt
           }],
           temperature: 0.7,
-          max_tokens: 1000
+          max_tokens: 500
         }, {
           headers: {
             'Authorization': `Bearer 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`,
@@ -152,7 +147,7 @@ export default {
         const content = response.data.choices[0].message.content
         const parsedContent = JSON.parse(content)
         
-        // Spotify에서 각 트랙 검색 및 정보 가져오기
+        // Spotify에서 각 트랙 검색
         for (const track of parsedContent.tracks) {
           await this.searchSpotifyTrack(track)
         }

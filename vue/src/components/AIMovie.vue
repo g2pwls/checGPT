@@ -64,9 +64,14 @@ import axios from 'axios'
 
 export default {
   name: 'AIMovie',
+  props: {
+    book: {
+      type: Object,
+      required: true
+    }
+  },
   data() {
     return {
-      book: {},
       recommendedMovies: [],
       isLoading: true,
       selectedMovie: null,
@@ -86,20 +91,10 @@ export default {
     }
   },
   async created() {
-    await this.loadBookData()
     await this.getMovieRecommendations()
     this.isLoading = false
   },
   methods: {
-    async loadBookData() {
-      try {
-        const bookId = this.$route.params.bookId
-        const response = await axios.get(`http://127.0.0.1:8000/api/books/${bookId}/`)
-        this.book = response.data
-      } catch (error) {
-        console.error('책 정보를 불러오는 데 실패했습니다:', error)
-      }
-    },
     async getMovieRecommendations() {
       try {
         const prompt = `다음 책의 내용을 바탕으로 관련된 영화를 3가지 추천해주세요:
@@ -112,7 +107,7 @@ export default {
 직접 해당 도서의 줄거리를 찾아서 이 책의 내용을 파악한 뒤 이 책의 내용과 밀접하게 관련된 영화 3가지를 추천해 주세요.
 만약 해당 도서가 실제 사건을 바탕으로 한 책이라면,
 해당 도서의 역사적 배경과 일치하는 배경을 가진 영화를 찾고, 그 중 관객 수가 가장 많은 순으로 보여 주세요.
-예를 들어서, 한강 작가의 소년의 온다는 1980년대 광주 민주화 운동을 배경으로 한 책이므로, 관련 영화는 '택시운전사', '변호인', '1987'으로 나와야 합니다.
+예를 들어서, 한강 작가의 소년의 온다 책의 관련 영화는 '택시운전사', '변호인', '1987'으로 나와야 합니다.
 
 다음 형식으로 응답해주세요:
 {
@@ -120,11 +115,11 @@ export default {
     {
       "title": "영화 제목",
       "year": "개봉년도",
-      "description": "영화 설명"
+      "description": "영화 설명",
+      "poster": "포스터 이미지 URL"
     }
   ]
-}
-`
+}`
 
         const response = await axios.post('https://api.openai.com/v1/chat/completions', {
           model: "gpt-4o-mini",
@@ -145,8 +140,8 @@ export default {
         const parsedContent = JSON.parse(content)
         this.recommendedMovies = parsedContent.movies
 
-        // 각 영화의 예고편 검색
-        for (let movie of this.recommendedMovies) {
+        // 각 영화에 대해 유튜브 예고편 검색
+        for (const movie of this.recommendedMovies) {
           await this.searchMovieTrailer(movie)
         }
       } catch (error) {
