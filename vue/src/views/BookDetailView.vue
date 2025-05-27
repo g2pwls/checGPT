@@ -18,7 +18,7 @@
             @click="goToCommunity" 
             class="community-btn"
           >
-            이야기마당
+            Community
           </button>
         </div>
       </div>
@@ -711,7 +711,7 @@ export default {
 .community-btn {
   padding: 0.5rem 1rem;
   border: none;
-  background: #1c1c1c;
+  background: #3b3b3b;
   color: white;
   border-radius: 20px;
   cursor: pointer;
@@ -719,7 +719,7 @@ export default {
 }
 
 .community-btn:hover {
-  background: #45a049;
+  background: #5f5f5f;
   transform: scale(1.05);
 }
 

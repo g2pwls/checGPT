@@ -164,7 +164,7 @@ export default {
 }
 
 .notice-item:hover {
-  background-color: #e3f2fd;
+  background-color: #ecebeb;
   transform: translateY(-2px);
 }
 
@@ -189,12 +189,12 @@ export default {
 
 .notice-text .book-title {
   font-weight: 600;
-  color: #1976d2;
+  color: #070707;
 }
 
 .open-label {
   font-size: 0.9em;
-  color: #4caf50;
+  color: #666666;
 }
 
 .notice-date {
