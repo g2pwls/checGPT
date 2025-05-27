@@ -11,9 +11,8 @@
       
       <div v-else-if="recommendedMovies.length > 0" class="movie-grid">
         <div v-for="movie in recommendedMovies" :key="movie.title" 
-             class="movie-card" 
-             :class="{ 'expanded': expandedMovie === movie }"
-             @click="toggleMovieExpansion(movie)">
+             class="movie-card"
+             @click="openMovieModal(movie, $event)">
           <div class="movie-info">
             <h3 class="movie-title">{{ movie.title }}</h3>
             <p class="movie-year">{{ movie.year }}</p>
@@ -34,6 +33,29 @@
         <p>관련 영화를 찾을 수 없습니다.</p>
       </div>
     </section>
+
+    <!-- 영화 상세 모달 -->
+    <div v-if="selectedMovie" class="movie-modal" @click.self="closeMovieModal">
+      <div class="modal-content" :style="modalStyle">
+        <button class="close-button" @click="closeMovieModal">&times;</button>
+        <div class="modal-body">
+          <h2 class="modal-title">{{ selectedMovie.title }}</h2>
+          <p class="modal-year">{{ selectedMovie.year }}</p>
+          <div class="modal-trailer" v-if="selectedMovie.trailerId">
+            <iframe
+              :src="`https://www.youtube.com/embed/${selectedMovie.trailerId}?rel=0&autoplay=1`"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
+            ></iframe>
+          </div>
+          <div class="modal-description">
+            <h3>줄거리</h3>
+            <p>{{ selectedMovie.description }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -47,7 +69,20 @@ export default {
       book: {},
       recommendedMovies: [],
       isLoading: true,
-      expandedMovie: null
+      selectedMovie: null,
+      modalPosition: null
+    }
+  },
+  computed: {
+    modalStyle() {
+      if (!this.modalPosition) return {}
+      
+      return {
+        '--initial-top': `${this.modalPosition.top}px`,
+        '--initial-left': `${this.modalPosition.left}px`,
+        '--initial-width': `${this.modalPosition.width}px`,
+        '--initial-height': `${this.modalPosition.height}px`
+      }
     }
   },
   async created() {
@@ -138,12 +173,23 @@ export default {
         console.error('영화 예고편을 가져오는 데 실패했습니다:', error)
       }
     },
-    toggleMovieExpansion(movie) {
-      if (this.expandedMovie === movie) {
-        this.expandedMovie = null
-      } else {
-        this.expandedMovie = movie
+    openMovieModal(movie, event) {
+      this.selectedMovie = movie
+      document.body.style.overflow = 'hidden'
+      
+      // 클릭한 카드의 위치 정보 저장
+      const card = event.currentTarget
+      const rect = card.getBoundingClientRect()
+      this.modalPosition = {
+        top: rect.top,
+        left: rect.left,
+        width: rect.width,
+        height: rect.height
       }
+    },
+    closeMovieModal() {
+      this.selectedMovie = null
+      document.body.style.overflow = 'auto'
     }
   }
 }
@@ -205,19 +251,13 @@ export default {
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease;
   cursor: pointer;
 }
 
 .movie-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.movie-card.expanded {
-  grid-column: 1 / -1;
-  transform: none;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .movie-info {
@@ -258,11 +298,6 @@ export default {
   margin-top: 15px;
 }
 
-.expanded .movie-description {
-  font-size: 1.1rem;
-  line-height: 1.6;
-}
-
 .no-movies {
   text-align: center;
   padding: 40px;
@@ -271,14 +306,153 @@ export default {
   border-radius: 10px;
 }
 
+/* 모달 스타일 */
+.movie-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-content {
+  background: white;
+  border-radius: 15px;
+  width: 90%;
+  max-width: 1000px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  animation: popup 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: center;
+}
+
+@keyframes popup {
+  0% {
+    position: absolute;
+    top: var(--initial-top);
+    left: var(--initial-left);
+    width: var(--initial-width);
+    height: var(--initial-height);
+    opacity: 0;
+  }
+  100% {
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 90%;
+    max-width: 1000px;
+    height: auto;
+    opacity: 1;
+  }
+}
+
+.close-button {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: #666;
+  cursor: pointer;
+  z-index: 1;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.3s;
+}
+
+.close-button:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.modal-body {
+  padding: 30px;
+}
+
+.modal-title {
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.modal-year {
+  color: #666;
+  font-size: 1.1rem;
+  margin-bottom: 20px;
+}
+
+.modal-trailer {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%;
+  margin-bottom: 30px;
+}
+
+.modal-trailer iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.modal-description {
+  margin-top: 20px;
+}
+
+.modal-description h3 {
+  font-size: 1.3rem;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.modal-description p {
+  color: #666;
+  line-height: 1.6;
+  font-size: 1.1rem;
+}
+
 @media (max-width: 768px) {
   .movie-grid {
     grid-template-columns: 1fr;
   }
-  
-  .movie-card.expanded {
-    margin: 0 -20px;
-    border-radius: 0;
+
+  .modal-content {
+    width: 95%;
+    margin: 10px;
+  }
+
+  .modal-body {
+    padding: 20px;
+  }
+
+  .modal-title {
+    font-size: 1.5rem;
+  }
+
+  .modal-description p {
+    font-size: 1rem;
   }
 }
 </style> 
