@@ -1,4 +1,5 @@
 <template>
+  <div class="container">
   <div class="story-view">
     <div class="story-header">
       <h2 class="page-title">📚 이야기마당</h2>
@@ -18,7 +19,6 @@
               <span class="open-label">이야기마당이 열렸습니다!</span>
             </div>
           </div>
-          <span class="notice-date">{{ formatDate(book.created_at) }}</span>
         </div>
       </div>
     </div>
@@ -26,7 +26,11 @@
     <!-- 전체 이야기마당 목록 -->
     <div class="books-section">
       <h3>📖 전체 이야기마당</h3>
-      <div class="books-grid">
+      <div v-if="booksWithStory.length === 0" class="no-books">
+        <p>현재 이야기마당이 열린 책이 없습니다.</p>
+        <p class="sub-text">책에 좋아요를 2개 이상 받으면 이야기마당이 열립니다!</p>
+      </div>
+      <div v-else class="books-grid">
         <div v-for="book in booksWithStory" :key="book.id" 
              class="book-card" @click="goToCommunity(book.id)">
           <img :src="book.cover" :alt="book.title" class="book-cover">
@@ -34,11 +38,11 @@
             <h3 class="book-title">{{ book.title }}</h3>
             <p class="book-author">{{ book.author }}</p>
             <div class="story-stats">
-              <span class="stat-item">
-                <i class="fas fa-comments"></i> {{ book.comment_count || 0 }}
+              <span class="stat-item likes">
+                <i class="fas fa-heart"></i> {{ book.likes_count }}
               </span>
               <span class="stat-item">
-                <i class="fas fa-heart"></i> {{ book.like_count || 0 }}
+                <i class="fas fa-comments"></i> {{ book.comment_count || 0 }}
               </span>
             </div>
           </div>
@@ -46,6 +50,7 @@
       </div>
     </div>
   </div>
+</div>
 </template>
 
 <script>
@@ -62,16 +67,16 @@ export default {
   async created() {
     try {
       const response = await axios.get('http://127.0.0.1:8000/api/books/');
-      // 커뮤니티(이야기마당)가 있는 책들만 필터링
-      const booksWithCommunity = response.data.filter(book => 
-        book.has_community || book.community_posts?.length > 0
+      // 좋아요 2개 이상 받은 책들만 필터링
+      const booksWithEnoughLikes = response.data.filter(book => 
+        book.likes_count >= 2
       );
       
       // 전체 이야기마당 목록
-      this.booksWithStory = booksWithCommunity;
+      this.booksWithStory = booksWithEnoughLikes;
       
       // 최근 오픈된 3개의 이야기마당
-      this.recentStoryBooks = [...booksWithCommunity]
+      this.recentStoryBooks = [...booksWithEnoughLikes]
         .sort((a, b) => {
           const dateA = a.community_created_at ? new Date(a.community_created_at) : new Date(0);
           const dateB = b.community_created_at ? new Date(b.community_created_at) : new Date(0);
@@ -108,6 +113,9 @@ export default {
 </script>
 
 <style scoped>
+.container {
+  background-color: #e7e7e7;
+}
 .story-view {
   max-width: 1200px;
   margin: 0 auto;
@@ -133,7 +141,7 @@ export default {
 .notice-section {
   background: white;
   border-radius: 12px;
-  padding: 20px;
+  padding: 10px;
   margin-bottom: 40px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
@@ -268,6 +276,19 @@ export default {
 
 .stat-item i {
   margin-right: 5px;
+}
+
+.no-books {
+  text-align: center;
+  padding: 20px;
+  border-radius: 12px;
+  background-color: #f8f9fa;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.sub-text {
+  color: #666;
+  font-size: 0.9em;
 }
 
 @media (max-width: 768px) {

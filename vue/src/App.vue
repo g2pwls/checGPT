@@ -51,7 +51,7 @@ function logout() {
 
 <style scoped>
 .custom-navbar {
-  background-color: #D4CCC3;
+  background-color: #ffffff;
   padding: 1rem 2rem;
   height: 26px;
 }
@@ -63,7 +63,7 @@ function logout() {
 }
 
 .namename {
-  color: rgb(0, 105, 0);
+  color: #363636;
   text-decoration: none;
   cursor: pointer;
   font-size: smaller;
@@ -72,7 +72,7 @@ function logout() {
 .logout,
 .nav-left a,
 .nav-right a {
-  color: rgb(0, 105, 0);
+  color: #333333;
   text-decoration: none;
   font-weight: bold;
   cursor: pointer;

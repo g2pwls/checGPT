@@ -67,7 +67,8 @@ const router = createRouter({
     {
       path: '/books/:bookId/community',
       name: 'community',
-      component: CommunityView
+      component: () => import('@/views/CommunityView.vue'),
+      props: true
     },
     {
       path: '/community/:postId',

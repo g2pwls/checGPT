@@ -304,7 +304,6 @@ export default {
   min-height: 93.9vh;
   display: flex;
   justify-content: center;
-  align-items: center;
   background-color: #f5f5f5;
 }
 
@@ -313,6 +312,7 @@ export default {
   max-width: 1200px;
   padding: 2rem;
   text-align: center;
+  padding-top: 250px;
 }
 
 .title {
