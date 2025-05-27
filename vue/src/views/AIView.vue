@@ -12,8 +12,9 @@
     </div>
     
     <div class="action-buttons">
-      <button @click="saveAIReport" class="save-button">
-        <i class="fas fa-save"></i> AI 레포트 저장하기
+      <button @click="saveAIReport" class="save-button" :disabled="loading">
+        <i class="fas fa-save"></i> 
+        {{ buttonText }}
       </button>
     </div>
   </div>
@@ -34,7 +35,19 @@ export default {
     return {
       book: null,
       loading: false,
-      error: null
+      error: null,
+      isCompleted: false
+    }
+  },
+  computed: {
+    buttonText() {
+      if (this.loading) {
+        return '저장 중...'
+      }
+      if (this.isCompleted) {
+        return 'AI 레포트 저장 완료'
+      }
+      return 'AI 레포트 저장하기'
     }
   },
   created() {
@@ -48,6 +61,7 @@ export default {
     async saveAIReport() {
       this.loading = true
       this.error = null
+      this.isCompleted = false
       
       try {
         // AI 분석 내용을 이미지로 변환
@@ -100,6 +114,7 @@ export default {
         
         if (response.data) {
           this.$toast.success('AI 레포트가 저장되었습니다.')
+          this.isCompleted = true
         }
       } catch (error) {
         console.error('AI 레포트 저장 실패:', error)
