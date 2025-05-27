@@ -123,7 +123,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: 40px 0 0 0;
+  padding: 5px 0 0 50;
 }
 
 .signupcard {
@@ -133,7 +133,7 @@ body {
   padding: 2.5rem 2rem;
   border-radius: 0px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  width: 420px;
+  width: 595px;
   display: flex;
   flex-direction: column;
   gap: 1.2rem;
@@ -198,10 +198,10 @@ body {
 
 .interests-group > .checkbox-row {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 0.5rem 1rem;
-  margin-bottom: 0.5rem;
-  margin-top: 0.4rem;
+  margin-bottom: 0rem;
+  margin-top: 0em;
   width: 100%;
 }
 
