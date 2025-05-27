@@ -195,6 +195,10 @@ export default {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
+  background-color: #ffffff; /* 흰색 배경 */
+  border-radius: 8px; /* 둥근 모서리 */
+  border: 1px solid #ddd; /* 테두리 */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); /* 가벼운 그림자 */
 }
 
 .section-loading {
@@ -203,9 +207,10 @@ export default {
   align-items: center;
   justify-content: center;
   padding: 40px;
-  background: #f5f5f5;
-  border-radius: 10px;
+  background-color: #f8f8f8; /* 밝은 회색 배경 */
+  border-radius: 8px; /* 둥근 모서리 */
   margin: 20px 0;
+  border: 1px solid #eee;
 }
 
 .loading-spinner {
@@ -224,225 +229,218 @@ export default {
 }
 
 .title {
-  font-size: 2rem;
-  color: #333;
-  margin-bottom: 30px;
+  font-size: 1.5rem; /* 폰트 크기 조정 */
+  color: #333; /* 어두운 글자색 */
+  margin-bottom: 20px; /* 마진 조정 */
   text-align: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee; /* 하단 테두리 */
 }
 
 .movie-section {
-  margin-bottom: 40px;
+  margin-bottom: 0; /* 마진 제거 */
 }
 
 .movie-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* 그리드 조정 */
   gap: 20px;
   margin-top: 20px;
 }
 
 .movie-card {
-  background: white;
-  border-radius: 10px;
+  background-color: #f9f9f9; /* 밝은 배경 */
+  border-radius: 8px; /* 둥근 모서리 */
   overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03); /* 가벼운 그림자 */
+  transition: all 0.2s ease; /* 트랜지션 조정 */
   cursor: pointer;
+  border: 1px solid #eee;
+  display: flex; /* flexbox 사용 */
+  flex-direction: column; /* 세로 정렬 */
 }
 
 .movie-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transform: translateY(-3px); /* 호버 효과 */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* 호버 그림자 */
 }
 
 .movie-info {
-  padding: 15px;
+  padding: 15px; /* 패딩 */
+  flex-grow: 1; /* 남은 공간 채우기 */
+  display: flex;
+  flex-direction: column;
 }
 
 .movie-title {
-  font-size: 1.2rem;
-  margin: 0 0 10px 0;
+  font-size: 1.1rem; /* 폰트 크기 조정 */
+  font-weight: bold;
   color: #333;
+  margin-bottom: 8px; /* 마진 */
 }
 
 .movie-year {
-  color: #666;
-  font-size: 0.9rem;
+  font-size: 0.9rem; /* 폰트 크기 조정 */
+  color: #777;
   margin-bottom: 10px;
 }
 
 .movie-trailer {
-  position: relative;
   width: 100%;
-  padding-top: 56.25%;
-  margin: 15px 0;
+  height: 180px; /* 트레일러 높이 */
+  margin-bottom: 10px;
 }
 
 .movie-trailer iframe {
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 100%;
   height: 100%;
+  border-radius: 4px; /* 둥근 모서리 */
 }
 
 .movie-description {
-  color: #666;
-  font-size: 0.9rem;
+  font-size: 0.95rem; /* 폰트 크기 조정 */
+  color: #555;
   line-height: 1.4;
-  margin-top: 15px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 4; /* 최대 4줄 */
+  -webkit-box-orient: vertical;
 }
 
 .no-movies {
   text-align: center;
   padding: 40px;
-  color: #666;
-  background: #f5f5f5;
-  border-radius: 10px;
+  background-color: #ffffff; /* 흰색 배경 */
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  border: 1px solid #ddd;
+  color: #777;
 }
 
-/* 모달 스타일 */
+/* 영화 상세 모달 스타일 */
 .movie-modal {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
+  background-color: rgba(0, 0, 0, 0.7); /* 더 어두운 오버레이 */
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
-  padding: 20px;
+  z-index: 2000; /* AIView의 모달보다 위에 표시 */
   animation: fadeIn 0.3s ease;
-  will-change: opacity;
+}
+
+.modal-content {
+  background-color: #ffffff; /* 흰색 배경 */
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* 그림자 강화 */
+  max-width: 800px;
+  width: 90%;
+  position: relative;
+  animation: scaleIn 0.3s ease;
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-.modal-content {
-  background: white;
-  border-radius: 15px;
-  width: 90%;
-  max-width: 800px;
-  position: relative;
-  transform-origin: center;
-  will-change: transform, opacity;
-}
-
-@keyframes popup {
-  0% {
-    transform: scale(0.8);
-    opacity: 0;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-.modal-content {
-  animation: popup 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+@keyframes scaleIn {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }
 
 .close-button {
   position: absolute;
-  top: 15px;
-  right: 15px;
-  background: none;
+  top: 10px;
+  right: 10px;
+  font-size: 1.8rem; /* 폰트 크기 증가 */
   border: none;
-  font-size: 2rem;
-  color: #666;
+  background: none;
   cursor: pointer;
-  z-index: 1;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: background-color 0.3s;
+  color: #777; /* 무채색 */
+  transition: color 0.2s ease;
 }
 
 .close-button:hover {
-  background-color: rgba(0, 0, 0, 0.1);
+  color: #333; /* 호버 색상 */
 }
 
 .modal-body {
-  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
 .modal-title {
-  font-size: 1.8rem;
+  font-size: 1.8rem; /* 폰트 크기 */
+  font-weight: bold;
   color: #333;
-  margin-bottom: 10px;
-  word-break: keep-all;
+  margin-bottom: 5px;
 }
 
 .modal-year {
-  color: #666;
-  font-size: 1.1rem;
-  margin-bottom: 20px;
+  font-size: 1rem;
+  color: #777;
+  margin-bottom: 10px;
 }
 
 .modal-trailer {
-  position: relative;
   width: 100%;
-  padding-top: 56.25%;
-  margin-bottom: 30px;
+  height: 400px; /* 모달 트레일러 높이 */
 }
 
 .modal-trailer iframe {
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 100%;
   height: 100%;
-}
-
-.modal-description {
-  margin-top: 20px;
+  border-radius: 4px;
 }
 
 .modal-description h3 {
   font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 10px;
   color: #333;
-  margin-bottom: 15px;
 }
 
 .modal-description p {
-  color: #666;
-  line-height: 1.6;
-  font-size: 1.1rem;
+  font-size: 1rem;
+  color: #555;
+  line-height: 1.5;
 }
 
 @media (max-width: 768px) {
   .movie-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); /* 모바일 그리드 */
+    gap: 15px;
+  }
+
+  .movie-card {
+    flex-direction: column;
+  }
+
+  .movie-info {
+    padding: 10px;
+  }
+
+  .movie-trailer {
+    height: 150px; /* 모바일 트레일러 높이 */
   }
 
   .modal-content {
-    width: 95%;
-    margin: 10px;
+    padding: 20px;
   }
 
-  .modal-body {
-    padding: 20px;
+  .modal-trailer {
+    height: 250px; /* 모바일 모달 트레일러 높이 */
   }
 
   .modal-title {
     font-size: 1.5rem;
-  }
-
-  .modal-description p {
-    font-size: 1rem;
   }
 }
 </style> 

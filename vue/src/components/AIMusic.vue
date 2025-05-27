@@ -232,6 +232,10 @@ export default {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
+  background-color: #ffffff; /* 흰색 배경 */
+  border-radius: 8px; /* 둥근 모서리 */
+  border: 1px solid #ddd; /* 테두리 */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); /* 가벼운 그림자 */
 }
 
 .section-loading {
@@ -240,16 +244,17 @@ export default {
   align-items: center;
   justify-content: center;
   padding: 40px;
-  background: #f5f5f5;
-  border-radius: 10px;
+  background-color: #f8f8f8; /* 밝은 회색 배경 */
+  border-radius: 8px; /* 둥근 모서리 */
   margin: 20px 0;
+  border: 1px solid #eee;
 }
 
 .loading-spinner {
   width: 40px;
   height: 40px;
   border: 4px solid #f3f3f3;
-  border-top: 4px solid #1DB954;
+  border-top: 4px solid #3498db;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 15px;
@@ -261,258 +266,244 @@ export default {
 }
 
 .title {
-  font-size: 2rem;
-  color: #333;
-  margin-bottom: 30px;
+  font-size: 1.5rem; /* 폰트 크기 조정 */
+  color: #333; /* 어두운 글자색 */
+  margin-bottom: 20px; /* 마진 조정 */
   text-align: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee; /* 하단 테두리 */
 }
 
 .music-section {
-  margin-bottom: 40px;
+  margin-bottom: 0; /* 마진 제거 */
 }
 
 .music-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* 그리드 조정 */
   gap: 20px;
   margin-top: 20px;
 }
 
 .music-card {
-  background: white;
-  border-radius: 10px;
+  background-color: #f9f9f9; /* 밝은 배경 */
+  border-radius: 8px; /* 둥근 모서리 */
   overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03); /* 가벼운 그림자 */
+  transition: all 0.2s ease; /* 트랜지션 조정 */
+  cursor: pointer;
+  border: 1px solid #eee;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 15px;
 }
 
 .music-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-3px); /* 호버 효과 */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* 호버 그림자 */
 }
 
 .album-cover {
-  width: 100%;
-  padding-top: 100%;
-  position: relative;
+  width: 120px; /* 앨범 커버 크기 */
+  height: 120px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  overflow: hidden;
 }
 
 .album-cover img {
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
 .music-info {
-  padding: 15px;
+  flex-grow: 1;
 }
 
 .track-title {
-  font-size: 1.2rem;
-  margin: 0 0 10px 0;
+  font-size: 1rem; /* 폰트 크기 조정 */
+  font-weight: bold;
   color: #333;
+  margin-bottom: 5px;
+  word-break: keep-all;
 }
 
 .artist-name {
-  color: #666;
-  font-size: 0.9rem;
+  font-size: 0.9rem; /* 폰트 크기 조정 */
+  color: #777;
   margin-bottom: 5px;
 }
 
 .album-name {
-  color: #888;
-  font-size: 0.8rem;
+  font-size: 0.85rem; /* 폰트 크기 조정 */
+  color: #555;
 }
 
 .no-music {
   text-align: center;
   padding: 40px;
-  color: #666;
-  background: #f5f5f5;
-  border-radius: 10px;
+  background-color: #ffffff; /* 흰색 배경 */
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  border: 1px solid #ddd;
+  color: #777;
 }
 
-@media (max-width: 768px) {
-  .music-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
+/* 음악 상세 모달 스타일 */
 .music-modal {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
+  background-color: rgba(0, 0, 0, 0.7); /* 더 어두운 오버레이 */
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
-  padding: 20px;
+  z-index: 2000; /* AIView의 모달보다 위에 표시 */
   animation: fadeIn 0.3s ease;
-  will-change: opacity;
 }
 
 .modal-content {
-  background: white;
-  border-radius: 15px;
+  background-color: #ffffff; /* 흰색 배경 */
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* 그림자 강화 */
+  max-width: 600px; /* 모달 너비 조정 */
   width: 90%;
-  max-width: 500px;
   position: relative;
-  transform-origin: center;
-  will-change: transform, opacity;
+  animation: scaleIn 0.3s ease;
 }
 
-@keyframes popup {
-  0% {
-    transform: scale(0.8);
-    opacity: 0;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-.modal-content {
-  animation: popup 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+@keyframes scaleIn {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }
 
 .close-button {
   position: absolute;
-  top: 15px;
-  right: 15px;
-  background: none;
+  top: 10px;
+  right: 10px;
+  font-size: 1.8rem; /* 폰트 크기 증가 */
   border: none;
-  font-size: 2rem;
-  color: #666;
+  background: none;
   cursor: pointer;
-  z-index: 1;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: background-color 0.3s;
+  color: #777; /* 무채색 */
+  transition: color 0.2s ease;
 }
 
 .close-button:hover {
-  background-color: rgba(0, 0, 0, 0.1);
+  color: #333; /* 호버 색상 */
 }
 
 .modal-body {
-  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .modal-album {
   display: flex;
-  flex-direction: column;
-  align-items: center;
   gap: 20px;
+  align-items: center;
 }
 
 .modal-album-cover {
-  width: 250px;
-  height: 250px;
-  border-radius: 10px;
+  width: 150px; /* 모달 앨범 커버 크기 */
+  height: 150px;
   object-fit: cover;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  border: 1px solid #ddd;
 }
 
 .modal-info {
-  text-align: center;
-  width: 100%;
+  flex-grow: 1;
 }
 
 .modal-title {
-  font-size: 1.8rem;
+  font-size: 1.5rem; /* 모달 제목 폰트 크기 */
+  font-weight: bold;
   color: #333;
-  margin-bottom: 10px;
-  word-break: keep-all;
+  margin-bottom: 5px;
 }
 
 .modal-artist {
-  color: #666;
-  font-size: 1.2rem;
-  margin-bottom: 20px;
-}
-
-.album-details {
-  margin-top: 20px;
-  padding-top: 20px;
-  border-top: 1px solid #eee;
+  font-size: 1.1rem; /* 모달 아티스트 폰트 크기 */
+  color: #777;
+  margin-bottom: 15px;
 }
 
 .album-details h3 {
-  font-size: 1.2rem;
+  font-size: 1.1rem; /* 앨범 상세 제목 폰트 크기 */
+  font-weight: bold;
   color: #333;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
 }
 
 .album-details p {
-  color: #666;
-  font-size: 1.1rem;
-}
-
-.album-description {
-  margin-top: 15px;
-  padding-top: 15px;
-  border-top: 1px solid #eee;
-}
-
-.album-description h4 {
-  font-size: 1.1rem;
-  color: #333;
-  margin-bottom: 10px;
-}
-
-.album-description p {
-  color: #666;
   font-size: 1rem;
-  line-height: 1.6;
-  white-space: pre-line;
+  color: #555;
+  line-height: 1.4;
 }
 
 @media (max-width: 768px) {
-  .modal-content {
-    width: 95%;
-    margin: 10px;
+  .music-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); /* 모바일 그리드 */
+    gap: 15px;
   }
 
-  .modal-body {
+  .music-card {
+    padding: 10px;
+  }
+
+  .album-cover {
+    width: 80px;
+    height: 80px;
+  }
+
+  .track-title {
+    font-size: 0.9rem;
+  }
+
+  .artist-name,
+  .album-name {
+    font-size: 0.8rem;
+  }
+
+  .modal-content {
     padding: 20px;
   }
 
+  .modal-album {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
   .modal-album-cover {
-    width: 200px;
-    height: 200px;
+    width: 100px;
+    height: 100px;
   }
 
   .modal-title {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
   }
 
   .modal-artist {
-    font-size: 1.1rem;
+    font-size: 1rem;
   }
 
-  .album-details h3 {
-    font-size: 1.1rem;
-  }
-
+  .album-details h3,
   .album-details p {
-    font-size: 1rem;
-  }
-
-  .album-description h4 {
-    font-size: 1rem;
-  }
-  
-  .album-description p {
     font-size: 0.9rem;
   }
 }
