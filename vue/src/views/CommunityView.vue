@@ -1,7 +1,7 @@
 <template>
   <div class="community-view">
     <div class="community-header">
-      <h1>{{ book.title }} 이야기마당</h1>
+      <h1>{{ book.title }} Thread</h1>
       <button @click="isWriteModalOpen = true" class="write-btn">글쓰기</button>
     </div>
 
