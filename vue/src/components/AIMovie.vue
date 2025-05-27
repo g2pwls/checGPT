@@ -1,38 +1,39 @@
 <template>
   <div class="movie-recommendation-wrapper">
-    <div class="loading-overlay" v-if="isLoading">
-      <div class="loading-spinner"></div>
-      <p>영화 추천을 생성하는 중입니다...</p>
-    </div>
-
-    <div v-else class="content">
-      <h1 class="title">{{ book.title }} 관련 영화 추천</h1>
+    <h1 class="title">{{ book.title }} 관련 영화 추천</h1>
+    
+    <!-- 영화 추천 섹션 -->
+    <section class="movie-section">
+      <div v-if="isLoading" class="section-loading">
+        <div class="loading-spinner"></div>
+        <p>영화 추천을 생성하는 중입니다...</p>
+      </div>
       
-      <!-- 영화 추천 섹션 -->
-      <section class="movie-section">
-        <div v-if="recommendedMovies.length > 0" class="movie-grid">
-          <div v-for="movie in recommendedMovies" :key="movie.title" class="movie-card">
-            <div class="movie-info">
-              <h3 class="movie-title">{{ movie.title }}</h3>
-              <p class="movie-year">{{ movie.year }}</p>
-              <div class="movie-trailer" v-if="movie.trailerId">
-                <iframe
-                  :src="`https://www.youtube.com/embed/${movie.trailerId}?rel=0`"
-                  frameborder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowfullscreen
-                  loading="lazy"
-                ></iframe>
-              </div>
-              <p class="movie-description">{{ movie.description }}</p>
+      <div v-else-if="recommendedMovies.length > 0" class="movie-grid">
+        <div v-for="movie in recommendedMovies" :key="movie.title" 
+             class="movie-card" 
+             :class="{ 'expanded': expandedMovie === movie }"
+             @click="toggleMovieExpansion(movie)">
+          <div class="movie-info">
+            <h3 class="movie-title">{{ movie.title }}</h3>
+            <p class="movie-year">{{ movie.year }}</p>
+            <div class="movie-trailer" v-if="movie.trailerId">
+              <iframe
+                :src="`https://www.youtube.com/embed/${movie.trailerId}?rel=0`"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+                loading="lazy"
+              ></iframe>
             </div>
+            <p class="movie-description">{{ movie.description }}</p>
           </div>
         </div>
-        <div v-else class="no-movies">
-          <p>관련 영화를 찾을 수 없습니다.</p>
-        </div>
-      </section>
-    </div>
+      </div>
+      <div v-else class="no-movies">
+        <p>관련 영화를 찾을 수 없습니다.</p>
+      </div>
+    </section>
   </div>
 </template>
 
@@ -45,7 +46,8 @@ export default {
     return {
       book: {},
       recommendedMovies: [],
-      isLoading: true
+      isLoading: true,
+      expandedMovie: null
     }
   },
   async created() {
@@ -131,12 +133,16 @@ export default {
 
         if (response.data.items && response.data.items.length > 0) {
           movie.trailerId = response.data.items[0].id.videoId
-          console.log(`Found trailer for ${movie.title}: ${movie.trailerId}`)
-        } else {
-          console.log(`No trailer found for ${movie.title}`)
         }
       } catch (error) {
         console.error('영화 예고편을 가져오는 데 실패했습니다:', error)
+      }
+    },
+    toggleMovieExpansion(movie) {
+      if (this.expandedMovie === movie) {
+        this.expandedMovie = null
+      } else {
+        this.expandedMovie = movie
       }
     }
   }
@@ -148,31 +154,27 @@ export default {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
-  min-height: 93.9vh;
 }
 
-.loading-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, 0.9);
+.section-loading {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  z-index: 1000;
+  justify-content: center;
+  padding: 40px;
+  background: #f5f5f5;
+  border-radius: 10px;
+  margin: 20px 0;
 }
 
 .loading-spinner {
-  width: 50px;
-  height: 50px;
-  border: 5px solid #f3f3f3;
-  border-top: 5px solid #3498db;
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 
 @keyframes spin {
@@ -203,11 +205,19 @@ export default {
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
+  transition: all 0.3s ease;
+  cursor: pointer;
 }
 
 .movie-card:hover {
   transform: translateY(-5px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.movie-card.expanded {
+  grid-column: 1 / -1;
+  transform: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .movie-info {
@@ -226,17 +236,10 @@ export default {
   margin-bottom: 10px;
 }
 
-.movie-description {
-  color: #666;
-  font-size: 0.9rem;
-  line-height: 1.4;
-  margin-top: 15px;
-}
-
 .movie-trailer {
   position: relative;
   width: 100%;
-  padding-top: 56.25%; /* 16:9 Aspect Ratio */
+  padding-top: 56.25%;
   margin: 15px 0;
 }
 
@@ -246,6 +249,18 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
+}
+
+.movie-description {
+  color: #666;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  margin-top: 15px;
+}
+
+.expanded .movie-description {
+  font-size: 1.1rem;
+  line-height: 1.6;
 }
 
 .no-movies {
@@ -259,6 +274,11 @@ export default {
 @media (max-width: 768px) {
   .movie-grid {
     grid-template-columns: 1fr;
+  }
+  
+  .movie-card.expanded {
+    margin: 0 -20px;
+    border-radius: 0;
   }
 }
 </style> 

@@ -1,32 +1,30 @@
 <template>
   <div class="music-recommendation-wrapper">
-    <div class="loading-overlay" v-if="isLoading">
-      <div class="loading-spinner"></div>
-      <p>음악 추천을 생성하는 중입니다...</p>
-    </div>
-
-    <div v-else class="content">
-      <h1 class="title">{{ book.title }} 관련 음악 추천</h1>
+    <h1 class="title">{{ book.title }} 관련 음악 추천</h1>
+    
+    <!-- 음악 추천 섹션 -->
+    <section class="music-section">
+      <div v-if="isLoading" class="section-loading">
+        <div class="loading-spinner"></div>
+        <p>음악 추천을 생성하는 중입니다...</p>
+      </div>
       
-      <!-- 음악 추천 섹션 -->
-      <section class="music-section">
-        <div v-if="recommendedTracks.length > 0" class="music-grid">
-          <div v-for="track in recommendedTracks" :key="track.id" class="music-card">
-            <div class="album-cover">
-              <img :src="track.albumCover" :alt="track.albumName" />
-            </div>
-            <div class="music-info">
-              <h3 class="track-title">{{ track.name }}</h3>
-              <p class="artist-name">{{ track.artist }}</p>
-              <p class="album-name">{{ track.albumName }}</p>
-            </div>
+      <div v-else-if="recommendedTracks.length > 0" class="music-grid">
+        <div v-for="track in recommendedTracks" :key="track.id" class="music-card">
+          <div class="album-cover">
+            <img :src="track.albumCover" :alt="track.albumName" />
+          </div>
+          <div class="music-info">
+            <h3 class="track-title">{{ track.name }}</h3>
+            <p class="artist-name">{{ track.artist }}</p>
+            <p class="album-name">{{ track.albumName }}</p>
           </div>
         </div>
-        <div v-else class="no-music">
-          <p>관련 음악을 찾을 수 없습니다.</p>
-        </div>
-      </section>
-    </div>
+      </div>
+      <div v-else class="no-music">
+        <p>관련 음악을 찾을 수 없습니다.</p>
+      </div>
+    </section>
   </div>
 </template>
 
@@ -160,28 +158,25 @@ export default {
   min-height: 93.9vh;
 }
 
-.loading-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, 0.9);
+.section-loading {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  z-index: 1000;
+  justify-content: center;
+  padding: 40px;
+  background: #f5f5f5;
+  border-radius: 10px;
+  margin: 20px 0;
 }
 
 .loading-spinner {
-  width: 50px;
-  height: 50px;
-  border: 5px solid #f3f3f3;
-  border-top: 5px solid #1DB954;
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #1DB954;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 
 @keyframes spin {
