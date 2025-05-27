@@ -1,7 +1,7 @@
 <template>
   <div class="ai-view">
-    <AIMovie />
     <AIMusic />
+    <AIMovie />
   </div>
 </template>
 
