@@ -1,24 +1,44 @@
 <template>
   <div class="signupwrapper">
-  <form @submit.prevent="submitForm" enctype="multipart/form-data" class="signupcard">
-    아이디<input v-model="form.username" placeholder="ID" />
-    <p v-if="errors.username" style="color: red;">{{ errors.username[0] }}</p>
-    이메일<input v-model="form.email" placeholder="pro@ssafy.com" type="email" />
-    비밀번호<input v-model="form.password1" placeholder="password" type="password" />
-    <p v-if="errors.password1" style="color: red;">{{ errors.password1[0] }}</p>
-    비밀번호 확인<input v-model="form.password2" placeholder="비밀번호와 일치해야 합니다" type="password" />
-    이름<input v-model="form.name" placeholder="이름" />
-    프로필 이미지<input @change="onFileChange" type="file" />
-
-    <div>
-      <label v-for="(label, value) in genreChoices" :key="value">
-        <input type="checkbox" :value="value" v-model="form.interests" />
-        {{ label }}
-      </label>
-    </div>
-    <button type="submit">회원가입</button>
-  </form>
-</div>
+    <form @submit.prevent="submitForm" enctype="multipart/form-data" class="signupcard">
+      <div class="form-group">
+        <label for="username">아이디</label>
+        <input id="username" v-model="form.username" placeholder="ID" />
+        <p v-if="errors.username">{{ errors.username[0] }}</p>
+      </div>
+      <div class="form-group">
+        <label for="email">이메일</label>
+        <input id="email" v-model="form.email" placeholder="pro@ssafy.com" type="email" />
+      </div>
+      <div class="form-group">
+        <label for="password1">비밀번호</label>
+        <input id="password1" v-model="form.password1" placeholder="password" type="password" />
+        <p v-if="errors.password1">{{ errors.password1[0] }}</p>
+      </div>
+      <div class="form-group">
+        <label for="password2">비밀번호 확인</label>
+        <input id="password2" v-model="form.password2" placeholder="비밀번호와 일치해야 합니다" type="password" />
+      </div>
+      <div class="form-group">
+        <label for="name">이름</label>
+        <input id="name" v-model="form.name" placeholder="이름" />
+      </div>
+      <div class="form-group">
+        <label for="profile_image">프로필 이미지</label>
+        <input id="profile_image" @change="onFileChange" type="file" />
+      </div>
+      <div class="form-group interests-group">
+        <span style="font-weight:500; color:#333; margin-bottom:0.2rem;">관심 카테고리</span>
+        <div class="checkbox-row">
+          <label v-for="(label, value) in genreChoices" :key="value">
+            <input type="checkbox" :value="value" v-model="form.interests" />
+            {{ label }}
+          </label>
+        </div>
+      </div>
+      <button type="submit">회원가입</button>
+    </form>
+  </div>
 </template>
 
 <script setup>
@@ -94,72 +114,118 @@ body {
 
 <style scoped>
 .signupwrapper {
-  height: 100vh;
-  background-color: #000;
+  min-height: 100vh;
+  background-color: #fff;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
+  padding: 40px 0 0 0;
 }
 
 .signupcard {
-  background-color: #1e1e1e;
-  color: white;
-  font-weight: bold;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-  width: 320px;
+  background-color: #fff;
+  color: #222;
+  font-weight: 500;
+  padding: 2.5rem 2rem;
+  border-radius: 0px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  width: 350px;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.2rem;
+  border: 1px solid #eee;
+  transition: box-shadow 0.4s cubic-bezier(.4,1.4,.6,1), transform 0.4s cubic-bezier(.4,1.4,.6,1), opacity 0.6s, top 0.6s;
+  opacity: 0;
+  transform: translateY(30px);
+  animation: signupCardFadeIn 0.7s cubic-bezier(.4,1.4,.6,1) forwards;
 }
 
-/* 입력창 스타일 - 로그인 input과 동일 */
+@keyframes signupCardFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  margin-bottom: 0.2rem;
+}
+.form-group label {
+  color: #333;
+  font-weight: 500;
+  margin-bottom: 0.1rem;
+}
+
 .signupcard input[type="text"],
 .signupcard input[type="email"],
 .signupcard input[type="password"],
 .signupcard input[type="file"],
 .signupcard input:not([type="checkbox"]) {
-  padding: 10px;
-  border: none;
-  border-radius: 4px;
-  background-color: #2a2a2a;
-  color: white;
-  font-size: 14px;
+  padding: 12px 16px;
+  border: 1px solid #dadada;
+  border-radius: 15px;
+  background-color: #fff;
+  color: #222;
+  font-size: 15px;
   outline: none;
+  transition: border-color 0.3s;
+}
+.signupcard input[type="text"]:focus,
+.signupcard input[type="email"]:focus,
+.signupcard input[type="password"]:focus {
+  border-color: #333;
 }
 
-/* 체크박스 라벨 스타일 */
+.interests-group > .checkbox-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  margin-bottom: 0.5rem;
+  margin-top: 0.4rem;
+}
 .signupcard label {
-  color: white;
-  font-weight: bold;
+  color: #333;
+  font-weight: 500;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  min-width: 110px;
+  margin-right: 0.5rem;
+  margin-bottom: 0.2rem;
   cursor: pointer;
   user-select: none;
 }
-
-/* 체크박스 자체는 기본 스타일 유지 (필요시 커스터마이징 가능) */
 .signupcard input[type="checkbox"] {
   cursor: pointer;
+  margin-right: 0.3em;
 }
 
-/* 버튼 스타일 - 로그인 submit 스타일과 비슷하게 */
 .signupcard button {
-  padding: 10px;
-  background-color: #f44;
+  padding: 12px;
+  background-color: #333;
   border: none;
-  border-radius: 4px;
+  border-radius: 15px;
   color: white;
   font-weight: bold;
   font-size: 16px;
   cursor: pointer;
   transition: background-color 0.3s;
 }
-
 .signupcard button:hover {
-  background-color: #d33;
+  background-color: #555;
+}
+
+/* 에러 메시지 스타일 개선 */
+.signupcard p {
+  color: #e74c3c;
+  font-size: 0.95em;
+  margin: 0 0 0.5em 0;
 }
 
 </style>
