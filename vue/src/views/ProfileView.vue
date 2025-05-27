@@ -65,9 +65,9 @@
             </div>
 
             <!-- Top Books Section -->
-            <div v-if="topBooks.length > 0" class="top-books-section">
-              <h3 class="section-title">대표 도서</h3>
-              <div class="top-books-grid">
+            <div class="top-books-section">
+              <h3 class="section-title section-title-normal">대표 도서</h3>
+              <div v-if="topBooks.length > 0" class="top-books-grid">
                 <div v-for="topBook in topBooks" :key="topBook.id" class="top-book-item" @click="goToBook(topBook.book.id)">
                   <div class="rank-badge">{{ topBook.rank }}순위</div>
                   <div class="book-cover-container">
@@ -77,11 +77,14 @@
                   <p class="book-author">{{ topBook.book.author }}</p>
                 </div>
               </div>
+              <div v-else class="empty-state">
+                <p>아직 대표 도서가 없습니다.</p>
+              </div>
             </div>
 
             <!-- Top Genres Section -->
             <div v-if="topGenres.length > 0" class="top-genres-section">
-              <h3 class="section-title">선호 장르</h3>
+              <h3 class="section-title section-title-normal">선호 장르</h3>
               <div class="top-genres-grid">
                 <div v-for="(genre, index) in topGenres" :key="genre.id" class="genre-item">
                   <div class="rank-badge">{{ index + 1 }}순위</div>
@@ -516,7 +519,7 @@ watch(
 
 <style scoped>
 .profile-container {
-  background-color: #f8f8f8; /* 밝은 회색 배경 */
+  background-color: #ffffff; /* 밝은 회색 배경 */
   font-family: 'Noto Sans KR', sans-serif;
   color: #333; /* 어두운 글자색 */
   min-height: 100vh; /* 최소 높이 설정 */
@@ -549,7 +552,7 @@ watch(
   height: 120px;
   border-radius: 50%;
   object-fit: cover;
-  margin-bottom: 15px;
+  margin-bottom: 5px;
   border: 1px solid #ddd; /* 테두리 추가 */
 }
 
@@ -677,6 +680,10 @@ watch(
   color: #333;
   border-bottom: 1px solid #eee;
   padding-bottom: 10px;
+}
+
+.section-title.section-title-normal {
+  font-weight: 400;
 }
 
 .top-books-grid,
