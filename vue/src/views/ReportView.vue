@@ -110,7 +110,7 @@ export default {
 
 <style scoped>
 .report-view {
-  background-color: #f9f6f2;
+  background-color: #e7e7e7;
   min-height: 100vh;
   width: 100%;
   padding-top: 1px; /* margin collapse 방지 */

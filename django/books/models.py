@@ -29,6 +29,10 @@ class Book(models.Model):
     likes = models.ManyToManyField(
         settings.AUTH_USER_MODEL, related_name="liked_books", blank=True
     )
+    # 이야기마당(커뮤니티) 관련 필드 추가
+    has_community = models.BooleanField(default=False)
+    community_created_at = models.DateTimeField(null=True, blank=True)
+    comment_count = models.IntegerField(default=0)
 
     def __str__(self):
         return self.title
@@ -36,6 +40,10 @@ class Book(models.Model):
     @property
     def likes_count(self):
         return self.likes.count()
+
+    @property
+    def like_count(self):
+        return self.likes_count
 
 
 from django.contrib.auth import get_user_model
@@ -142,14 +150,36 @@ class CommunityComment(models.Model):
 
 
 class TopBook(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='top_books')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="top_books")
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     rank = models.IntegerField()  # 1, 2, or 3
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ('user', 'rank')
-        ordering = ['rank']
+        unique_together = ("user", "rank")
+        ordering = ["rank"]
 
     def __str__(self):
         return f"{self.user.username}'s {self.rank}th top book: {self.book.title}"
+
+
+class AIReport(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="ai_reports")
+    book = models.ForeignKey(
+        "Book", on_delete=models.CASCADE, related_name="ai_reports"
+    )
+    report_file = models.FileField(upload_to="ai_reports/")
+    report_image = models.ImageField(
+        upload_to="ai_reports/images/", null=True, blank=True
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        unique_together = [
+            "user",
+            "book",
+        ]  # 한 사용자당 책 하나에 대해 하나의 레포트만 저장 가능
+
+    def __str__(self):
+        return f"{self.book.title} AI Report - {self.user.username}"

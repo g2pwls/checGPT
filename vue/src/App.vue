@@ -32,6 +32,7 @@ function logout() {
         <template v-if="userStore.isLoggedIn">
           <span class="namename">{{ userStore.username }}님, 환영합니다!</span>
           <RouterLink :to="{ name: 'BookList' }">책마루</RouterLink>
+          <router-link :to="{ name: 'story' }" class="nav-link">이야기마당</router-link> 
           <RouterLink :to="{ name: 'Report' }">감상문</RouterLink>
           <RouterLink :to="{ name: 'UserProfile', params: { userId: userStore.userId } }">나의 책갈피</RouterLink>
           <span @click="logout" class="logout">떠나기</span>
@@ -50,7 +51,7 @@ function logout() {
 
 <style scoped>
 .custom-navbar {
-  background-color: #D4CCC3;
+  background-color: #ffffff;
   padding: 1rem 2rem;
   height: 26px;
 }
@@ -62,7 +63,7 @@ function logout() {
 }
 
 .namename {
-  color: rgb(0, 105, 0);
+  color: #363636;
   text-decoration: none;
   cursor: pointer;
   font-size: smaller;
@@ -71,7 +72,7 @@ function logout() {
 .logout,
 .nav-left a,
 .nav-right a {
-  color: rgb(0, 105, 0);
+  color: #333333;
   text-decoration: none;
   font-weight: bold;
   cursor: pointer;
