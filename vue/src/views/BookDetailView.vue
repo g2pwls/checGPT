@@ -123,8 +123,8 @@
 
         <!-- AI 설명 읽어주기 섹션 -->
         <section class="ai-audio-section">
-          <button @click="generateAudio" :disabled="isGenerating" class="ai-audio-btn">
-            {{ isGenerating ? '오디오 생성 중...' : 'AI 설명 읽어주기 생성' }}
+          <button @click="generateAudio" :disabled="isGenerating || isGenerated" class="ai-audio-btn">
+            {{ buttonText }}
           </button>
           <div class="audiofile" v-if="book.audio_file">
             <div class="audiio-sang">
@@ -162,8 +162,20 @@ export default {
       showAllThreads: false,
       sortType: 'latest',
       isGenerating: false,
+      isGenerated: false,
       isThreadModalOpen: false,
       isInLibrary: false,
+    }
+  },
+  computed: {
+    buttonText() {
+      if (this.isGenerating) {
+        return '오디오 생성 중...'
+      }
+      if (this.isGenerated) {
+        return 'AI 설명 읽어주기 생성 완료'
+      }
+      return 'AI 설명 읽어주기 생성'
     }
   },
   watch: {
@@ -216,6 +228,7 @@ export default {
       try {
         const response = await axios.post(`http://127.0.0.1:8000/api/books/${this.book.id}/generate-audio/`)
         this.book.audio_file = response.data.audio_file
+        this.isGenerated = true
       } catch (error) {
         alert('오디오 생성에 실패했습니다.')
         console.error(error)
@@ -551,7 +564,7 @@ export default {
   font-size: 1.1rem;
   cursor: pointer;
   transition: background-color 0.3s;
-  margin-bottom: 15px;
+  /* margin-bottom: 15px; */
 }
 
 .ai-audio-btn:hover {
