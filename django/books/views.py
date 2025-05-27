@@ -650,6 +650,9 @@ class BookViewSet(viewsets.ModelViewSet):
     'description': b['description'][:200]
 } for b in other_books[:30]]}
 
+추천 이유는 아래 형식을 반드시 따르세요:
+“{book.title}과 유사한 이유는 ~~~이며, ~~하고, ~~~한 부분을 담고 있습니다.”
+
 응답 형식:
 [
     {{"id": "책ID", "reason": "추천 이유 (구체적으로 입력 도서와의 연관성 설명)"}},
