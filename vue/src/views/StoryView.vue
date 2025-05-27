@@ -28,7 +28,7 @@
       <h3>전체 Community</h3>
       <div v-if="booksWithStory.length === 0" class="no-books">
         <p>현재 Community가 열린 책이 없습니다.</p>
-        <p class="sub-text">책에 좋아요를 2개 이상 받으면 Community가 열립니다!</p>
+        <p class="sub-text">도서의 좋아요가 2개 이상일 경우 Community가 열립니다.</p>
       </div>
       <div v-else class="books-grid">
         <div v-for="book in booksWithStory" :key="book.id" 
@@ -124,6 +124,7 @@ export default {
   color: #2c3e50;
   margin-bottom: 10px;
   font-size: 2em;
+  font-weight: 400;
 }
 
 .description {
@@ -138,11 +139,14 @@ export default {
   padding-left: 20px;
   margin-bottom: 20px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border: 1px solid #ddd;
 }
 
 .notice-section h3 {
   margin-bottom: 20px;
   color: #2c3e50;
+  font-weight: 400;
+  
 }
 
 .notice-items {
@@ -207,11 +211,13 @@ export default {
   border-radius: 12px;
   padding: 20px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border: 1px solid #ddd;
 }
 
 .books-section h3 {
   margin-bottom: 20px;
   color: #2c3e50;
+  font-weight: 400;
 }
 
 .books-grid {
