@@ -236,6 +236,7 @@ export default {
   margin-bottom: 10px;
   text-align: center;
   padding-bottom: 0;
+  font-weight: 400;
   border-bottom: none;
 }
 

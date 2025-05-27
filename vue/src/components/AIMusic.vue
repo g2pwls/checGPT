@@ -482,6 +482,7 @@ export default {
   text-align: center;
   padding-bottom: 0;
   border-bottom: none;
+  font-weight: 400;
 }
 
 .divider {

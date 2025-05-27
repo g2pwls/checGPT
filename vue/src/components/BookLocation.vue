@@ -1,7 +1,7 @@
 <template>
   <div class="book-location">
     <div class="analysis-section">
-      <h3>이 책과 관련된 AI분석</h3>
+      <h3> {{this.book.title}} 도서 기반 AI 분석 레포트</h3>
       <div v-if="loading" class="loading">
         <div class="loading-spinner"></div>
         <p>AI가 책의 내용을 분석하고 있습니다...</p>
@@ -479,5 +479,10 @@ iframe {
   .book-info {
     padding: 15px;
   }
+
+  .section-title {
+    font-weight: 400;
+  }
+
 }
 </style> 
