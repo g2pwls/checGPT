@@ -190,7 +190,7 @@
     /* 검색창 */
     .search-input {
         padding: 10px;
-        width: calc(100% - 20px); /* 패딩 고려한 너비 */
+        width: 158px; /* 패딩 고려한 너비 */
         margin-bottom: 24px;
         border: 1px solid #ccc;
         background-color: #fff;
