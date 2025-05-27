@@ -26,7 +26,7 @@ function logout() {
   <header class="custom-navbar">
     <nav class="nav-container">
       <div class="nav-left">
-        <RouterLink to="/">Starbooks</RouterLink>
+        <RouterLink to="/">CheckGPT</RouterLink>
       </div>
       <div class="nav-right">
         <template v-if="userStore.isLoggedIn">
@@ -50,7 +50,7 @@ function logout() {
 
 <style scoped>
 .custom-navbar {
-  background-color: #D4CCC3;
+  background-color: #c3c6c4;
   padding: 1rem 2rem;
   height: 26px;
 }
@@ -62,7 +62,7 @@ function logout() {
 }
 
 .namename {
-  color: rgb(0, 105, 0);
+  color: #000000;
   text-decoration: none;
   cursor: pointer;
   font-size: smaller;
@@ -71,7 +71,7 @@ function logout() {
 .logout,
 .nav-left a,
 .nav-right a {
-  color: rgb(0, 105, 0);
+  color: #000000;
   text-decoration: none;
   font-weight: bold;
   cursor: pointer;
@@ -80,7 +80,7 @@ function logout() {
 .logout:hover,
 .nav-left a:hover,
 .nav-right a:hover {
-  color: lightgreen;
+  color: #ffffff;
 }
 
 .nav-right {

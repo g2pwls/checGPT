@@ -1,7 +1,7 @@
 <template>
   <div class="main-container">
     <div class="search-container">
-      <h1 class="title">도서 AI 검색</h1>
+      <h1 class="title">AI 도서 검색</h1>
       <div class="search-box">
         <input 
           v-model="searchQuery" 
@@ -301,26 +301,53 @@ export default {
 
 <style scoped>
 .main-container {
-  min-height: 93.9vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #f5f5f5;
+  position: relative;
+  background-image: url('@/assets/background.jpeg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+  width: 100%;
+  filter: grayscale(100%);
+  overflow: hidden;
+}
+
+/* 화면 아래쪽 반은 흰색, 위쪽 반은 사진, 경계에 짧은 그라데이션 추가 */
+.main-container::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 80%; /* 화면 아래쪽 반 */
+  background: 
+    linear-gradient(
+      to top,
+      white 80%,               /* 완전 흰색 아래쪽 */
+      rgba(255, 255, 255, 0) 100%,  /* 위로 20% 구간에 투명해지는 그라데이션 */
+      transparent 100%
+    );
+  z-index: 1;
 }
 
 .search-container {
-  width: 100%;
-  max-width: 1200px;
-  padding: 2rem;
+  position: relative;
+  z-index: 2; /* 그라데이션 위로 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh; /* 전체 화면 중앙 정렬을 위해 */
   text-align: center;
 }
 
 .title {
   font-size: 2.5rem;
   color: #333;
-  margin-bottom: 2rem;
+  margin-bottom: 0.5rem;
   font-weight: bold;
   margin-top: 10px;
+  padding: 0rem;
 }
 
 .search-box {
@@ -328,7 +355,7 @@ export default {
   margin: 0 auto;
   max-width: 600px;
   background: white;
-  border-radius: 50px;
+  border-radius: 20px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
@@ -336,7 +363,7 @@ export default {
   flex: 1;
   padding: 1.5rem 2rem;
   border: none;
-  border-radius: 50px 0 0 50px;
+  border-radius: 20px 0 0 20px;
   font-size: 1.1rem;
   outline: none;
 }
@@ -344,15 +371,15 @@ export default {
 .search-button {
   padding: 1.5rem 2rem;
   border: none;
-  background: #4CAF50;
+  background: #c3c6c4;
   color: white;
-  border-radius: 0 50px 50px 0;
+  border-radius: 0 20px 20px 0;
   cursor: pointer;
   transition: background-color 0.3s;
 }
 
 .search-button:hover {
-  background: #45a049;
+  background: #000000;
 }
 
 .loading {
