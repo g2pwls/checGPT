@@ -9,11 +9,11 @@
             class="search-input"
           />
           <li
-          :class="{ active: selectedCategory === 0 }"
-          @click="selectedCategory = 0"
-            >
+            :class="{ active: selectedCategory === null }"
+            @click="selectedCategory = null"
+          >
             전체
-            </li>
+          </li>
           <li
             v-for="category in categories"
             :key="category.id"
@@ -57,11 +57,9 @@
   const books = ref([]);
   const categories = ref([]);
   const searchQuery = ref("");
-  const selectedCategory = ref(0);
+  const selectedCategory = ref(null);  // null로 초기화
   const router = useRouter();
   const route = useRoute();
-  let searchTimeout = null;
-  let isInitialLoad = true;
   
   // URL에서 카테고리 파라미터 가져오기
   const categoryParam = route.query.category;
@@ -70,64 +68,46 @@
   }
 
   const fetchBooks = async () => {
-    try {
-      const params = {};
-      if (selectedCategory.value) {
-        params.category = selectedCategory.value;
-      }
-      if (searchQuery.value) {
-        params.search = searchQuery.value;
-      }
-      const response = await axios.get("http://127.0.0.1:8000/api/books/", { params });
-      books.value = response.data;
-    } catch (error) {
-      console.error('Error fetching books:', error);
+    const params = {};
+    if (selectedCategory.value !== null) {  // null이 아닐 때만 category 파라미터 추가
+      params.category = selectedCategory.value;
     }
+    if (searchQuery.value) {
+      params.search = searchQuery.value;
+    }
+    const response = await axios.get("http://127.0.0.1:8000/api/books/", { params });
+    books.value = response.data;
   };
   
   const fetchCategories = async () => {
-    try {
-      const response = await axios.get("http://127.0.0.1:8000/api/categories/");
-      categories.value = response.data;
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-    }
+    const response = await axios.get("http://127.0.0.1:8000/api/categories/");
+    categories.value = response.data;
   };
   
   // 카테고리 변경 감시
   watch(selectedCategory, (newCategory) => {
-    if (!isInitialLoad) {
-      fetchBooks();
-      // URL 쿼리 파라미터 업데이트
-      router.push({
-        query: { 
-          ...route.query,
-          category: newCategory || undefined
-        }
-      });
-    }
+    fetchBooks();
+    // URL 쿼리 파라미터 업데이트
+    router.push({
+      query: { 
+        ...route.query,
+        category: newCategory || undefined
+      }
+    });
   });
   
   // 검색어 변경 감시
-  watch(searchQuery, (newQuery) => {
-    if (searchTimeout) {
-      clearTimeout(searchTimeout);
-    }
-    searchTimeout = setTimeout(() => {
-      fetchBooks();
-    }, 300);
-  });
+  watch(searchQuery, fetchBooks);
   
   // URL 쿼리 파라미터 변경 감시
   watch(() => route.query.category, (newCategory) => {
     if (newCategory !== selectedCategory.value?.toString()) {
-      selectedCategory.value = Number(newCategory) || 0;
+      selectedCategory.value = newCategory ? Number(newCategory) : null;
     }
   });
   
   onMounted(async () => {
     await Promise.all([fetchCategories(), fetchBooks()]);
-    isInitialLoad = false;
   });
   
   const goToDetail = (bookId) => {
