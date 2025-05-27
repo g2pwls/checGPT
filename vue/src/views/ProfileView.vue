@@ -666,7 +666,7 @@ watch(
 .library-grid {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 1.5rem;
+  gap: 10px;
   padding: 1rem;
   max-width: 1200px;
   margin: 0 auto;
@@ -699,7 +699,7 @@ watch(
 .library-item {
   background: white;
   border-radius: 0.5rem;
-  padding: 1rem;
+  padding: 10px;
   transition: transform 0.2s;
   cursor: pointer;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -741,6 +741,7 @@ watch(
   line-height: 1.3;
   height: 2.6em;
   width: 100%;
+  margin-top: 10px;
 }
 
 .book-author {
@@ -751,6 +752,8 @@ watch(
   -webkit-box-orient: vertical;
   overflow: hidden;
   width: 100%;
+  margin-top: 0px;
+  margin-bottom: 0px;
 }
 
 .threads-list {
@@ -1003,8 +1006,8 @@ watch(
 }
 
 .top-genres-section {
-  margin-bottom: 2rem;
-  padding: 1.5rem;
+  margin-bottom: 10px;
+  padding: 20px;
   background: white;
   border-radius: 1rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -1077,7 +1080,7 @@ watch(
 
 .book-cover {
   width: 100%;
-  height: 200px;
+  height: 180px;
   object-fit: cover;
 }
 

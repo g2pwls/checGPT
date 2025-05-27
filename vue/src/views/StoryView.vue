@@ -2,7 +2,7 @@
   <div class="container">
   <div class="story-view">
     <div class="story-header">
-      <h2 class="page-title">📚 이야기마당</h2>
+      <h2 class="page-title">이야기마당</h2>
       <p class="description">독자들과 함께 나누는 책 이야기 공간입니다.</p>
     </div>
 
@@ -35,16 +35,8 @@
              class="book-card" @click="goToCommunity(book.id)">
           <img :src="book.cover" :alt="book.title" class="book-cover">
           <div class="book-info">
-            <h3 class="book-title">{{ book.title }}</h3>
+            <h3 class="book-title" style="margin-bottom: 0px;">{{ book.title }}</h3>
             <p class="book-author">{{ book.author }}</p>
-            <div class="story-stats">
-              <span class="stat-item likes">
-                <i class="fas fa-heart"></i> {{ book.likes_count }}
-              </span>
-              <span class="stat-item">
-                <i class="fas fa-comments"></i> {{ book.comment_count || 0 }}
-              </span>
-            </div>
           </div>
         </div>
       </div>
@@ -114,7 +106,8 @@ export default {
 
 <style scoped>
 .container {
-  background-color: #e7e7e7;
+  background-color: #ffffff;
+  height: 93.5vh;
 }
 .story-view {
   max-width: 1200px;
@@ -142,7 +135,7 @@ export default {
   background: white;
   border-radius: 12px;
   padding: 10px;
-  margin-bottom: 40px;
+  margin-bottom: 20px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
@@ -233,6 +226,7 @@ export default {
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
+  height: 360px;
 }
 
 .book-card:hover {
@@ -255,6 +249,7 @@ export default {
   font-size: 1.1em;
   color: #2c3e50;
   margin-bottom: 5px;
+  margin-bottom: 0px;
 }
 
 .book-author {
@@ -262,11 +257,6 @@ export default {
   color: #666;
   font-size: 0.9em;
   margin-bottom: 10px;
-}
-
-.story-stats {
-  display: flex;
-  gap: 15px;
 }
 
 .stat-item {

@@ -1,4 +1,5 @@
 <template>
+  <div class="main-container">
   <div class="book-detail-wrapper">
     <header class="header">
       <div class="left-header">
@@ -122,8 +123,8 @@
 
         <!-- AI 설명 읽어주기 섹션 -->
         <section class="ai-audio-section">
-          <button @click="generateAudio" :disabled="isGenerating" class="ai-audio-btn">
-            {{ isGenerating ? '오디오 생성 중...' : 'AI 설명 읽어주기 생성' }}
+          <button @click="generateAudio" :disabled="isGenerating || isGenerated" class="ai-audio-btn">
+            {{ buttonText }}
           </button>
           <div class="audiofile" v-if="book.audio_file">
             <div class="audiio-sang">
@@ -144,6 +145,7 @@
       @submit-thread="addThread"
     />
   </div>
+</div>
 </template>
 
 <script>
@@ -160,8 +162,20 @@ export default {
       showAllThreads: false,
       sortType: 'latest',
       isGenerating: false,
+      isGenerated: false,
       isThreadModalOpen: false,
       isInLibrary: false,
+    }
+  },
+  computed: {
+    buttonText() {
+      if (this.isGenerating) {
+        return '오디오 생성 중...'
+      }
+      if (this.isGenerated) {
+        return 'AI 설명 읽어주기 생성 완료'
+      }
+      return 'AI 설명 읽어주기 생성'
     }
   },
   watch: {
@@ -214,6 +228,7 @@ export default {
       try {
         const response = await axios.post(`http://127.0.0.1:8000/api/books/${this.book.id}/generate-audio/`)
         this.book.audio_file = response.data.audio_file
+        this.isGenerated = true
       } catch (error) {
         alert('오디오 생성에 실패했습니다.')
         console.error(error)
@@ -412,6 +427,9 @@ export default {
 </script>
 
 <style scoped>
+.main-container {
+  background-color: #ffffff;
+}
 .book-detail-wrapper {
   max-width: 1500px;
   margin: 0 auto;
@@ -426,8 +444,9 @@ export default {
   margin-bottom: 10px;
   padding: 12px 30px 12px 30px;
   background-color: white;
-  border-radius: 10px;
+  border-radius: 0px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid #dadada;
 }
 
 .left-header {
@@ -448,16 +467,16 @@ export default {
 
 .content-wrapper {
   display: flex;
-  gap: 30px;
+  gap: 10px;
   background-color: #f5f5f5;
   padding: 10px;
-  border-radius: 10px;
+  border-radius: 0px;
 }
 
 .left-content {
   flex: 1.2;
   background-color: white;
-  border-radius: 10px;
+  border-radius: 0px;
   padding: 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -508,7 +527,7 @@ export default {
 .author-info-section,
 .ai-audio-section {
   background-color: white;
-  border-radius: 10px;
+  border-radius: 0px;
   padding: 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -539,18 +558,18 @@ export default {
 .ai-audio-btn {
   width: 100%;
   padding: 15px;
-  background-color: #4CAF50;
+  background-color: #e74c3c;
   color: white;
   border: none;
   border-radius: 8px;
   font-size: 1.1rem;
   cursor: pointer;
   transition: background-color 0.3s;
-  margin-bottom: 15px;
+  /* margin-bottom: 15px; */
 }
 
 .ai-audio-btn:hover {
-  background-color: #45a049;
+  background-color: #ff6c6c;
 }
 
 .ai-audio-btn:disabled {
@@ -601,7 +620,7 @@ export default {
 }
 
 .sort-tab.active {
-  background-color: #4CAF50;
+  background-color: #1c1c1c;
   color: white;
 }
 
@@ -661,7 +680,7 @@ export default {
 .action-buttons {
   display: flex;
   gap: 1rem;
-  margin-top: 1rem;
+  margin-top: 0px;
 }
 
 .like-btn {
@@ -691,7 +710,7 @@ export default {
 .community-btn {
   padding: 0.5rem 1rem;
   border: none;
-  background: #4CAF50;
+  background: #1c1c1c;
   color: white;
   border-radius: 20px;
   cursor: pointer;
@@ -707,7 +726,7 @@ export default {
   padding: 10px 20px;
   border: none;
   border-radius: 20px;
-  background-color: #e74c3c;
+  background-color: #1c1c1c;
   color: white;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -715,7 +734,7 @@ export default {
 }
 
 .action-btn:hover {
-  background-color: #c0392b;
+  background-color: #505050;
 }
 
 .action-btn.in-library {
@@ -727,11 +746,11 @@ export default {
 }
 
 .thread-write-btn {
-  background-color: #e74c3c;
+  background-color: #1c1c1c;
 }
 
 .thread-write-btn:hover {
-  background-color: #c0392b;
+  background-color: #505050;
 }
 
 .toggle-btn {
@@ -782,15 +801,14 @@ export default {
 }
 
 .ai-analysis-btn {
-  background-color: #ff4081;
+  background-color: #e74c3c;
   color: white;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
 }
 
 .ai-analysis-btn:hover {
-  background-color: #f50057;
+  background-color: #ff7676;
 }
 
 .ai-analysis-btn i {

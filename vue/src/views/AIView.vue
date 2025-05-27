@@ -113,13 +113,19 @@ export default {
         })
         
         if (response.data) {
-          this.$toast.success('AI 레포트가 저장되었습니다.')
+          this.$toast.success('AI 레포트가 저장되었습니다.', {
+            position: 'top-right',
+            duration: 3000
+          })
           this.isCompleted = true
         }
       } catch (error) {
         console.error('AI 레포트 저장 실패:', error)
         const errorMessage = error.response?.data?.detail || error.message || 'AI 레포트 저장에 실패했습니다.'
-        this.$toast.error(errorMessage)
+        this.$toast.error(errorMessage, {
+          position: 'top-right',
+          duration: 3000
+        })
         this.error = errorMessage
       } finally {
         this.loading = false
