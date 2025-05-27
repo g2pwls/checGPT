@@ -974,6 +974,8 @@ watch(
   max-width: 800px;
   width: 90%;
   position: relative;
+  max-height: 80vh;
+  overflow-y: auto;
 }
 
 .close-button {
