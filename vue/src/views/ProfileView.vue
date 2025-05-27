@@ -701,6 +701,7 @@ watch(
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
   width: 100%;
+  max-width: 900px; /* Ensure 3 items per row */
 }
 
 .library-grid {
@@ -708,6 +709,7 @@ watch(
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
   width: 100%;
+  max-width: 900px; /* Ensure 3 items per row */
 }
 
 .top-genres-section {
