@@ -28,7 +28,7 @@
       <h3>전체 Community</h3>
       <div v-if="booksWithStory.length === 0" class="no-books">
         <p>현재 Community가 열린 책이 없습니다.</p>
-        <p class="sub-text">도서의 좋아요가 2개 이상일 경우 Community가 열립니다.</p>
+        <p class="sub-text">도서의 좋아요가 2개 이상일 경우, 해당 도서의 Community가 열립니다.</p>
       </div>
       <div v-else class="books-grid">
         <div v-for="book in booksWithStory" :key="book.id" 

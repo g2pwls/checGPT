@@ -547,7 +547,7 @@ export default {
 <style scoped>
 .thread-detail {
   background: #fff;
-  color: black;
+  color: #222;
   padding-bottom: 40px;
   min-height: 95vh;
 }
@@ -567,25 +567,27 @@ export default {
 
 .right-box {
   flex: 1;
-  background: white;
+  background: #fff;
   padding: 40px;
-  border-radius: 10px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border-radius: 0px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  border: 1px solid #ddd;
 }
 
 .left-sidebar {
   width: 300px;
   display: flex;
   flex-direction: column;
-  gap: 30px;
+  gap: 20px;
 }
 
 .left-box {
-  background: white;
+  background: #fff;
   padding: 25px;
-  border-radius: 10px;
+  border-radius: 15px;
   width: 96%;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  border: 1px solid #ddd;
 }
 
 .book-card {
@@ -609,7 +611,7 @@ export default {
   width: 100%;
   height: 150px;
   object-fit: cover;
-  border-radius: 6px;
+  border-radius: 8px;
 }
 
 .book-info {
@@ -621,7 +623,7 @@ export default {
 
 .book-title {
   font-size: 16px;
-  font-weight: bold;
+  font-weight: 400;
   color: #333;
   margin: 0;
 }
@@ -646,9 +648,9 @@ export default {
 
 .thread-title {
   font-size: 28px;
-  font-weight: bold;
+  font-weight: 400;
   margin-bottom: 20px;
-  color: #333;
+  color: #222;
 }
 
 .thread-content {
@@ -660,44 +662,81 @@ export default {
 
 .actions button {
   margin-right: 10px;
-  background: #e74c3c;
+  background: #333;
   color: white;
   border: none;
-  padding: 6px 12px;
+  padding: 10px 20px;
   border-radius: 15px;
   cursor: pointer;
+  font-size: 15px;
+  font-weight: 500;
+  transition: background-color 0.3s;
 }
 
-.actions-comment button {
-  display: flex;
-  margin-right: 10px;
-  background: #e74c3c;
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 15px;
-  cursor: pointer;
+.actions button:hover {
+  background: #555;
 }
 
 .comments {
   margin-top: 40px;
 }
 
-.comments input {
-  width: 80%;
-  padding: 10px;
+.comments h3 {
+  font-weight: 400;
+  color: #222;
+  margin-bottom: 18px;
+}
+
+.comment-input-section {
+  margin: 20px 0;
+}
+
+.comment-textarea {
+  width: 100%;
+  padding: 14px 18px;
+  border: 1px solid #dadada;
+  border-radius: 15px;
+  font-size: 15px;
+  min-height: 80px;
+  resize: none;
   margin-bottom: 10px;
-  border-radius: 6px;
+  background: #fff;
+  color: #222;
+  transition: border-color 0.3s;
+}
+
+.comment-textarea:focus {
+  border-color: #333;
+}
+
+.comment-btn-wrapper {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.comment-btn {
+  padding: 12px 24px;
+  background: #1c1c1c;
+  color: white;
   border: none;
-  border: 1px solid #cecece;
+  border-radius: 15px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.comment-btn:hover {
+  background: #666;
 }
 
 .comment {
-  background: white;
-  padding: 15px;
-  margin-bottom: 10px;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  background: #fff;
+  padding: 18px 22px;
+  margin-bottom: 14px;
+  border-radius: 15px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  border: 1px solid #ddd;
   width: 100%;
   box-sizing: border-box;
 }
@@ -738,7 +777,7 @@ export default {
 
 .profile-name {
   font-size: 16px;
-  font-weight: bold;
+  font-weight: 400;
   color: #333;
 }
 
@@ -761,22 +800,23 @@ export default {
 
 .follow-btn {
   width: 100%;
-  padding: 8px;
+  padding: 10px;
   border: none;
-  border-radius: 20px;
-  background: #e74c3c;
+  border-radius: 15px;
+  background: #1c1c1c;
   color: white;
-  font-size: 14px;
+  font-size: 15px;
+  font-weight: 500;
   cursor: pointer;
   transition: background-color 0.3s;
 }
 
 .follow-btn.following {
-  background: #666;
+  background: #4b4b4b;
 }
 
 .follow-btn:hover {
-  background: #c0392b;
+  background: #666;
 }
 
 .follow-btn.following:hover {
@@ -801,40 +841,6 @@ export default {
 
 .like-btn:hover {
   transform: scale(1.05);
-}
-
-.comment-input-section {
-  margin: 20px 0;
-}
-
-.comment-textarea {
-  width: 96%;
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
-  min-height: 80px;
-  resize: none;
-  margin-bottom: 10px;
-}
-
-.comment-btn-wrapper {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.comment-btn {
-  padding: 8px 16px;
-  background: #e74c3c;
-  color: white;
-  border: none;
-  border-radius: 15px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.comment-btn:hover {
-  background: #c0392b;
 }
 
 .comment-content {
