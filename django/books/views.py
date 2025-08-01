@@ -784,3 +784,4 @@ class AIReportViewSet(viewsets.ModelViewSet):
             return Response(
                 {"error": "Report not found"}, status=status.HTTP_404_NOT_FOUND
             )
+

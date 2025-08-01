@@ -1,16 +1,22 @@
 <template>
   <div class="ai-view">
+    <div v-if="loading" class="ai-loading-overlay">
+      <div class="ai-spinner"></div>
+    </div>
     <div class="ai-content" ref="aiContent">
       <div class="container">
         <div v-if="book">
-          <book-location :book="book"></book-location>
+          <div class="ai-card">
+            <book-location :book="book"></book-location>
+            <AIMusic :book="book" />
+            <AIMovie :book="book" />
+          </div>
         </div>
         <div v-else class="no-book">
           <p>선택된 책이 없습니다.</p>
         </div>
       </div>
     </div>
-    
     <div class="action-buttons">
       <button @click="saveAIReport" class="save-button" :disabled="loading">
         <i class="fas fa-save"></i> 
@@ -21,6 +27,8 @@
 </template>
 
 <script>
+import AIMusic from '@/components/AIMusic.vue'
+import AIMovie from '@/components/AIMovie.vue'
 import BookLocation from '@/components/BookLocation.vue'
 import html2canvas from 'html2canvas'
 import { jsPDF } from 'jspdf'
@@ -29,7 +37,9 @@ import axios from 'axios'
 export default {
   name: 'AIView',
   components: {
-    BookLocation
+    BookLocation,
+    AIMusic,
+    AIMovie
   },
   data() {
     return {
@@ -133,21 +143,14 @@ export default {
     }
   }
 }
+
 </script>
 
 <style scoped>
 .ai-view {
-  padding: 30px 20px;
-  background-color: #f5f7fa;
+  padding: 20px;
   min-height: 100vh;
-}
-
-.ai-content {
-  background: white;
-  border-radius: 16px;
-  padding: 30px;
-  margin-bottom: 20px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  background-color: #ffffff;
 }
 
 .container {
@@ -155,43 +158,91 @@ export default {
   margin: 0 auto;
 }
 
-.no-book {
-  text-align: center;
-  padding: 50px;
-  background-color: white;
-  border-radius: 16px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+.ai-card {
+  background: white;
+  border-radius: 0px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  border: 1px solid #eee;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-.no-book p {
-  color: #666;
-  font-size: 1.1em;
+.ai-card > * {
+  width: 100%;
+}
+
+.no-book {
+  text-align: center;
+  padding: 40px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .action-buttons {
-  margin-top: 20px;
-  text-align: center;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
 }
 
 .save-button {
-  background-color: #4CAF50;
+  background-color: #e53935;
   color: white;
   border: none;
-  padding: 10px 20px;
+  padding: 12px 24px;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 1rem;
   display: flex;
   align-items: center;
   gap: 8px;
-  margin: 0 auto;
+  transition: background-color 0.3s;
 }
 
 .save-button:hover {
-  background-color: #45a049;
+  background-color: #e74c3c;
+}
+
+.save-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
 }
 
 .save-button i {
-  font-size: 18px;
+  font-size: 1.2rem;
+}
+
+@media (max-width: 768px) {
+  .save-button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+.ai-loading-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(255,255,255,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+.ai-spinner {
+  width: 48px;
+  height: 48px;
+  border: 6px solid #e0e0e0;
+  border-top: 6px solid #222;
+  border-radius: 50%;
+  animation: ai-spin 1s linear infinite;
+  background: transparent;
+}
+@keyframes ai-spin {
+  0% { transform: rotate(0deg);}
+  100% { transform: rotate(360deg);}
 }
 </style>

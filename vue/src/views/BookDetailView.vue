@@ -18,7 +18,7 @@
             @click="goToCommunity" 
             class="community-btn"
           >
-            이야기마당
+            Community
           </button>
         </div>
       </div>
@@ -558,7 +558,7 @@ export default {
 .ai-audio-btn {
   width: 100%;
   padding: 15px;
-  background-color: #e74c3c;
+  background-color: #1c1c1c;
   color: white;
   border: none;
   border-radius: 8px;
@@ -693,6 +693,7 @@ export default {
   border-radius: 20px;
   cursor: pointer;
   transition: all 0.3s ease;
+  color: #111111;
 }
 
 .like-btn:hover {
@@ -710,7 +711,7 @@ export default {
 .community-btn {
   padding: 0.5rem 1rem;
   border: none;
-  background: #1c1c1c;
+  background: #3b3b3b;
   color: white;
   border-radius: 20px;
   cursor: pointer;
@@ -718,7 +719,7 @@ export default {
 }
 
 .community-btn:hover {
-  background: #45a049;
+  background: #5f5f5f;
   transform: scale(1.05);
 }
 
@@ -727,7 +728,7 @@ export default {
   border: none;
   border-radius: 20px;
   background-color: #1c1c1c;
-  color: white;
+  color: #ffffff;
   cursor: pointer;
   transition: all 0.3s ease;
   font-size: 0.9rem;
@@ -780,7 +781,7 @@ export default {
 }
 
 .ai-button {
-  background-color: #ff4081;
+  background-color: #e53935;
   color: white;
   border: none;
   padding: 0.8rem 1.5rem;

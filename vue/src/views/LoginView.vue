@@ -60,64 +60,77 @@ const goSignup = () => {
 
 
 <style scoped>
-.signup-button {
-  width: 320px;
-  padding: 10px;
-  background-color: #444;
-  border: none;
-  border-radius: 4px;
-  color: white;
-  font-weight: bold;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
 .login-wrapper {
-  height: 100vh;
-  background-color: #000;
+  min-height: 100vh;
+  background-color: #fff;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
+  padding: 180px 0 0 0;
 }
 
 .login-card {
-  background-color: #1e1e1e;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-  width: 320px;
+  background-color: #fff;
+  padding: 2.5rem 2rem;
+  border-radius: 0px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  width: 350px;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.5rem;
+  border: 1px solid #eee;
+  transition: box-shadow 0.4s cubic-bezier(.4,1.4,.6,1), transform 0.4s cubic-bezier(.4,1.4,.6,1), opacity 0.6s, top 0.6s;
+  opacity: 0;
+  transform: translateY(30px);
+  animation: loginCardFadeIn 0.7s cubic-bezier(.4,1.4,.6,1) forwards;
+}
+
+
+@keyframes loginCardFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .login-card div {
   display: flex;
   flex-direction: column;
+  gap: 0.5rem;
 }
 
 label {
-  color: white;
-  font-weight: bold;
-  margin-bottom: 0.5rem;
+  color: #333;
+  font-weight: 500;
+  margin-bottom: 0.2rem;
 }
 
 input[type="text"],
 input[type="password"] {
-  padding: 10px;
-  border: none;
-  border-radius: 4px;
-  background-color: #2a2a2a;
-  color: white;
-  font-size: 14px;
+  padding: 12px 16px;
+  border: 1px solid #dadada;
+  border-radius: 15px;
+  background-color: #fff;
+  color: #222;
+  font-size: 15px;
   outline: none;
+  transition: border-color 0.3s;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus {
+  border-color: #333;
 }
 
 input[type="submit"] {
-  padding: 10px;
-  background-color: #f44;
+  padding: 12px;
+  background-color: #333;
   border: none;
-  border-radius: 4px;
+  border-radius: 15px;
   color: white;
   font-weight: bold;
   font-size: 16px;
@@ -126,6 +139,23 @@ input[type="submit"] {
 }
 
 input[type="submit"]:hover {
-  background-color: #d33;
+  background-color: #111111;
+}
+
+.signup-button {
+  width: 100%;
+  padding: 12px;
+  background-color: #f8f8f8;
+  border: 1px solid #dadada;
+  border-radius: 15px;
+  color: #333;
+  font-weight: 500;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+.signup-button:hover {
+  background-color: #d1d1d1;
+  color: #fff;
 }
 </style>

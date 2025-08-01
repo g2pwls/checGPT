@@ -96,7 +96,7 @@ export default {
   .title {
     text-align: center;
     font-size: 24px;
-    font-weight: bold;
+    font-weight: 400;
     margin-bottom: 30px;
   }
   
@@ -141,12 +141,16 @@ export default {
   
   .cancel {
     background-color: #fff;
-    color: #f44;
-    border: 1px solid #f44;
+    color: #1c1c1c;
+    border: 1px solid #666;
   }
   
   .submit {
-    background-color: #f44;
+    background-color: #1c1c1c;
+    color: white;
+  }
+  .submit:hover {
+    background-color: #666;
     color: white;
   }
   </style>

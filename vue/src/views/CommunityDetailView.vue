@@ -357,7 +357,7 @@ export default {
 }
 
 .edit-btn {
-  background: #4CAF50;
+  background: #363636;
   color: white;
 }
 
@@ -419,7 +419,7 @@ export default {
   top: 10px;
   padding: 2px 6px;
   font-size: 0.8rem;
-  color: #dc3545;
+  color: #525252;
   background: none;
   border: none;
   cursor: pointer;
@@ -444,7 +444,7 @@ export default {
 
 .submit-comment-btn {
   padding: 10px 20px;
-  background: #4CAF50;
+  background: #444444;
   color: white;
   border: none;
   border-radius: 4px;
@@ -452,7 +452,7 @@ export default {
 }
 
 .submit-comment-btn:hover {
-  background: #45a049;
+  background: #020202;
 }
 
 .modal {
@@ -505,7 +505,7 @@ export default {
 }
 
 .submit-btn {
-  background: #4CAF50;
+  background: #313131;
   color: white;
 }
 

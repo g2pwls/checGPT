@@ -1,7 +1,7 @@
 <template>
   <div class="community-view">
     <div class="community-header">
-      <h1>{{ book.title }} 이야기마당</h1>
+      <h1>{{ book.title }} Thread</h1>
       <button @click="isWriteModalOpen = true" class="write-btn">글쓰기</button>
     </div>
 
@@ -384,7 +384,7 @@ export default {
 }
 
 .tab-btn.active {
-  background: #4CAF50;
+  background: #3b3b3b;
   color: white;
 }
 
@@ -448,7 +448,7 @@ export default {
 }
 
 .post-title:hover {
-  color: #4CAF50;
+  color: #8d8d8d;
 }
 
 .writer {
@@ -504,7 +504,7 @@ export default {
 
 .write-btn {
   padding: 10px 20px;
-  background: #4CAF50;
+  background: #5c5c5c;
   color: white;
   border: none;
   border-radius: 20px;
@@ -514,7 +514,7 @@ export default {
 }
 
 .write-btn:hover {
-  background: #45a049;
+  background: #252525;
 }
 
 .modal {
@@ -568,7 +568,7 @@ export default {
 }
 
 .submit-btn {
-  background: #4CAF50;
+  background: #353535;
   color: white;
 }
 

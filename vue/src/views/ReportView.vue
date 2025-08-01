@@ -1,7 +1,7 @@
 <template>
   <div class="report-view">
     <div class="report-container">
-      <h1 class="report-title">감상문</h1>
+      <h1 class="report-title">Thread</h1>
       
       <!-- 정렬 탭 추가 -->
       <div class="sort-tabs">
@@ -110,23 +110,31 @@ export default {
 
 <style scoped>
 .report-view {
-  background-color: #e7e7e7;
+  background: #fff;
   min-height: 100vh;
   width: 100%;
   padding-top: 1px; /* margin collapse 방지 */
+  font-family: 'Noto Sans KR', sans-serif;
+  color: #333;
 }
 
 .report-container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 40px 20px;
+  background-color: #ffffff; /* 흰색 배경 */
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  border: 1px solid #ddd;
 }
 
 .report-title {
-  font-size: 2rem;
+  font-size: 1.8rem; /* 폰트 크기 조정 */
   font-weight: bold;
-  margin-bottom: 30px;
+  margin-bottom: 20px; /* 마진 조정 */
   color: #333;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
 }
 
 /* 정렬 탭 스타일 */
@@ -134,53 +142,54 @@ export default {
   display: flex;
   gap: 10px;
   margin-bottom: 20px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
 }
 
 .sort-tab {
   padding: 8px 16px;
   border: none;
   border-radius: 20px;
-  background-color: #f5f5f5;
-  color: #666;
+  background-color: #eee; /* 배경색 */
+  color: #666; /* 글자색 */
   cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 14px;
-  border: 1px solid #ddd;
-
+  transition: all 0.2s ease;
+  font-size: 0.9rem; /* 폰트 크기 조정 */
 }
 
 .sort-tab:hover {
-  background-color: #e0e0e0;
+  background-color: #ddd; /* 호버 시 배경색 */
+  color: #333; /* 호버 시 글자색 */
 }
 
 .sort-tab.active {
-  background-color: #3498db;
-  color: white;
+  background-color: #333; /* 활성화 시 배경색 */
+  color: white; /* 활성화 시 글자색 */
 }
 
 .threads-container {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 15px;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* 반응형 그리드 */
+  gap: 20px;
   margin-top: 20px;
 }
 
 .thread-card {
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 10px;
+  background-color: #f9f9f9; /* 밝은 배경 */
+  border: 1px solid #eee;
+  border-radius: 8px;
   padding: 15px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
   cursor: pointer;
-  transition: transform 0.2s ease;
+  transition: all 0.2s ease;
   display: flex;
   flex-direction: column;
-  height: 250px;
-  min-width: 200px;
+  min-height: 250px; /* 최소 높이 유지 */
 }
 
 .thread-card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-3px);
+  box-shadow: 0 3px 6px rgba(0,0,0,0.06);
 }
 
 .thread-header {
@@ -197,28 +206,34 @@ export default {
 }
 
 .book-cover {
-  width: 35px;
-  height: 50px;
+  width: 40px; /* 책 표지 크기 조정 */
+  height: 60px;
   object-fit: cover;
   border-radius: 4px;
+  border: 1px solid #ddd;
 }
 
 .book-title {
-  font-size: 0.85rem;
-  color: #666;
+  font-size: 0.9rem; /* 폰트 크기 조정 */
+  color: #555; /* 글자색 조정 */
   flex: 1;
   word-break: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .thread-meta {
   display: flex;
   justify-content: space-between;
-  color: #888;
+  color: #777; /* 글자색 조정 */
   font-size: 0.8rem;
 }
 
 .thread-title {
   font-size: 1.1rem;
+  font-weight: bold;
   margin-bottom: 8px;
   color: #333;
   word-break: break-word;
@@ -230,7 +245,7 @@ export default {
 
 .thread-content {
   font-size: 0.9rem;
-  color: #666;
+  color: #555; /* 글자색 조정 */
   line-height: 1.4;
   margin-bottom: 12px;
   flex-grow: 1;
@@ -249,8 +264,8 @@ export default {
 
 .interactions {
   display: flex;
-  gap: 12px;
-  color: #888;
+  gap: 15px;
+  color: #777; /* 글자색 조정 */
   font-size: 0.9rem;
 }
 
@@ -261,5 +276,54 @@ export default {
 
 .date {
   color: #999;
+}
+
+@media (max-width: 768px) {
+  .report-container {
+    padding: 20px 10px;
+  }
+
+  .report-title {
+    font-size: 1.5rem;
+  }
+
+  .sort-tabs {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .threads-container {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+  }
+
+  .thread-card {
+    min-height: 200px; /* 모바일 최소 높이 */
+  }
+
+  .book-cover {
+    width: 30px;
+    height: 45px;
+  }
+
+  .book-title {
+    font-size: 0.8rem;
+  }
+
+  .thread-meta {
+    font-size: 0.7rem;
+  }
+
+  .thread-title {
+    font-size: 1rem;
+  }
+
+  .thread-content {
+    font-size: 0.85rem;
+  }
+
+  .interactions {
+    font-size: 0.8rem;
+  }
 }
 </style> 

@@ -1,7 +1,7 @@
 <template>
   <div class="book-location">
     <div class="analysis-section">
-      <h3>📚 이 책과 관련된 AI분석</h3>
+      <h3 class="section-title"> {{this.book.title}} 도서 기반 AI 분석 레포트</h3>
       <div v-if="loading" class="loading">
         <div class="loading-spinner"></div>
         <p>AI가 책의 내용을 분석하고 있습니다...</p>
@@ -12,10 +12,10 @@
       </div>
       <div v-else-if="analysis" class="analysis-content">
         <div class="analysis-text">
-          <h4>📍 추천 장소</h4>
+          <h4>추천 장소</h4>
           <p class="place">{{ recommendedPlace }}</p>
           <div class="divider"></div>
-          <h4>📖 장소 선정 이유</h4>
+          <h4>장소 선정 이유</h4>
           <p class="reason">{{ analysis }}</p>
         </div>
       </div>
@@ -34,14 +34,14 @@
     </div>
 
     <div class="recommendation-section" v-if="recommendedBooks.length > 0">
-      <h3>📚 이런 책은 어떠세요?</h3>
+      <h3 class="section-title">이런 책은 어떠세요?</h3>
+      <div class="divider"></div>
       <div class="recommended-books">
         <div v-for="book in recommendedBooks" :key="book.id" class="book-card" @click="goToBook(book.id)">
           <img :src="book.cover" :alt="book.title" class="book-cover">
           <div class="book-info">
             <h4>{{ book.title }}</h4>
             <p class="book-author">{{ book.author }}</p>
-            <div class="divider"></div>
             <p class="recommendation-reason">
               <span class="reason-label">AI의 추천 이유</span>
               {{ book.recommendation_reason }}
@@ -205,16 +205,18 @@ export default {
 .analysis-section {
   background-color: white;
   padding: 25px;
-  border-radius: 12px;
+  border-radius: 15px;
   margin-bottom: 20px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  border: 1px solid #ddd;
 }
 
-.analysis-section h3 {
+.analysis-section h3.section-title {
   margin: 0 0 20px 0;
   color: #2c3e50;
   font-size: 1.5em;
   text-align: center;
+  font-weight: 400;
 }
 
 .analysis-section h4 {
@@ -226,7 +228,7 @@ export default {
 .analysis-content {
   background-color: #f8f9fa;
   padding: 20px;
-  border-radius: 8px;
+  border-radius: 15px;
 }
 
 .analysis-text p {
@@ -247,24 +249,31 @@ export default {
 }
 
 .divider {
+  width: 100%;
   height: 1px;
-  background-color: #e0e0e0;
+  background: #e0e0e0;
   margin: 20px 0;
+  border-radius: 1px;
 }
 
 .loading {
   text-align: center;
   padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 220px;
 }
 
 .loading-spinner {
   width: 40px;
   height: 40px;
-  margin: 0 auto 20px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #3498db;
+  border: 4px solid #e0e0e0;
+  border-top: 4px solid #222;
   border-radius: 50%;
   animation: spin 1s linear infinite;
+  background: transparent;
 }
 
 @keyframes spin {
@@ -307,11 +316,12 @@ export default {
 
 .map-section {
   margin-top: 20px;
-  border-radius: 12px;
+  border-radius: 15px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
   background-color: white;
   padding: 20px;
+  border: 1px solid #ddd;
 }
 
 iframe {
@@ -324,15 +334,17 @@ iframe {
   margin-top: 30px;
   background-color: white;
   padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
-.recommendation-section h3 {
-  margin: 0 0 20px 0;
+.recommendation-section h3.section-title {
+  margin: 0 0 10px 0;
   color: #2c3e50;
   font-size: 1.5em;
   text-align: center;
+  font-weight: 400;
 }
 
 .recommended-books {
@@ -384,12 +396,7 @@ iframe {
   margin: 0;
   color: #666;
   font-size: 1em;
-}
-
-.divider {
-  height: 1px;
-  background-color: #eee;
-  margin: 15px 0;
+  margin-bottom: 12px;
 }
 
 .recommendation-reason {
@@ -467,5 +474,10 @@ iframe {
   .book-info {
     padding: 15px;
   }
+
+  .section-title {
+    font-weight: 400;
+  }
+
 }
 </style> 

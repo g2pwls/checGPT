@@ -15,11 +15,11 @@
           <div class="follow-stats">
             <div class="stat">
               <span class="stat-value">{{ user.followers_count || 0 }}</span>
-              <span class="stat-label">팔로워</span>
+              <span class="stat-label"> 팔로워</span>
             </div>
             <div class="stat">
               <span class="stat-value">{{ user.following_count || 0 }}</span>
-              <span class="stat-label">팔로잉</span>
+              <span class="stat-label"> 팔로잉</span>
             </div>
           </div>
           <button 
@@ -65,9 +65,9 @@
             </div>
 
             <!-- Top Books Section -->
-            <div v-if="topBooks.length > 0" class="top-books-section">
-              <h3 class="section-title">대표 도서</h3>
-              <div class="top-books-grid">
+            <div class="top-books-section">
+              <h3 class="section-title section-title-normal">대표 도서</h3>
+              <div v-if="topBooks.length > 0" class="top-books-grid">
                 <div v-for="topBook in topBooks" :key="topBook.id" class="top-book-item" @click="goToBook(topBook.book.id)">
                   <div class="rank-badge">{{ topBook.rank }}순위</div>
                   <div class="book-cover-container">
@@ -77,30 +77,37 @@
                   <p class="book-author">{{ topBook.book.author }}</p>
                 </div>
               </div>
+              <div v-else class="empty-state">
+                <p>아직 대표 도서가 없습니다.</p>
+              </div>
             </div>
 
             <!-- Top Genres Section -->
             <div v-if="topGenres.length > 0" class="top-genres-section">
-              <h3 class="section-title">선호 장르</h3>
+              <h3 class="section-title section-title-normal">선호 장르</h3>
               <div class="top-genres-grid">
-                <div v-for="(genre, index) in topGenres" :key="genre.id" class="genre-item">
+                <div v-for="(genre, index) in topGenres" :key="genre.id" class="genre-card">
                   <div class="rank-badge">{{ index + 1 }}순위</div>
-                  <h4 class="genre-name">{{ genre.name }}</h4>
-                  <p class="genre-count">{{ genre.count }}권</p>
+                  <div class="genre-name">{{ genre.name }}</div>
+                  <div class="genre-count">{{ genre.count }}권</div>
                 </div>
               </div>
             </div>
 
+            <!-- Library Section -->
             <div v-if="library.length === 0" class="empty-state">
               <p>서재에 추가된 책이 없습니다.</p>
             </div>
-            <div v-else class="library-grid">
-              <div v-for="item in library" :key="item.id" class="library-item" @click="goToBook(item.book.id)">
-                <div class="book-cover-container">
-                  <img :src="item.book.cover" :alt="item.book.title" class="book-cover">
+            <div v-else>
+              <h3 class="section-title section-title-normal">전체 도서</h3>
+              <div class="library-grid">
+                <div v-for="item in library" :key="item.id" class="library-item" @click="goToBook(item.book.id)">
+                  <div class="book-cover-container">
+                    <img :src="item.book.cover" :alt="item.book.title" class="book-cover">
+                  </div>
+                  <h3 class="book-title">{{ item.book.title }}</h3>
+                  <p class="book-author">{{ item.book.author }}</p>
                 </div>
-                <h3 class="book-title">{{ item.book.title }}</h3>
-                <p class="book-author">{{ item.book.author }}</p>
               </div>
             </div>
           </div>
@@ -145,7 +152,7 @@
 
           <!-- AI Reports Tab -->
           <div v-if="activeTab === 'ai-reports'" class="ai-reports-section">
-            <h3>📊 AI 분석 레포트</h3>
+            <h3>AI 분석 레포트</h3>
             <div class="reports-grid">
               <div v-for="report in aiReports" :key="report.id" class="report-card">
                 <div class="report-content" @click="showReport(report)">
@@ -516,62 +523,65 @@ watch(
 
 <style scoped>
 .profile-container {
-  padding: 2rem;
-  min-height: 100vh;
-  background-color: #f5f5f5;
+  background-color: #ffffff; /* 밝은 회색 배경 */
+  font-family: 'Noto Sans KR', sans-serif;
+  color: #333; /* 어두운 글자색 */
+  min-height: 100vh; /* 최소 높이 설정 */
+  padding: 20px;
 }
 
 .content-wrapper {
   max-width: 1200px;
   margin: 0 auto;
   display: flex;
-  gap: 2rem;
+  gap: 20px;
 }
 
 .left-sidebar {
-  width: 300px;
+  width: 280px; /* 고정 너비 */
   flex-shrink: 0;
 }
 
 .profile-box {
-  background: white;
-  padding: 2rem;
-  border-radius: 1rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff; /* 흰색 배경 */
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
   text-align: center;
+  border: 1px solid #ddd;
 }
 
 .profile-image {
-  width: 150px;
-  height: 150px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
-  margin-bottom: 1rem;
   object-fit: cover;
+  margin-bottom: 5px;
+  border: 1px solid #ddd; /* 테두리 추가 */
 }
 
 .profile-name {
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   font-weight: bold;
-  margin-bottom: 0.5rem;
+  margin-bottom: 5px;
   color: #333;
 }
 
 .profile-username {
-  color: #666;
-  margin-bottom: 1rem;
+  font-size: 1rem;
+  color: #777;
+  margin-bottom: 20px;
 }
 
 .follow-stats {
   display: flex;
   justify-content: center;
-  gap: 2rem;
-  margin-bottom: 1.5rem;
+  gap: 20px;
+  margin-bottom: 20px;
 }
 
 .stat {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  text-align: center;
 }
 
 .stat-value {
@@ -582,56 +592,67 @@ watch(
 
 .stat-label {
   font-size: 0.9rem;
-  color: #666;
+  color: #777;
 }
 
 .follow-button {
-  width: 100%;
-  padding: 0.8rem;
+  padding: 10px 20px;
   border: none;
-  border-radius: 0.5rem;
-  background-color: rgb(0, 105, 0);
-  color: white;
-  font-weight: bold;
+  border-radius: 4px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  font-size: 1rem;
+  transition: background-color 0.2s ease;
+  width: 100%;
 }
 
-.follow-button:hover {
-  background-color: #0056b3;
+.follow-button:not(.following) {
+  background-color: #000000; /* 파란색 계열 (예시) */
+  color: white;
+}
+
+.follow-button:not(.following):hover {
+  background-color: #5f5f5f;
 }
 
 .follow-button.following {
-  background-color: #6c757d;
+  background-color: #5f5f5f; /* 빨간색 계열 (예시) */
+  color: white;
 }
 
 .follow-button.following:hover {
-  background-color: #5a6268;
+  background-color: #858484;
 }
 
 .right-box {
   flex: 1;
-  background: white;
-  border-radius: 1rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 0px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  border: 1px solid #ddd;
+  font-weight: 400;
+}
+
+.right-box .tab-button,
+.right-box .section-title {
+  font-weight: bold !important;
 }
 
 .tabs {
   display: flex;
-  border-bottom: 1px solid #eee;
-  padding: 0 1rem;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 20px;
 }
 
 .tab-button {
-  padding: 1rem 1.5rem;
+  padding: 10px 15px;
   border: none;
   background: none;
-  font-size: 1rem;
-  color: #666;
   cursor: pointer;
-  transition: all 0.2s;
-  position: relative;
+  font-size: 1rem;
+  color: #777;
+  transition: color 0.2s ease, border-bottom-color 0.2s ease;
+  border-bottom: 2px solid transparent;
 }
 
 .tab-button:hover {
@@ -639,254 +660,297 @@ watch(
 }
 
 .tab-button.active {
-  color: rgb(0, 105, 0);
+  color: #333;
   font-weight: bold;
+  border-bottom-color: #333;
 }
 
-.tab-button.active::after {
-  content: '';
-  position: absolute;
-  bottom: -1px;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background-color: rgb(0, 105, 0);
+.library-actions {
+  margin-bottom: 20px;
+  text-align: right;
 }
 
-.tab-content {
-  padding: 2rem;
+.edit-btn {
+  padding: 8px 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #eee;
+  cursor: pointer;
+  font-size: 0.9rem;
 }
 
-.empty-state {
-  text-align: center;
-  color: #666;
-  padding: 2rem;
+.edit-btn:hover {
+  background-color: #ddd;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 15px;
+  color: #333;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+.section-title.section-title-normal {
+  font-weight: 400;
+}
+
+.top-books-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  width: 100%;
+  max-width: 900px; /* Ensure 3 items per row */
 }
 
 .library-grid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 10px;
-  padding: 1rem;
-  max-width: 1200px;
-  margin: 0 auto;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  width: 100%;
+  max-width: 900px; /* Ensure 3 items per row */
 }
 
-@media (max-width: 1200px) {
-  .library-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
+.top-genres-section {
+  margin-bottom: 48px;
 }
 
-@media (max-width: 992px) {
-  .library-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
+.top-genres-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  width: 100%;
 }
 
-@media (max-width: 768px) {
-  .library-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 480px) {
-  .library-grid {
-    grid-template-columns: repeat(1, minmax(0, 1fr));
-  }
-}
-
-.library-item {
-  background: white;
-  border-radius: 0.5rem;
-  padding: 10px;
-  transition: transform 0.2s;
+.genre-card {
+  background-color: #f9f9f9;
+  padding: 15px;
+  border-radius: 8px;
+  text-align: center;
+  border: 1px solid #eee;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease;
   cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
   align-items: center;
-  text-align: center;
+  justify-content: center;
 }
 
+.genre-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.06);
+}
+
+.rank-badge {
+  display: inline-block;
+  background-color: #333;
+  color: white;
+  font-size: 0.8rem;
+  padding: 3px 8px;
+  border-radius: 12px;
+  margin-bottom: 10px;
+}
+
+.genre-name {
+  font-size: 1rem;
+  font-weight: bold;
+  margin-bottom: 4px;
+  color: #333;
+}
+
+.genre-count {
+  font-size: 0.9rem;
+  color: #777;
+}
+
+.top-books-section {
+  margin-bottom: 48px;
+}
+
+.library-content {
+  margin-bottom: 32px;
+}
+
+.top-book-item,
+.library-item {
+  background-color: #f9f9f9; /* 밝은 배경 */
+  padding: 15px;
+  border-radius: 8px;
+  text-align: center;
+  border: 1px solid #eee;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.top-book-item:hover,
 .library-item:hover {
   transform: translateY(-2px);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.06);
 }
 
 .book-cover-container {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  margin-bottom: 0.5rem;
+  width: 100px;
+  height: 150px;
+  margin: 0 auto 10px;
 }
 
 .book-cover {
   width: 100%;
-  max-width: 180px;
-  aspect-ratio: 2/3;
+  height: 100%;
   object-fit: cover;
-  border-radius: 0.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  border: 1px solid #ddd;
 }
 
 .book-title {
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: bold;
-  margin-bottom: 0.25rem;
+  margin-bottom: 4px;
   color: #333;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  line-height: 1.3;
-  height: 2.6em;
-  width: 100%;
-  margin-top: 10px;
 }
 
 .book-author {
-  font-size: 0.8rem;
-  color: #666;
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  width: 100%;
-  margin-top: 0px;
-  margin-bottom: 0px;
+  font-size: 0.9rem;
+  color: #777;
 }
 
 .threads-list {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 15px;
 }
 
 .thread-item {
-  background: white;
-  border-radius: 1rem;
-  padding: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s;
+  background-color: #f9f9f9; /* 밝은 배경 */
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #eee;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease;
   cursor: pointer;
 }
 
 .thread-item:hover {
   transform: translateY(-2px);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.06);
 }
 
 .thread-header {
-  margin-bottom: 1rem;
-}
-
-.book-info {
-  flex: 1; /* 텍스트 영역이 남는 공간 차지 */
   display: flex;
-  gap: 1rem;
   align-items: center;
-  overflow: hidden;
+  gap: 15px;
+  margin-bottom: 10px;
 }
 
-.book-cover {
+.thread-header .book-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.thread-header .book-cover {
+  width: 50px;
+  height: 75px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+}
+
+.thread-header .book-title {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.thread-meta {
+  font-size: 0.85rem;
+  color: #777;
+}
+
+.thread-meta .author {
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+.thread-body h3 {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.thread-body .thread-content {
+  font-size: 1rem;
+  color: #555;
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+
+.thread-footer .interactions span {
+  font-size: 0.9rem;
+  color: #777;
+  margin-right: 15px;
+}
+
+.ai-reports-section h3 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 15px;
+  color: #333;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+.reports-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 20px;
+}
+
+.report-card {
+  background-color: #f9f9f9; /* 밝은 배경 */
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #eee;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.report-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.06);
+}
+
+.report-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+}
+
+.report-card .book-cover {
   width: 80px;
   height: 120px;
   object-fit: cover;
-  border-radius: 0.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  border: 1px solid #ddd;
 }
 
-.book-details {
-  flex: 1;
-}
-
-.book-title {
-  font-size: 1.1rem;
+.report-info h4 {
+  font-size: 1rem;
   font-weight: bold;
+  margin-bottom: 5px;
   color: #333;
-  margin-bottom: 0.5rem;
 }
 
-.thread-meta {
-  display: flex;
-  gap: 1rem;
-  color: #666;
-  font-size: 0.9rem;
-}
-
-.author {
-  font-weight: 500;
-}
-
-.date {
-  color: #888;
-}
-
-.thread-body {
-  margin-bottom: 1rem;
-}
-
-.thread-title {
-  font-size: 1.3rem;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 0.5rem;
-}
-
-.thread-content {
-  color: #666;
-  line-height: 1.6;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.thread-footer {
-  display: flex;
-  justify-content: space-between;
-  padding-top: 1rem;
-  border-top: 1px solid #eee;
-}
-
-.engagement-stats {
-  display: flex;
-  gap: 1.5rem;
-  color: #666;
-  font-size: 0.9rem;
-}
-
-.thread-meta {
-  display: flex;
-  gap: 15px;
-  color: #888;
-}
-
-.interactions {
-  display: flex;
-  gap: 15px;
-  color: #888;
-}
-
-.library-actions {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 1rem;
-  padding: 0 1rem;
-}
-
-.edit-btn {
-  background: rgb(0, 105, 0);
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.edit-btn:hover {
-  background: rgb(0, 85, 0);
+.report-date {
+  font-size: 0.85rem;
+  color: #777;
 }
 
 .modal-overlay {
@@ -895,7 +959,7 @@ watch(
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.5); /* 어두운 오버레이 */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -903,282 +967,174 @@ watch(
 }
 
 .modal-content {
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-  width: 95%;
-  max-width: 900px;
-  max-height: 95vh;
+  background-color: #ffffff; /* 흰색 배경 */
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  max-width: 800px;
+  width: 90%;
+  position: relative;
+  max-height: 80vh;
   overflow-y: auto;
-  position: relative;
-}
-
-.top-books-section {
-  margin-bottom: 10px;
-  padding: 1.5rem;
-  background: white;
-  border-radius: 1rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.section-title {
-  font-size: 1.2rem;
-  font-weight: bold;
-  margin-bottom: 1rem;
-  color: #333;
-  margin-top: 10px;
-}
-
-.top-books-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
-}
-
-.top-book-item {
-  position: relative;
-  background: white;
-  border-radius: 0.5rem;
-  padding: 1rem;
-  transition: transform 0.2s;
-  cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
-.top-book-item:hover {
-  transform: translateY(-2px);
-}
-
-.rank-badge {
-  position: absolute;
-  top: 0.5rem;
-  left: 0.5rem;
-  background: rgb(0, 105, 0);
-  color: white;
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.25rem;
-  font-size: 0.8rem;
-  font-weight: bold;
-}
-
-.top-book-item .book-cover-container {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  margin-bottom: 0.5rem;
-}
-
-.top-book-item .book-cover {
-  width: 100%;
-  max-width: 180px;
-  aspect-ratio: 2/3;
-  object-fit: cover;
-  border-radius: 0.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.top-book-item .book-title {
-  font-size: 0.9rem;
-  font-weight: bold;
-  margin-bottom: 0.25rem;
-  color: #333;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  line-height: 1.3;
-  height: 2.6em;
-  width: 100%;
-}
-
-.top-book-item .book-author {
-  font-size: 0.8rem;
-  color: #666;
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  width: 100%;
-}
-
-.top-genres-section {
-  margin-bottom: 10px;
-  padding: 20px;
-  background: white;
-  border-radius: 1rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.top-genres-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
-}
-
-.genre-item {
-  position: relative;
-  background: #f8f9fa;
-  border-radius: 0.5rem;
-  padding: 1.5rem;
-  text-align: center;
-  transition: transform 0.2s;
-}
-
-.genre-item:hover {
-  transform: translateY(-2px);
-}
-
-.genre-name {
-  font-size: 1.1rem;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 0.5rem;
-}
-
-.genre-count {
-  font-size: 0.9rem;
-  color: #666;
-}
-
-.ai-reports-section {
-  padding: 20px;
-}
-
-.reports-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 20px;
-  margin-top: 20px;
-}
-
-.report-card {
-  position: relative;
-  background: white;
-  border-radius: 0.5rem;
-  overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s;
-  display: flex;
-  flex-direction: column;
-  width: 215px;
-  height: 310px;
-}
-
-.report-content {
-  flex: 1;
-  padding: 1rem;
-  cursor: pointer;
-}
-
-.report-content:hover {
-  background-color: #f8f9fa;
-}
-
-.book-cover {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-}
-
-.report-info {
-  padding: 15px;
-}
-
-.report-info h4 {
-  margin: 0 0 10px 0;
-  font-size: 1.1em;
-  color: #2c3e50;
-}
-
-.report-date {
-  color: #666;
-  font-size: 0.9em;
-  margin-bottom: 10px;
-}
-
-.view-report-btn {
-  background-color: #1976d2;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 5px;
-  cursor: pointer;
-  width: 100%;
-  transition: background-color 0.3s ease;
-}
-
-.view-report-btn:hover {
-  background-color: #1565c0;
 }
 
 .close-button {
   position: absolute;
   top: 10px;
   right: 10px;
-  background: none;
+  font-size: 1.5rem;
   border: none;
-  font-size: 24px;
+  background: none;
   cursor: pointer;
-  color: #666;
+  color: #777;
+}
+
+.close-button:hover {
+  color: #333;
 }
 
 .report-viewer {
-  margin-top: 20px;
-  background: #f5f5f5;
-  border-radius: 8px;
-  padding: 20px;
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 20px;
+  margin-top: 20px;
 }
 
 .report-image {
-  width: 100%;
-  max-height: 70vh;
-  object-fit: contain;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  max-width: 100%;
+  height: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
 }
 
 .report-actions {
   display: flex;
-  gap: 10px;
-  justify-content: center;
-  margin-top: 20px;
+  gap: 15px;
 }
 
 .action-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-decoration: none;
-  border: none;
+  transition: background-color 0.2s ease;
 }
 
 .download-btn {
-  background-color: #4CAF50;
+  background-color: #333; /* 무채색 다운로드 버튼 */
   color: white;
 }
 
 .download-btn:hover {
-  background-color: #45a049;
+  background-color: #555;
 }
 
 .delete-btn {
-  background-color: #f44336;
+  background-color: #000000; /* 빨간색 삭제 버튼 */
   color: white;
 }
 
 .delete-btn:hover {
-  background-color: #d32f2f;
+  background-color: #797979;
+}
+
+/* AI 레포트 관련 버튼 (ProfileView에 AI 분석 시작하기 버튼이 없으므로 AI 레포트 모달 내 버튼에 적용) */
+/* ProfileView에는 AI 분석 시작하기 버튼이 없으므로, AI 관련 기능 버튼은 AI Report Modal 내의 버튼에 적용 */
+/* AI 레포트 다운로드 버튼은 AI 관련 기능으로 간주하여 빨간색 적용 */
+.report-viewer .action-button.download-btn {
+    background-color: #e74c3c; /* 요청된 빨간색 */
+    color: white;
+}
+
+.report-viewer .action-button.download-btn:hover {
+    background-color: #ff7676; /* 기존 빨간색보다 밝게 */
+}
+
+@media (max-width: 1200px) {
+  .top-books-grid,
+  .library-grid,
+  .top-genres-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .content-wrapper {
+    flex-direction: column;
+  }
+
+  .left-sidebar {
+    width: 100%;
+    text-align: center;
+  }
+
+  .profile-image {
+    width: 100px;
+    height: 100px;
+  }
+
+  .follow-stats {
+    justify-content: center;
+  }
+
+  .right-box {
+    padding: 15px;
+  }
+
+  .tabs {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    border-bottom: none;
+  }
+
+  .tab-button {
+    border-bottom: none;
+  }
+
+  .tab-button.active {
+    border-bottom: 2px solid #333;
+  }
+
+  .top-books-grid,
+  .library-grid,
+  .top-genres-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .top-book-item,
+  .library-item,
+  .genre-card {
+    padding: 10px;
+  }
+
+  .book-cover-container {
+    width: 80px;
+    height: 120px;
+  }
+
+  .thread-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .thread-header .book-info {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .modal-content {
+    padding: 20px;
+  }
+
+  .report-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
 }
 </style>

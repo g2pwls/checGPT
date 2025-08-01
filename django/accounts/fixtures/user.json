@@ -1,0 +1,112 @@
+[
+{
+    "model": "accounts.user",
+    "pk": 1,
+    "fields": {
+        "password": "pbkdf2_sha256$600000$UcAdJL7TLQxBloT0IWnqQ0$imqCsXkWyP4U2XlLGkOIGsjh8gX836N8mjTH8XMX+xw=",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "yhjyhw",
+        "first_name": "",
+        "last_name": "",
+        "email": "qwer@naver.com",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-05-27T11:39:27.258Z",
+        "name": "윤혜진",
+        "profile_image": "profiles/��ũ����_2025-01-22_123824.png",
+        "interests": "",
+        "groups": [],
+        "user_permissions": [],
+        "following": []
+    }
+},
+{
+    "model": "accounts.user",
+    "pk": 2,
+    "fields": {
+        "password": "pbkdf2_sha256$600000$kJjRaESJwPf3MU695qYNdN$LTywf8fh9u28IQOCO6jHqAA1hnTL80AcoskHSluI6Rs=",
+        "last_login": "2025-05-27T13:03:54.083Z",
+        "is_superuser": true,
+        "username": "admin",
+        "first_name": "",
+        "last_name": "",
+        "email": "admin@naver.com",
+        "is_staff": true,
+        "is_active": true,
+        "date_joined": "2025-05-27T12:49:12.836Z",
+        "name": "",
+        "profile_image": "",
+        "interests": "",
+        "groups": [],
+        "user_permissions": [],
+        "following": []
+    }
+},
+{
+    "model": "accounts.user",
+    "pk": 5,
+    "fields": {
+        "password": "pbkdf2_sha256$600000$qbTgefgSbIMlRjpoI1MMWy$n5EfpPQ92FcaR3ELkzGL2x3V6ofkxHv8ZfHKBEYUC5w=",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "admin1",
+        "first_name": "",
+        "last_name": "",
+        "email": "w@naver.com",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-05-27T13:11:20.766Z",
+        "name": "박지현",
+        "profile_image": "profiles/��ũ����_2025-01-22_123749.png",
+        "interests": "",
+        "groups": [],
+        "user_permissions": [],
+        "following": []
+    }
+},
+{
+    "model": "accounts.user",
+    "pk": 6,
+    "fields": {
+        "password": "pbkdf2_sha256$600000$nzTYpqnMjfm4GGKzVbrfA7$cfa+9TES5331fsnlb+DsumsBbKMByJop/Cq3q4sI1G4=",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "admin2",
+        "first_name": "",
+        "last_name": "",
+        "email": "qwe@naver.com",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-05-27T13:11:42.750Z",
+        "name": "신민석",
+        "profile_image": "profiles/��ũ����_2025-01-22_123824_Feeofet.png",
+        "interests": "",
+        "groups": [],
+        "user_permissions": [],
+        "following": []
+    }
+},
+{
+    "model": "accounts.user",
+    "pk": 7,
+    "fields": {
+        "password": "pbkdf2_sha256$600000$9stjAv8nTr8CZXEUhpBIgv$z1GQsGql3jnd6VF8jw8++Eb2y+jo3oVF/4OzcNTi3gg=",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "admin3",
+        "first_name": "",
+        "last_name": "",
+        "email": "2@naver.com",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-05-27T13:12:31.379Z",
+        "name": "박태건",
+        "profile_image": "profiles/��ũ����_2025-01-22_123749_VF3uuDN.png",
+        "interests": "",
+        "groups": [],
+        "user_permissions": [],
+        "following": []
+    }
+}
+]

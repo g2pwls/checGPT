@@ -9,11 +9,11 @@
             class="search-input"
           />
           <li
-          :class="{ active: selectedCategory === 0 }"
-          @click="selectedCategory = 0"
-            >
+            :class="{ active: selectedCategory === null }"
+            @click="selectedCategory = null"
+          >
             전체
-            </li>
+          </li>
           <li
             v-for="category in categories"
             :key="category.id"
@@ -57,7 +57,7 @@
   const books = ref([]);
   const categories = ref([]);
   const searchQuery = ref("");
-  const selectedCategory = ref(0);
+  const selectedCategory = ref(null);  // null로 초기화
   const router = useRouter();
   const route = useRoute();
   
@@ -69,7 +69,7 @@
 
   const fetchBooks = async () => {
     const params = {};
-    if (selectedCategory.value) {
+    if (selectedCategory.value !== null) {  // null이 아닐 때만 category 파라미터 추가
       params.category = selectedCategory.value;
     }
     if (searchQuery.value) {
@@ -102,13 +102,12 @@
   // URL 쿼리 파라미터 변경 감시
   watch(() => route.query.category, (newCategory) => {
     if (newCategory !== selectedCategory.value?.toString()) {
-      selectedCategory.value = Number(newCategory) || 0;
+      selectedCategory.value = newCategory ? Number(newCategory) : null;
     }
   });
   
   onMounted(async () => {
-    await fetchCategories();
-    await fetchBooks();
+    await Promise.all([fetchCategories(), fetchBooks()]);
   });
   
   const goToDetail = (bookId) => {
@@ -121,143 +120,229 @@
     .container {
         display: flex;
         height: 93.5vh;
-        background-color: #111;
-        color: white;
+        background-color: #ffffff; /* 흰색 배경 */
+        color: #333; /* 어두운 글자색 */
         font-family: 'Noto Sans KR', sans-serif;
         gap: 0;
     }
     
     /* 사이드바 */
     .sidebar {
-        width: 20%;
-        padding: 20px 10px 20px 20px;
-        background-color: #ffffff;
+        width: 200px; /* 너비 조정 */
+        padding: 20px; /* 패딩 조정 */
+        background-color: #ffffff; /* 흰색 배경 */
 
         display: flex;            /* flex 컨테이너 */
         flex-direction: column;   /* 세로 정렬 */
-        align-items: center;      /* 가로 중앙 정렬 */
-    
+        align-items: flex-start;      /* 왼쪽 정렬 */
+        border-right: 1px solid #ddd; /* 구분선 */
+        box-sizing: border-box;
+        overflow-y: auto; /* 스크롤 가능 */
     }
     
     .sidebar h2 {
-        color: #f44;
+        color: #555; /* 무채색 계열 색상 */
         font-size: 1.2rem;
-        margin-bottom: 16px;
-        margin-left: 16px;
-        
+        margin-bottom: 20px; /* 마진 조정 */
+        align-self: center; /* 제목 중앙 정렬 */
     }
     
     .sidebar ul {
         list-style: none;
         padding: 0;
-        margin-top: 100px;
+        margin-top: 0; /* 마진 제거 */
+        width: 100%; /* 전체 너비 사용 */
+        text-align: left; /* 텍스트 왼쪽 정렬 */
     }
     
     .sidebar li {
-        font-size: 15px;
-        margin-bottom: 15px;
+        font-size: 1rem; /* 폰트 크기 조정 */
+        margin-bottom: 12px; /* 마진 조정 */
         cursor: pointer;
-        color: #515151;
-        font-weight: bold;
+        color: #555; /* 무채색 계열 색상 */
+        font-weight: normal; /* 기본 폰트 굵기 */
+        padding: 8px 10px; /* 패딩 추가 */
+        border-radius: 4px; /* 둥근 모서리 */
+        transition: all 0.2s ease;
     }
     
     .sidebar li:hover {
-        color: #f88;
+        color: #333; /* 호버 시 글자색 진하게 */
+        background-color: #f8f8f8; /* 호버 시 배경색 살짝 추가 */
     }
     
     .sidebar li.active {
-        color: #f44;
-        font-weight: bold;
+        color: #333; /* 활성화된 항목 글자색 진하게 */
+        font-weight: bold; /* 활성화된 항목 폰트 굵기 */
+        background-color: #eee; /* 활성화된 항목 배경색 */
     }
     
     /* 본문 */
     .main-content {
         flex: 1;
-        padding: 100px 24px 24px 10px;
+        padding: 40px 24px; /* 패딩 조정 */
         overflow-y: auto;
-        background-color: #ffffff;
+        background-color: #ffffff; /* 흰색 배경 */
         display: flex;
-        /* justify-content: center */
-        /* overflow: hidden; */
-        
+        justify-content: center;
     }
     
     /* 검색창 */
     .search-input {
         padding: 10px;
-        /* width: 100%; */
+        width: 158px; /* 패딩 고려한 너비 */
         margin-bottom: 24px;
-        border: 1px solid #856f55;
-        background-color: #333333;
-        color: white;
-        height: 20px;
-        width: 200px;
-        border-radius: 3px;
+        border: 1px solid #ccc;
+        background-color: #fff;
+        color: #333;
+        height: 40px;
+        border-radius: 4px;
         font-size: 16px;
+        box-sizing: border-box;
     }
     .search-input::placeholder {
-      color: #ffffff; /* 연두색 또는 원하는 색상으로 바꾸세요 */
-      opacity: 1;      /* 불투명하게 */
+      color: #999;
     }
 
     
     /* 책 카드 그리드 */
     .book-grid {
         display: grid;
-        grid-template-columns: repeat(3, 1fr); /* 두 개씩 고정 */
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
         gap: 24px;
-        max-width: 1200px; /* 전체 그리드 너비 제한 */
+        max-width: 1200px;
         width: 100%;
-        height: 200px;
-
+        padding: 0;
+        box-sizing: border-box;
     }
     
     /* 개별 책 카드 */
     .book-card {
     display: flex;
-    background-color: #f0f0f0;
+    background-color: #ffffff;
     padding: 16px;
-    border-radius: 0px;
-    gap: 16px; /* 이미지와 텍스트 사이 간격 */
-    align-items: flex-start; /* 이미지와 텍스트 상단 정렬 */
-    height: 200px;
+    border-radius: 8px;
+    gap: 16px;
+    align-items: flex-start;
+    min-height: 200px;
     overflow: hidden;
-    color: #515151;
-    border: 1px solid #dadada;
+    color: #333;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+    }
+
+    .book-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
 
     .book-cover {
-    width: 120px; /* 이미지 너비 */
-    height: 180px; /* 이미지 높이 */
+    width: 120px;
+    height: 180px;
     object-fit: cover;
-    flex-shrink: 0; /* 이미지 크기 고정 */
+    flex-shrink: 0;
+    border-radius: 4px;
+    border: 1px solid #ddd;
     }
 
     .book-info {
-    flex: 1; /* 텍스트 영역이 남는 공간 차지 */
+    flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: center; /* 필요 시 세로 중앙 정렬 */
+    justify-content: flex-start;
     overflow: hidden;
     }
 
     .book-title {
-    font-size: 1rem;
+    font-size: 1.1rem;
     font-weight: bold;
-    margin-bottom: 4px;
+    margin-bottom: 8px;
+    color: #333;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    word-break: break-word;
     }
 
     .book-meta {
-    font-size: 0.85rem;
-    color: #aaa;
-    margin-bottom: 4px;
-    color: #715a41;
-
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 8px;
     }
 
     .book-subtitle {
-    font-size: 0.75rem;
-    color: #666;
+    font-size: 0.85rem;
+    color: #555;
+    line-height: 1.4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    word-break: break-word;
     }
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column; /* 세로 정렬 */
+    height: auto; /* 높이 자동 */
+  }
+
+  .sidebar {
+    width: 100%; /* 전체 너비 */
+    padding: 10px;
+    border-right: none;
+    border-bottom: 1px solid #ddd; /* 하단 구분선 */
+    align-items: center; /* 중앙 정렬 */
+  }
+
+  .sidebar ul {
+    margin-top: 0; /* 상단 마진 제거 */
+    display: flex; /* 가로 정렬 */
+    flex-wrap: wrap; /* 넘칠 경우 줄 바꿈 */
+    justify-content: center; /* 중앙 정렬 */
+    gap: 10px; /* 간격 */
+  }
+
+  .sidebar li {
+    margin-bottom: 0; /* 하단 마진 제거 */
+    padding: 5px 10px; /* 패딩 조정 */
+  }
+
+  .main-content {
+    padding: 20px 10px; /* 패딩 조정 */
+  }
+
+  .book-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+    padding: 0;
+  }
+
+  .book-card {
+    flex-direction: column; /* 세로 카드 */
+    align-items: center; /* 중앙 정렬 */
+    gap: 10px;
+    min-height: auto; /* 최소 높이 자동 */
+    padding: 10px;
+  }
+
+  .book-cover {
+    width: 100px;
+    height: 150px;
+  }
+
+  .book-info {
+    text-align: center; /* 텍스트 중앙 정렬 */
+  }
+
+  .book-title, .book-meta, .book-subtitle {
+    text-align: center; /* 텍스트 중앙 정렬 */
+  }
+}
 
 </style>
