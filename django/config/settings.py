@@ -1,0 +1,21 @@
+# Security settings
+X_FRAME_OPTIONS = "SAMEORIGIN"
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_BROWSER_XSS_FILTER = True
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
+
+# Media files
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
+# CORS settings
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+CORS_EXPOSE_HEADERS = ["Content-Disposition"]
+
+# OpenAI API Key
+OPENAI_API_KEY = os.getenv(
+    "OPENAI_API_KEY",
+    "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",
+)
