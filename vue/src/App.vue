@@ -1,85 +1,113 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
+import { onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useUserStore } from './stores/user'
+
+const userStore = useUserStore()
+const router = useRouter()
+
+onMounted(() => {
+  userStore.initializeFromStorage()
+})
+
+function logout() {
+  localStorage.removeItem('token')
+  localStorage.removeItem('name')
+  localStorage.removeItem('userId')
+  userStore.logout()
+  router.push('/').then(() => {
+    window.location.reload()
+  })
+}
 </script>
 
+
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
-    </div>
+  <header class="custom-navbar">
+    <nav class="nav-container">
+      <div class="nav-left">
+        <RouterLink to="/">ChecGPT</RouterLink>
+      </div>
+      <div class="nav-right">
+        <template v-if="userStore.isLoggedIn">
+          <span class="namename">{{ userStore.username }}님, 환영합니다!</span>
+          <RouterLink :to="{ name: 'BookList' }">Books</RouterLink>
+          <router-link :to="{ name: 'story' }" class="nav-link">Community</router-link> 
+          <RouterLink :to="{ name: 'Report' }">Thread</RouterLink>
+          <RouterLink :to="{ name: 'UserProfile', params: { userId: userStore.userId } }">My page</RouterLink>
+          <span @click="logout" class="logout">Log out</span>
+        </template>
+        <template v-else>
+          <RouterLink :to="{ name: 'Login' }">Sign in</RouterLink>
+          <RouterLink :to="{ name: 'BookList' }">Books</RouterLink>
+        </template>
+      </div>
+    </nav>
   </header>
-
   <RouterView />
 </template>
 
+
+
 <style scoped>
-header {
-  line-height: 1.5;
-  max-height: 100vh;
+.custom-navbar {
+  background-color: #ffffff;
+  padding: 1rem 2rem;
+  height: 26px;
 }
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
+.nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-nav {
-  width: 100%;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
+.namename {
+  color: #363636;
+  text-decoration: none;
+  cursor: pointer;
+  font-size: smaller;
 }
 
-nav a.router-link-exact-active {
-  color: var(--color-text);
+.logout,
+.nav-left a,
+.nav-right a {
+  color: #333333;
+  text-decoration: none;
+  font-weight: bold;
+  cursor: pointer;
 }
 
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
+.logout:hover,
+.nav-left a:hover,
+.nav-right a:hover {
+  color: rgb(143, 142, 142);
 }
 
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
-nav a:first-of-type {
-  border: 0;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
-    margin-top: 1rem;
-  }
+.divider {
+  color: rgb(82, 82, 82);
+  margin: 0 0.5rem;
 }
 </style>
+
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  background-color: #f9f6f2;
+  min-height: 100vh;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #f9f6f2;
+}
