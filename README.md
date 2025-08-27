@@ -39,6 +39,119 @@
 
 ---
 
+
+<!-- ====================== -->
+<!-- ⚙️ Backend (Django/DRF) -->
+<!-- ====================== -->
+<h2>⚙️ Backend</h2>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" />
+  <img src="https://img.shields.io/badge/Django-092E20?style=for-the-badge&logo=django&logoColor=white" />
+  <img src="https://img.shields.io/badge/DRF-a30000?style=for-the-badge&logo=django&logoColor=white" />
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/CORS%20Headers-0EA5E9?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Pillow-6A5ACD?style=for-the-badge&logo=pillow&logoColor=white" />
+  <img src="https://img.shields.io/badge/gTTS-10B981?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/OpenAI%20SDK-412991?style=for-the-badge&logo=openai&logoColor=white" />
+  <img src="https://img.shields.io/badge/pydantic-4B5563?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/httpx-111827?style=for-the-badge" />
+</p>
+
+<div align="center">
+<table style="width:85%; border-collapse:collapse; margin-top:14px;">
+  <thead>
+    <tr>
+      <th style="background:#10b981;color:#fff;padding:10px;text-align:center;border:1px solid #e5e7eb;">Category</th>
+      <th style="background:#10b981;color:#fff;padding:10px;text-align:center;border:1px solid #e5e7eb;">Stack</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td style="background:#f8fafc;padding:10px;border:1px solid #e5e7eb;"><strong>Language / Runtime</strong></td><td style="padding:10px;border:1px solid #e5e7eb;">Python 3.11</td></tr>
+    <tr><td style="background:#f8fafc;padding:10px;border:1px solid #e5e7eb;"><strong>Web Framework</strong></td><td style="padding:10px;border:1px solid #e5e7eb;">Django 4.2.5, Django REST Framework 3.16.0</td></tr>
+    <tr><td style="background:#f8fafc;padding:10px;border:1px solid #e5e7eb;"><strong>CORS / API Client</strong></td><td style="padding:10px;border:1px solid #e5e7eb;">django-cors-headers 4.7.0, httpx 0.28.1, requests 2.32.3</td></tr>
+    <tr><td style="background:#f8fafc;padding:10px;border:1px solid #e5e7eb;"><strong>Media / Utils</strong></td><td style="padding:10px;border:1px solid #e5e7eb;">Pillow 10.0.1, gTTS 2.5.4, Wikipedia-API 0.8.1</td></tr>
+    <tr><td style="background:#f8fafc;padding:10px;border:1px solid #e5e7eb;"><strong>AI / Validation</strong></td><td style="padding:10px;border:1px solid #e5e7eb;">OpenAI SDK 1.12.0, pydantic 2.10.6</td></tr>
+    <tr><td style="background:#f8fafc;padding:10px;border:1px solid #e5e7eb;"><strong>Infra</strong></td><td style="padding:10px;border:1px solid #e5e7eb;">asgiref 3.7.2, anyio 4.8.0, tzdata 2023.3</td></tr>
+  </tbody>
+</table>
+</div>
+
+
+<!-- ========================= -->
+<!-- 🎨 Frontend (Vue 3 + Vite) -->
+<!-- ========================= -->
+<h2>🎨 Frontend</h2>
+
+<!-- Centered badges (버전 X) -->
+<p align="center">
+  <img src="https://img.shields.io/badge/Vue-42B883?style=for-the-badge&logo=vue.js&logoColor=white" />
+  <img src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white" />
+  <img src="https://img.shields.io/badge/Pinia-F7DF1E?style=for-the-badge&logo=pinia&logoColor=000" />
+  <img src="https://img.shields.io/badge/Vue%20Router-CA4245?style=for-the-badge&logo=vue.js&logoColor=white" />
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Bootstrap-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white" />
+  <img src="https://img.shields.io/badge/axios-5A29E4?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/html2canvas-0F766E?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/html--to--image-059669?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/jsPDF-CC0000?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Vue%20Toast%20Notification-4B5563?style=for-the-badge" />
+</p>
+
+<!-- Table (버전 O) -->
+<div align="center">
+<table style="width:85%; border-collapse:collapse; margin-top:14px;">
+  <thead>
+    <tr>
+      <th style="background:#0ea5e9;color:#fff;padding:10px 12px;text-align:center;border:1px solid #e5e7eb;">Category</th>
+      <th style="background:#0ea5e9;color:#fff;padding:10px 12px;text-align:center;border:1px solid #e5e7eb;">Stack</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td style="background:#f8fafc;padding:10px;border:1px solid #e5e7eb;"><strong>Language</strong></td><td style="padding:10px;border:1px solid #e5e7eb;">JavaScript (ESNext)</td></tr>
+    <tr><td style="background:#f8fafc;padding:10px;border:1px solid #e5e7eb;"><strong>Runtime / Build</strong></td><td style="padding:10px;border:1px solid #e5e7eb;">Vite 6.2.4</td></tr>
+    <tr><td style="background:#f8fafc;padding:10px;border:1px solid #e5e7eb;"><strong>Framework</strong></td><td style="padding:10px;border:1px solid #e5e7eb;">Vue 3.5.13, Vue Router 4.5.0, Pinia 3.0.2</td></tr>
+    <tr><td style="background:#f8fafc;padding:10px;border:1px solid #e5e7eb;"><strong>UI / Styling</strong></td><td style="padding:10px;border:1px solid #e5e7eb;">Bootstrap 5.3.6, Bootstrap-Vue 2.23.1</td></tr>
+    <tr><td style="background:#f8fafc;padding:10px;border:1px solid #e5e7eb;"><strong>Networking</strong></td><td style="padding:10px;border:1px solid #e5e7eb;">axios 1.9.0</td></tr>
+    <tr><td style="background:#f8fafc;padding:10px;border:1px solid #e5e7eb;"><strong>Export / Util</strong></td><td style="padding:10px;border:1px solid #e5e7eb;">html2canvas 1.4.1, html-to-image 1.11.13, jsPDF 3.0.1</td></tr>
+    <tr><td style="background:#f8fafc;padding:10px;border:1px solid #e5e7eb;"><strong>UX Add-ons</strong></td><td style="padding:10px;border:1px solid #e5e7eb;">vue-toast-notification 3.1.3</td></tr>
+  </tbody>
+</table>
+</div>
+
+
+<!-- ========================= -->
+<!-- 🔧 Versioning / Docs -->
+<!-- ========================= -->
+<h2>🔧 Versioning</h2>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white" />
+  <img src="https://img.shields.io/badge/Notion-000000?style=for-the-badge&logo=notion&logoColor=white" />
+</p>
+
+<div align="center">
+<table style="width:75%; border-collapse:collapse; margin-top:14px;">
+  <thead>
+    <tr>
+      <th style="background:#f97316;color:#fff;padding:10px;text-align:center;border:1px solid #e5e7eb;">Category</th>
+      <th style="background:#f97316;color:#fff;padding:10px;text-align:center;border:1px solid #e5e7eb;">Usage</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td style="background:#f8fafc;padding:10px;border:1px solid #e5e7eb;"><strong>Git</strong></td><td style="padding:10px;border:1px solid #e5e7eb;">브랜치 전략 / PR 리뷰 / 태깅 / 릴리즈</td></tr>
+    <tr><td style="background:#f8fafc;padding:10px;border:1px solid #e5e7eb;"><strong>Notion</strong></td><td style="padding:10px;border:1px solid #e5e7eb;">요구사항 / 기능 명세 / 회의록 / 스프린트 관리</td></tr>
+  </tbody>
+</table>
+</div>
+
+
+---
+
 ## 4. 도서 추천 알고리즘 기술 설명
 
 - 사용자가 현재 열람 중인 책의 **제목, 작가, 줄거리**와 함께 전체 도서 리스트(`books.json`)를 GPT에게 전달합니다.
