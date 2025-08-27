@@ -172,8 +172,8 @@
 <table>
   <tbody align="center"> 
     <tr> <th style="text-align: center"> 메인화면 </th> <th style="text-align: center"> 도서 목록 </th> </tr>
-    <tr> <td width="50%"><img width="100%" src="./readme-assets/demostration/desktop_app_download.gif"/></td> 
-        <td width="50%"><img width="100%" src="./readme-assets/demostration/sign_up.gif"/></td> </tr> </tbody>
+    <tr> <td width="50%"><img width="100%" src="https://github.com/user-attachments/assets/3aa4d90f-6872-4325-89f4-46dde38fff97"/></td> 
+        <td width="50%"><img width="100%" src="https://github.com/user-attachments/assets/b6d24655-58ae-41dd-b21c-f73d6586838f"/></td> </tr> </tbody>
   <tbody align="center"> 
     <tr> <th style="text-align: center"> 로그인 </th> <th style="text-align: center"> 회원가입 </th> </tr>
     <tr> <td width="50%"><img width="100%" src="./readme-assets/demostration/tutorial_common_user.gif"/></td>
