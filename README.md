@@ -179,22 +179,22 @@
     <tr> <td width="50%"><img width="100%" src="https://github.com/user-attachments/assets/532b1838-ce95-425e-93ef-ebf5cdd7291f"/></td>
     <td width="50%"><img width="100%" src="https://github.com/user-attachments/assets/fd3e5761-ec7c-4f7e-9d90-3b0a24c43b93"/></td> </tr> </tbody>
   <tbody align="center"> 
+    <tr> <th style="text-align: center"> 도서 상세 및 오디오 읽어주기 생성</th> <th style="text-align: center"> 스레드 작성 </th> </tr>
+    <tr> <td width="50%"><img width="100%" src="https://github.com/user-attachments/assets/ae68c35a-ce03-4d0c-8703-4282d59c67e0"/></td>
+    <td width="50%"><img width="100%" src="https://github.com/user-attachments/assets/79678d82-5ba5-45c6-a53d-2403d8a295e4"/></td> </tr>
+  </tbody>
+  <tbody align="center"> 
     <tr> <th style="text-align: center"> 커뮤니티 </th> <th style="text-align: center">  커뮤니티 상세 </th> </tr>
     <tr> <td width="50%"><img width="100%" src="https://github.com/user-attachments/assets/9517d8fd-17a1-4310-a204-072ff160fa82"/></td>
     <td width="50%"><img width="100%" src="https://github.com/user-attachments/assets/1c75092a-f944-4b7a-a216-d4602dc079cd"/></td> </tr>
   </tbody>
   <tbody align="center"> 
-    <tr> <th style="text-align: center"> 마이페이지 </th> <th style="text-align: center"> 대표 도서 설정 </th> </tr>
-    <tr> <td width="50%"><img width="100%" src="./readme-assets/demostration/mypage.gif"/></td>
-    <td width="50%"><img width="100%" src="./readme-assets/demostration/meeting_room_creating.gif"/></td> </tr>
+    <tr> <th style="text-align: center"> 내 서제에 담기 </th> <th style="text-align: center"> 대표 도서 설정 </th> </tr>
+    <tr> <td width="50%"><img width="100%" src="https://github.com/user-attachments/assets/5eb87f22-4372-4079-9b0d-e24f95783418"/></td>
+    <td width="50%"><img width="100%" src="https://github.com/user-attachments/assets/c2bc115b-f667-4eda-b47a-d35c3ffaa326"/></td> </tr>
   </tbody>
   <tbody align="center"> 
-    <tr> <th style="text-align: center"> 도서 상세 </th> <th style="text-align: center"> 스레드 작성 </th> </tr>
-    <tr> <td width="50%"><img width="100%" src="./readme-assets/demostration/chat.gif"/></td>
-    <td width="50%"><img width="100%" src="./readme-assets/demostration/meeting_room_setting.gif"/></td> </tr>
-  </tbody>
-  <tbody align="center"> 
-    <tr> <th style="text-align: center"> 커뮤니티 </th> <th style="text-align: center">  AI 리포트 </th> </tr>
+    <tr> <th style="text-align: center"> AI 리포트 </th> <th style="text-align: center">  AI 리포트 pdf 저장 </th> </tr>
     <tr> <td width="50%"><img width="100%" src="./readme-assets/demostration/live_room_common_user.gif"/></td>
     <td width="50%"><img width="100%" src="./readme-assets/demostration/live_room_lip_reading_user.gif"/></td> </tr>
   </tbody>
