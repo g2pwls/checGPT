@@ -163,6 +163,40 @@
 
 ## 5. 핵심 기능 설명
 
+## 📲 기능 구성
+
+<a name="skills"></a>
+
+<div align="center">
+
+<table>
+  <tbody align="center"> 
+    <tr> <th style="text-align: center"> 메인화면 </th> <th style="text-align: center"> 도서 목록 </th> </tr>
+    <tr> <td width="50%"><img width="100%" src="./readme-assets/demostration/desktop_app_download.gif"/></td> 
+        <td width="50%"><img width="100%" src="./readme-assets/demostration/sign_up.gif"/></td> </tr> </tbody>
+  <tbody align="center"> 
+    <tr> <th style="text-align: center"> 로그인 </th> <th style="text-align: center"> 회원가입 </th> </tr>
+    <tr> <td width="50%"><img width="100%" src="./readme-assets/demostration/tutorial_common_user.gif"/></td>
+    <td width="50%"><img width="100%" src="./readme-assets/demostration/tutorial_lip_reading_user.gif"/></td> </tr> </tbody>
+  <tbody align="center"> 
+    <tr> <th style="text-align: center"> 마이페이지 </th> <th style="text-align: center"> 대표 도서 설정 </th> </tr>
+    <tr> <td width="50%"><img width="100%" src="./readme-assets/demostration/mypage.gif"/></td>
+    <td width="50%"><img width="100%" src="./readme-assets/demostration/meeting_room_creating.gif"/></td> </tr>
+  </tbody>
+  <tbody align="center"> 
+    <tr> <th style="text-align: center"> 도서 상세 </th> <th style="text-align: center"> 스레드 작성 </th> </tr>
+    <tr> <td width="50%"><img width="100%" src="./readme-assets/demostration/chat.gif"/></td>
+    <td width="50%"><img width="100%" src="./readme-assets/demostration/meeting_room_setting.gif"/></td> </tr>
+  </tbody>
+  <tbody align="center"> 
+    <tr> <th style="text-align: center"> 커뮤니티 </th> <th style="text-align: center">  AI 리포트트 </th> </tr>
+    <tr> <td width="50%"><img width="100%" src="./readme-assets/demostration/live_room_common_user.gif"/></td>
+    <td width="50%"><img width="100%" src="./readme-assets/demostration/live_room_lip_reading_user.gif"/></td> </tr>
+  </tbody>
+</table>
+</div>
+<br>
+
 ### 기본 도서 기능
 
 - 도서 목록 조회 / 상세보기
