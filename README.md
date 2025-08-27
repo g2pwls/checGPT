@@ -173,11 +173,16 @@
   <tbody align="center"> 
     <tr> <th style="text-align: center"> 메인화면 </th> <th style="text-align: center"> 도서 목록 </th> </tr>
     <tr> <td width="50%"><img width="100%" src="https://github.com/user-attachments/assets/3aa4d90f-6872-4325-89f4-46dde38fff97"/></td> 
-        <td width="50%"><img width="100%" src="https://github.com/user-attachments/assets/b6d24655-58ae-41dd-b21c-f73d6586838f"/></td> </tr> </tbody>
+        <td width="50%"><img width="100%" src="https://github.com/user-attachments/assets/d47cc697-3f08-4648-8dca-cd3839fd4ac3"/></td> </tr> </tbody>
   <tbody align="center"> 
     <tr> <th style="text-align: center"> 로그인 </th> <th style="text-align: center"> 회원가입 </th> </tr>
-    <tr> <td width="50%"><img width="100%" src="./readme-assets/demostration/tutorial_common_user.gif"/></td>
-    <td width="50%"><img width="100%" src="./readme-assets/demostration/tutorial_lip_reading_user.gif"/></td> </tr> </tbody>
+    <tr> <td width="50%"><img width="100%" src="https://github.com/user-attachments/assets/532b1838-ce95-425e-93ef-ebf5cdd7291f"/></td>
+    <td width="50%"><img width="100%" src="https://github.com/user-attachments/assets/fd3e5761-ec7c-4f7e-9d90-3b0a24c43b93"/></td> </tr> </tbody>
+  <tbody align="center"> 
+    <tr> <th style="text-align: center"> 커뮤니티 </th> <th style="text-align: center">  커뮤니티 상 </th> </tr>
+    <tr> <td width="50%"><img width="100%" src="https://github.com/user-attachments/assets/9517d8fd-17a1-4310-a204-072ff160fa82"/></td>
+    <td width="50%"><img width="100%" src="./readme-assets/demostration/live_room_lip_reading_user.gif"/></td> </tr>
+  </tbody>
   <tbody align="center"> 
     <tr> <th style="text-align: center"> 마이페이지 </th> <th style="text-align: center"> 대표 도서 설정 </th> </tr>
     <tr> <td width="50%"><img width="100%" src="./readme-assets/demostration/mypage.gif"/></td>
@@ -189,7 +194,7 @@
     <td width="50%"><img width="100%" src="./readme-assets/demostration/meeting_room_setting.gif"/></td> </tr>
   </tbody>
   <tbody align="center"> 
-    <tr> <th style="text-align: center"> 커뮤니티 </th> <th style="text-align: center">  AI 리포트트 </th> </tr>
+    <tr> <th style="text-align: center"> 커뮤니티 </th> <th style="text-align: center">  AI 리포트 </th> </tr>
     <tr> <td width="50%"><img width="100%" src="./readme-assets/demostration/live_room_common_user.gif"/></td>
     <td width="50%"><img width="100%" src="./readme-assets/demostration/live_room_lip_reading_user.gif"/></td> </tr>
   </tbody>
