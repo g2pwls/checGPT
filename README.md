@@ -25,6 +25,11 @@
 
 ---
 
+## 📆 프로젝트 기간
+2025.05.22 ~ 2025.05.27 (6일)
+
+---
+
 ## 👥 팀원 정보 및 업무 분담
 
 <table style="width:100%; border-collapse:collapse; text-align:center;">
