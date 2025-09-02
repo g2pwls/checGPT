@@ -255,8 +255,8 @@
 
 <table>
   <tbody align="center"> 
-    <tr> <th style="text-align: center"> 메인화면 </th> <th style="text-align: center"> 도서 목록 </th> </tr>
-    <tr> <td width="50%"><img width="100%" src="https://github.com/user-attachments/assets/3aa4d90f-6872-4325-89f4-46dde38fff97"/></td> 
+    <tr> <th style="text-align: center"> 메인화면에서 검색 </th> <th style="text-align: center"> 도서 목록 </th> </tr>
+    <tr> <td width="50%"><img width="100%" src="https://github.com/user-attachments/assets/0c599ef2-fe2c-4239-a578-8495d82ae2d8"/></td> 
         <td width="50%"><img width="100%" src="https://github.com/user-attachments/assets/d47cc697-3f08-4648-8dca-cd3839fd4ac3"/></td> </tr> </tbody>
   <tbody align="center"> 
     <tr> <th style="text-align: center"> 로그인 </th> <th style="text-align: center"> 회원가입 </th> </tr>
