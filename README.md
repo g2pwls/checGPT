@@ -279,8 +279,8 @@
   </tbody>
   <tbody align="center"> 
     <tr> <th style="text-align: center"> AI 리포트 </th> <th style="text-align: center">  AI 리포트 pdf 저장 </th> </tr>
-    <tr> <td width="50%"><img width="100%" src="./readme-assets/demostration/live_room_common_user.gif"/></td>
-    <td width="50%"><img width="100%" src="./readme-assets/demostration/live_room_lip_reading_user.gif"/></td> </tr>
+    <tr> <td width="50%"><img width="100%" src="https://github.com/user-attachments/assets/a5e4b5b2-5d62-480e-b52f-f45d4fee664d"/></td>
+    <td width="50%"><img width="100%" src="https://github.com/user-attachments/assets/8772d02a-9018-479e-889c-63316f97e534"/></td> </tr>
   </tbody>
 </table>
 </div>
